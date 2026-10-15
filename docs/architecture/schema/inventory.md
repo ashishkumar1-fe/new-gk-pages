@@ -2,19 +2,22 @@
 
 [← Schema](README.md)
 
-Service: inventory service (`/v1/admin/inventory`, `/warehouses`, `/locations`, `/purchase-orders`, `/transfers`, `/suppliers`). snake_case.
+Service: inventory service (`/v3/admin/inventory`, `/v3/admin/locations`; v1 for `/inventory/import`, `/inventory/export-csv`, `/purchase-orders`, `/transfers`, `/suppliers`). snake_case.
 
 ## Location
 
-The backend calls it a warehouse; each warehouse has a location (address).
+v3 locations (`/v3/admin/locations`, ids `iloc_*`); legacy screens still call them warehouses. The list returns inactive locations too; pickers show active ones.
 
 ```ts
 interface Location extends Entity {
   name: string;
-  address: Address;                // location.address_1, pincode, state …
+  address: Address;                // address_line_1/2, city, state, state_code, zip, country
   phone?: string;
-  coordinates?: { lat: number; lng: number };
   active: boolean;
+  isDefault: boolean;
+  fulfillsOnlineOrders: boolean;
+  inventorySource: 'ratio' | 'shopify' | 'oms';
+  gstin?: string;
 }
 ```
 
@@ -35,7 +38,7 @@ interface InventoryItem {
 }
 ```
 
-HSN, country of origin and weight live on the product/variant in this backend (see [catalog.md](catalog.md)), not on the inventory item.
+The v3 inventory item also carries HSN, HS code, country of origin and cost (paise); today's UI edits HSN and origin on the product/variant only (see [catalog.md](catalog.md)). Weight is product/variant only.
 
 ## Stock at a location
 
@@ -47,16 +50,12 @@ interface InventoryLevel {
   committed: number;               // tied to orders; read-only
   onHand: number;
   unavailable: {
+    reserved: number;
     damaged: number;
     qualityControl: number;
     safetyStock: number;
-    other: number;
   };
-  incoming: {
-    total: number;
-    purchaseOrders: Id[];
-    transfers: Id[];
-  };
+  incoming: number;                // v3 gives a total only; no PO / transfer ids
   updatedAt: DateTime;
 }
 ```
@@ -80,13 +79,11 @@ interface InventoryRow extends InventoryLevel {
 }
 ```
 
-`onHand = available + committed + unavailable total`. No `reserved` state; the current UI's "Reserved" writes to `safetyStock`.
+`onHand = available + committed + reserved + damaged + safetyStock + qualityControl` (incoming excluded; server-derived).
 
 ## Editing stock
 
-Same as today: stock is set as absolute values per location through `bulk-edit` (and `bulk-edit/multi-warehouse` from the product editor). Moving units to unavailable follows today's mapping (Damaged, Quality control, Reserved → safety stock, Other).
-
-The backend also has `adjust-quantities`, `move-quantities` and `adjustments` (history) endpoints that nothing uses yet. Switching to them changes inventory behaviour, so it is a product decision. Until then there is no adjustment history. See [deferred.md](deferred.md).
+Same as today, through v3: `set-on-hand` / `set-quantities` (absolute, with `compare_quantity`) and `adjust-quantities` (delta), each with a `reason` (correction, received, damaged, safety_stock_set, import, other) and an optional note. Every write is logged and readable through `GET /v3/admin/inventory/adjustments` (today: the variant adjustment history page). `move-quantities` and `bulk-adjust` exist but are unused. `bulk-edit/multi-warehouse` remains only for the product editor's variant quantity bulk edit. See [deferred.md](deferred.md).
 
 ## Supplier
 

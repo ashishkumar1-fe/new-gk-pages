@@ -12,8 +12,10 @@ list: {
     { id: 'conditions', header: 'Conditions', cell: rulesSummary },     // 2 lines, "+N more", tooltip
     { id: 'status',     header: 'Status',     cell: publishedBadge },   // Published / Draft
     { id: 'type',       header: 'Type',       cell: (c) => c.kind },    // Manual / Smart
+    { id: 'createdAt',  header: 'Created at', cell: date, hidden: true },
+    { id: 'updatedAt',  header: 'Updated at', cell: date, hidden: true },
   ],
-  search: { param: 'search', placeholder: 'Search collections', debounceMs: 400 },   // today: no debounce
+  search: { param: 'search', placeholder: 'Search collections', debounceMs: 400 },   // today: 500 ms
   filters: [
     { id: 'type', label: 'Type', type: 'multi_enum', options: [manual, smart], toParams: (v) => ({ types: v }) },
   ],
@@ -50,9 +52,9 @@ list: {
 
 | Rule | Source |
 |---|---|
-| Title required | `CollectionsForm.tsx:90` |
-| Handle required | `:92` |
-| Smart: ≥ 1 rule | `:277-278`, create `:207` |
+| Title required | `CollectionsForm.tsx:91` |
+| Handle required | `:93` |
+| Smart: ≥ 1 rule | `:278-279`, create `:207` |
 | Manual (create): ≥ 1 product | `CreateCollectionsForm.tsx:214` |
 
 ## Commands

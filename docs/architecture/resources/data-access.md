@@ -27,7 +27,7 @@ Service-specific mapping lives here, for example:
 | Inventory | `GET /inventory/warehouse/:warehouseId?filter&…&page&limit`; search uses `GET /inventory/search` |
 | Order | `GET /orders?page&limit&sort_field&sort_direction&search&<filters>` + `/orders/views`, `/orders/sortby` |
 | Customer | `POST /customers/filter { conditions, conditionLogic, page, limit, sortBy, sortOrder }` |
-| Discount | `POST /os-discount/fetch { status, search, sort_by, sort_order, page, limit }` |
+| Discount | `POST {BASE}/dashboard/v2/discount/fetch { status, search, sort_by, sort_order, page, limit, pageSize }` |
 
 ## Query keys
 

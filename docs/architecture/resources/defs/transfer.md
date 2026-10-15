@@ -35,7 +35,7 @@ Status tabs filter the current page client-side today; kept until the API suppor
 
 Save: `editor: { save: 'transfer.save', create: { route: '/transfers/new', command: 'transfer.create' } }`.
 
-Products child (create): columns Product, SKU, Quantity; picker searches inventory of the origin location (debounce 500 ms). Create can be prefilled from selected inventory rows.
+Products child (create): columns Product, SKU, Quantity; picker searches inventory of the origin location (debounce 500 ms). Create still accepts `?selectedItems` prefill, but the inventory list no longer offers it.
 
 ### Validation (`TransferForm/ValidationSchemas.ts`)
 

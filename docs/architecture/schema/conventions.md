@@ -101,7 +101,7 @@ Writes carry the acting staff member, added by the API client from the session, 
 
 | Service | Fields |
 |---|---|
-| os-order (orders, drafts, refunds, order tags) | `staff_id`, `staff_name` |
+| os-order (orders, drafts, refunds, order tags, fulfillments, holds) | `staff_id`, `staff_name` |
 | os-customer (customers, addresses, comments) | `staffId`, `staffName` |
 | Others | none today |
 

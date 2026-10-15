@@ -21,7 +21,7 @@ interface ListConfig<TItem> {
   views?: { source: 'static'; items: View[]; mode?: 'server' | 'client' } | { source: 'server'; default: 'is_default' | 'first' };
   sort?: { source: 'static'; options: SortOption[]; default: SortOption }
        | { source: 'server'; default: SortOption }      // orders, drafts: /sortby
-       | { source: 'column' };                           // discounts: sort_by on column click
+       | { source: 'column' };                           // discounts: sort_by on column click; orders, drafts: sort_field / sort_direction
   pageSize: number;                        // 50 everywhere
   selection?: { enabled: boolean; max?: number };   // orders: max 100
   inlineEdit?: InlineEditConfig<TItem>;    // inventory grid
@@ -88,7 +88,7 @@ Changing search, filters, sort, view or scope resets `page`.
 
 - **Server views** (orders, drafts): loaded from `/views`; a view's query (`["k=v"]`) becomes URL params. Default is the view marked default, else the first.
 - **Server sort options** (orders, drafts): loaded from `/sortby`.
-- **Column sort** (discounts): clicking a sortable column sets `sort_by` / `sort_order`.
+- **Column sort** (discounts, orders, drafts): clicking a sortable column sets `sort_by` / `sort_order` (discounts) or `sort_field` / `sort_direction` (orders, drafts).
 - **No sort** (products, collections, customers fixed to newest first): no sort UI, because the API doesn't sort.
 
 ## Selection and bulk

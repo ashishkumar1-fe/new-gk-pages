@@ -55,11 +55,9 @@ Found while mapping gk-pages. Plumbing defects are fixed in the commands. Defect
 
 | Defect in gk-pages | Data impact | Treatment |
 |---|---|---|
-| Manual discount create always shows success (soft failures ignored) | No | Fixed: result checks the API success flag |
+| Discount wizard create and edit always show success (`makeAPICall` soft failures not checked) | No | Fixed: result checks the API success flag |
 | Discount delete toast says "draft"; no confirm | No | Delete not in v1 (menu disabled today) |
 | Single product and collection delete without confirmation | No | Fixed: critical confirm |
-| Inventory "Update quantities" always shows success; sends `cost: NaN` | Yes (cost) | Fixed result handling; omit cost: needs sign-off |
-| Inventory bulk edit can't set a location to 0 (only > 0 sent) | Yes | Needs sign-off |
 | Product bulk edit converts product-level prices to paise twice | Yes (prices ×100) | Needs sign-off; high priority |
 | PO "Mark as ordered" sends costs not converted to paise (close/reopen do) | Yes (costs) | Needs sign-off |
 | Bulk cancel sends auto-refund without the single-cancel eligibility rule | Yes (refunds) | Needs sign-off |

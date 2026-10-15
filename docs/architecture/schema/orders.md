@@ -2,7 +2,7 @@
 
 [← Schema](README.md)
 
-Service: os-order (`/api/v1/admin/orders`, `/draft-orders`, `/refunds`) and timeline service. Money in paise. Totals, tax and discounts are calculated exactly as today (server `/calculate`); the schema mirrors, it doesn't redefine.
+Service: os-order (`/api/v1/admin/orders`, `/draft-orders`, `/refunds`) and timeline service. Money in paise. Totals, tax and discounts are calculated exactly as today (server `/draft-orders/calculate` for drafts, edit-session `preview` for order edits); the schema mirrors, it doesn't redefine.
 
 ## Order
 
@@ -42,6 +42,8 @@ interface Order extends Entity {
   note?: string;
   noteAttributes: { name: string; value: string }[];
   sourceName?: string;               // "web", "Draft Order"
+  sourceIdentifier?: string;         // source_identifier, e.g. the draft id
+  activeHoldsCount?: number;         // list only: active_holds_count
   isTest: boolean;
   cancelledAt?: DateTime;
   cancelReason?: 'customer' | 'declined' | 'fraud' | 'inventory' | 'staff' | 'other';
@@ -73,6 +75,7 @@ interface LineItem {
   vendor?: string;
   quantity: number;
   currentQuantity: number;           // after edits/removals
+  fulfillableQuantity: number;       // fulfillable_quantity; caps fulfil and edit
   unitPrice: Money;                  // snapshot
   discountAllocations: { amount: Money; discountIndex: number }[];
   requiresShipping: boolean;
@@ -118,7 +121,7 @@ COD orders can't be refunded through the payment gateway.
 interface Refund extends Entity {
   orderId: Id;
   status: 'pending' | 'processing' | 'success' | 'failed';
-  trigger: 'cancellation' | 'merchant_initiated';
+  trigger: 'cancellation' | 'merchant_initiated' | 'edit_triggered' | 'return';   // return: returns ship on qa/sandbox only
   restock: 'cancel' | 'no_restock';
   lines: { lineItemId: Id; quantity: number; restocked: boolean;
            tax: TaxLine[]; discount: Money }[];
@@ -137,13 +140,21 @@ Same core shape as an order (customer, addresses, line items, shipping line, app
 
 ```ts
 status: 'open' | 'invoice_sent' | 'completed';
+number?: number;                       // d_number, shown "#D3"
+invoiceUrl?: string;                   // live payment link; null once the draft is edited
+invoiceSentAt?: DateTime;
+paymentLinkId?: string;
+orderId?: Id;                          // os_order_id, set on completion
+financialIntent?: 'mark_as_paid' | 'payment_pending' | 'invoice';
+createdBy?: string;
 discountCode?: string;                 // code entered; sent to calculate
 appliedDiscount?: DiscountApplication; // from calculate, or a custom discount
 lineItems: (LineItem & { custom?: boolean; appliedDiscount?: DiscountApplication })[];
 ```
 
 - Totals come from `POST /draft-orders/calculate`, which also returns `availableCoupons`.
-- Completing is two calls, as today: create the order, then mark the draft completed. The new UI keeps the same calls in the same order, wrapped in one `draftOrder.complete` command.
+- Completing is one call, as today: `POST /draft-orders/:id/complete` (the server prices the saved draft, redeems coupons and links the order), wrapped in one `draftOrder.complete` command.
+- Sending an invoice (`POST /draft-orders/:id/send-invoice`) does not create an order; the order is written when payment arrives.
 
 ## Cancel
 
@@ -174,6 +185,35 @@ interface TimelineEvent {
 
 Comments: `POST /orders/{id}/comments { message, visibility: 'internal' }`.
 
+## Fulfillment
+
+```ts
+interface Fulfillment {
+  id: Id;
+  status?: string;
+  carrierCode?: string;
+  tracking: { number: string; url?: string; shipmentStatus?: string }[];
+  lineItems: { lineItemId: Id; quantity: number; locationId?: Id }[];
+  notifyCustomer: boolean;
+  createdAt: DateTime;
+}
+
+interface FulfillmentHold {
+  id: Id;
+  reason: HoldReason;
+  reasonNotes?: string;              // ≤ 500 chars
+  scope: 'order' | 'line_items';
+  lineItems?: { lineItemId: Id; quantity: number }[];
+  blockers: { id: Id; reason: HoldReason; isActive: boolean }[];   // extra reasons on one hold
+}
+
+type HoldReason =
+  | 'AWAITING_PAYMENT' | 'HIGH_RISK_OF_FRAUD' | 'INCORRECT_ADDRESS' | 'INVENTORY_OUT_OF_STOCK'
+  | 'UNKNOWN_DELIVERY_DATE' | 'ONLINE_STORE_POST_PURCHASE_CROSS_SELL' | 'AWAITING_RETURN_ITEMS' | 'OTHER';
+```
+
+`GET /orders/:id/fulfillments` returns `{ order_fulfillment_status, fulfillments, fulfillment_holds, held_line_items, fulfillable_line_items }`. Partially fulfilled arrives as `partial` (legacy) or `partially_fulfilled`; accept both.
+
 ## Not in v1
 
-Fulfillment creation, tracking, returns and exchanges: not in today's gk-pages or backend. The order shows `fulfillmentStatus` as returned.
+Returns and exchanges: not in gk-pages main (returns exist only on the qa and sandbox branches).

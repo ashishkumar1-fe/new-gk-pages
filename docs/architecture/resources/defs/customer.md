@@ -12,8 +12,10 @@ list: {
     { id: 'location', header: 'Location',           cell: (c) => [c.defaultAddress?.province, c.defaultAddress?.country] },
     { id: 'orders',   header: 'Orders',             cell: (c) => c.stats.ordersCount },
     { id: 'spent',    header: 'Amount spent',       cell: (c) => money(c.stats.amountSpent) },
+    { id: 'created',  header: 'Created At',         cell: date, hidden: true },
+    { id: 'updated',  header: 'Updated At',         cell: date, hidden: true },
   ],
-  search: { param: 'conditions', placeholder: 'Search customers', debounceMs: 400 },   // today: every keystroke
+  search: { param: 'conditions', placeholder: 'Search customers', debounceMs: 400 },   // today: 500 ms
   filters: [
     { id: 'tags', label: 'Tags', type: 'multi_enum', options: tagsLookup, toParams: (v) => cond('tags', 'contains_any', v) },
   ],
@@ -28,7 +30,7 @@ list: {
 }
 ```
 
-Search, as today: `contains` conditions OR-ed across email, firstName, lastName, name, phone, company, tags, address; when other filters are active, conditions are AND-ed (`CustomerHome.tsx:88-160`). Today's tag options come from the loaded page only; v1 uses the same until a tags lookup exists.
+Search, as today: `contains` conditions OR-ed across email, firstName, lastName, name, phone, company, tags, address; when other filters are active, conditions are AND-ed (`CustomerHome.tsx:94-166`). Today's tag options come from the loaded page only; v1 uses the same until a tags lookup exists.
 
 ## Editor
 

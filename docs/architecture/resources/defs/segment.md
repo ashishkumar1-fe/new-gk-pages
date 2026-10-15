@@ -27,7 +27,7 @@ list: {
 | Details | name, description (both required) |
 | Conditions | match AND / OR; rows of field, operator, value |
 
-- Fields: totalSpent, tags, firstName, lastName, isDeleted, isActive, createdAt, updatedAt (`SegmentForm.tsx:307`); operators by field type (`:26`); comma-separated values split into lists (`:139`).
+- Fields: totalSpent, tags, firstName, lastName, isDeleted, isActive, createdAt, updatedAt (`SegmentForm.tsx:319`); operators by field type (`:29`); comma-separated values split into lists (`:148`).
 - Edit reads the saved AND / OR (today it resets to AND).
 - `editor: { save: 'segment.save', create: { route: '/segments/new', command: 'segment.create' } }`
 

@@ -55,10 +55,10 @@ generic screens         list, editor, quick create, ⌘K       list.md, editor.m
 
 | Issue in gk-pages | Treatment |
 |---|---|
-| Search fires on every keystroke (inventory, collections, customers, drafts, discounts) | Fixed: debounced everywhere |
+| Search debounced 500 ms in the shared list toolbar (fixed in gk-pages since 2026-08-21) | Kept: debounced everywhere |
 | List state lost on navigation; held in Redux/session/local storage | Fixed: URL |
-| Column sort on current page only (products, orders, POs, transfers, customers) | Dropped: sort only where the API sorts |
-| Filters/tabs applied to current page only (PO and transfer tabs, draft filters, segment search) | Kept as today until the API has the param; listed in [deferred.md](../schema/deferred.md) |
+| Column sort on current page only (products, POs, transfers, customers; orders and drafts sort on the server since 2026-08) | Dropped: sort only where the API sorts |
+| Filters/tabs applied to current page only (PO and transfer tabs, segment search) | Kept as today until the API has the param; listed in [deferred.md](../schema/deferred.md) |
 | Edit saves that skip validation (PO, transfer) | Fixed: validation always runs |
 | No unsaved-changes guard on any editor | Added (design has a save bar) |
 | Product delete without confirmation | Confirmation added |

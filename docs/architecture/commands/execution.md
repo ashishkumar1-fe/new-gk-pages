@@ -62,7 +62,7 @@ Confirm labels state the action and count ("Archive 12 orders"), never "OK".
 ## Idempotency and retry
 
 - `per-attempt` key: generated when the dialog opens and reused for retries of that attempt (prevents double refunds on a double click or flaky network).
-- `per-input` key: derived from input, for APIs that dedupe by key (order bulk archive / unarchive today; bulk-ops does not).
+- `per-input` key: derived from input, for APIs that dedupe by key (order bulk archive / unarchive, draft completion, v3 inventory set / adjust today; bulk-ops does not).
 - Automatic retry only for idempotent commands, on network errors and 5xx, 2 attempts with backoff (proposed; same as reads).
 - The same command for the same target can't run twice at once; a second call while the first is running is ignored.
 
@@ -85,7 +85,7 @@ Confirm labels state the action and count ("Archive 12 orders"), never "OK".
 
 ## Audit and analytics
 
-Each run emits one PostHog event: command ID, resource, target IDs (not full input), actor (`Actor`: staff, app or assistant), surface, result status, duration. Assistant runs also record the conversation ID and the approved proposal. A staff-visible activity log needs a backend store ([open question 15](../docs/open-questions.md)).
+Each run emits one PostHog event: command ID, resource, target IDs (not full input), actor (`Actor`: staff, app or assistant), surface, result status, duration. Assistant runs also record the conversation ID and the approved proposal. A staff-visible activity log can use the Audit Service gk-pages already writes field-level changes to (`AUDIT_SERVICEURL`; [open question 15](../docs/open-questions.md)).
 
 ## Errors from the server
 

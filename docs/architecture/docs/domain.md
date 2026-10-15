@@ -30,7 +30,7 @@ Where the API shape differs from what the UI needs, a transformer in the domain'
 Business rules are plain functions:
 
 ```ts
-// as today (OrderDetails.tsx:466-488)
+// as today (OrderDetails.tsx:537-559)
 export const refundBlockReason = (o: Order): string | undefined =>
   o.status === 'cancelled' ? "Cancelled orders can't be refunded"
   : o.payment.method === 'cod' ? "COD orders can't be refunded"

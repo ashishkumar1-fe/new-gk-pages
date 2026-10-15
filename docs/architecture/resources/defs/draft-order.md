@@ -7,22 +7,30 @@
 ```ts
 list: {
   columns: [
+    { id: 'number',   header: 'Draft #' },                   // "#D3"; "—" when unnumbered
     { id: 'draft',    header: 'Draft order' },               // link
     { id: 'date',     header: 'Date', cell: dateTime },
+    { id: 'updated',  header: 'Updated', cell: dateTime, hidden: true },
     { id: 'customer', header: 'Customer' },
     { id: 'status',   header: 'Status', cell: draftStatusBadge },   // open blue, invoice sent yellow, completed green
     { id: 'total',    header: 'Total', cell: money },
   ],
-  search: { param: 'search', placeholder: 'Search draft orders', debounceMs: 400 },   // today: no debounce
+  search: { param: 'search', placeholder: 'Search draft orders', debounceMs: 400 },   // today: 500 ms
   views: { source: 'server', default: 'is_default' },   // /draft-orders/views
-  sort:  { source: 'server', default: { field: 'created_at', direction: 'desc' } },   // /draft-orders/sortby
+  sort:  { source: 'server', default: { field: 'created_at', direction: 'desc' } },   // /draft-orders/sortby; column click sets sort_field / sort_direction
+  filters: [
+    { id: 'status',   type: 'enum', options: ['open', 'invoice_sent', 'completed'], toParams: (v) => ({ status: v }) },
+    { id: 'created',  type: 'date_range', toParams: ([a, b]) => ({ created_from: ymd(a), created_to: ymd(b) }) },   // inclusive both ends
+    { id: 'customer', type: 'text', toParams: (v) => ({ customer_id: v }) },
+    { id: 'tags',     type: 'text', toParams: (v) => ({ tags: v }) },   // comma-separated, OR
+  ],
   pageSize: 50,
   selection: { enabled: true },
   empty: { title: 'Create a draft order', action: 'draftOrder.create' },
 }
 ```
 
-Today's draft filters run on the current page only; v1 declares them with `mode: 'client'` until the API supports them.
+Draft filters are server-side query params, as today.
 
 ## Editor
 
@@ -49,14 +57,15 @@ editor: {
 
 - Discounts: custom (percentage or fixed, > 0, code `CUSTOM`) applied as today; code discount re-runs calculate and fails if not applied; needs products first.
 - Tax shown from the server; today's 18% fallback when `total_tax` is missing is kept.
+- Line price: editable per catalog line (override vs `originalPrice`); freebies not editable.
 - Shipping line: today's modal has no opener, so no shipping line is sent; same in v1.
 
 ### Validation
 
 | Rule | Source |
 |---|---|
-| Custom item: name required, price > 0, quantity required | `DraftOrder.tsx:763-788` |
-| Quantity ≤ 1,000,000 | `ProductSection.tsx:813` |
+| Custom item: name required, price > 0, quantity required | `DraftOrder.tsx:1127-1152` |
+| Quantity ≤ 1,000,000 | `ProductSection.tsx:1003-1004` |
 | New customer: names, email, phone 10–15 digits, address1, city, state, PIN 6 digits | `CreateCustomerModal.tsx:73-126` |
 | Addresses: letters-only names and city, PIN 6 digits, phone 10 digits | `EditShippingAddressModal.tsx:113-164` |
 
@@ -65,13 +74,13 @@ editor: {
 ```ts
 commands: {
   page: ['draftOrder.export', 'draftOrder.create'],
-  bulk: ['draftOrder.bulkTags'],
-  primary: (d) => d.status !== 'completed' ? 'draftOrder.complete' : undefined,   // "Mark as paid"
-  more: () => ['draftOrder.delete'],               // confirm
+  bulk: ['draftOrder.bulkTags', 'draftOrder.bulkDelete'],
+  primary: (d) => d.status !== 'completed' ? 'draftOrder.complete' : undefined,   // "Place order": mark as paid / payment pending; blocked while unsaved
+  more: (d) => ['draftOrder.sendInvoice', 'draftOrder.duplicate', 'draftOrder.delete'],   // delete: confirm
 }
 ```
 
-`draftOrder.complete` keeps today's sequence: customer required if a discount is applied → calculate → create paid order → redeem discount (failure is a warning) → mark draft completed → open the new order.
+`draftOrder.complete` keeps today's single call: saved and clean draft required; customer required if a coupon is applied → `POST /draft-orders/:id/complete` → open the new order. While a payment link is live, the page polls the draft and opens the order when it converts (`useDraftPaymentWatch`).
 
 ## Other
 

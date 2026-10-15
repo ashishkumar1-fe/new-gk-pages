@@ -15,7 +15,7 @@ Every resource in the admin. Nav groups follow the Ratio design sidebar.
 | Transfer | inventory | `/transfers`, `/$id`, `/new`, `/$id/receive` | list + editor + receive | Products › Transfers | [transfer](defs/transfer.md) |
 | Customer | os-customer | `/customers`, `/customers/$id`, `/customers/new` | list + editor | Customers | [customer](defs/customer.md) |
 | Segment | os-customer | `/segments`, `/segments/$id`, `/segments/new`, `/segments/$id/customers` | list + editor | Customers › Segments | [segment](defs/segment.md) |
-| Discount | os-discount | `/discounts`, `/discounts/$id`, `/discounts/new/$kind` | list + editor | Discounts | [discount](defs/discount.md) |
+| Discount | Discount Service V2 (gateway) | `/discounts`, `/discounts/$id`, `/discounts/new` | list + editor | Discounts | [discount](defs/discount.md) |
 | Discount set | os-discount | `/discount-sets`, `/$id`, `/new/$kind` | list + editor | Discounts › Bulk codes | [discount](defs/discount.md#discount-set) |
 
 ## Supporting resources (lookups and settings)

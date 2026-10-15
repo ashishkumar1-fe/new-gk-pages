@@ -15,7 +15,7 @@ interface EditorConfig<T, TInput> {
   save: CommandId;
   create?: { route: string; initial: (ctx: CreateContext) => TInput; command: CommandId };
   calculate?: {                              // server-side totals
-    query: (d: TInput) => Promise<unknown>;  // /draft-orders/calculate, /orders/:id/calculate
+    query: (d: TInput) => Promise<unknown>;  // /draft-orders/calculate; order edit uses the os-order edit session (stage → preview)
     debounceMs: number;                      // 500 as today
     skipWhen?: (d: TInput) => boolean;       // no line items
   };

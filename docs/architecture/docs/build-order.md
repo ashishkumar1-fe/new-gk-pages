@@ -8,7 +8,7 @@ The [resource](../resources/registry.md) and [command](../commands/registry.md) 
 |---|---|---|
 | 1. Platform shell | Login, boot machine, merchant picker, API client and services, chrome, telemetry, UI primitives | Empty app a merchant can log into |
 | 2. Products | Product and collection list and editor | Confirmed resource contract, record editor machine |
-| 3. Orders | Order list and detail, notes, tags, archive, cancel, refund, edit, drafts | Confirmed command contract, refund and draft-complete machines |
+| 3. Orders | Order list and detail, notes, tags, archive, cancel, refund, edit (session), fulfilment and holds, drafts (complete, invoice) | Confirmed command contract, refund, order-edit-session and draft-payment-watch machines |
 | 4. Assistant | Panel, screen context, read tools, proposal flow over v1 topics | AI over products and orders |
 | 5. Remaining resources | Inventory, purchase orders, transfers, customers, segments, discounts | Ported through the registries |
 | 6. Extensions | Extension targets on resources, app bridge in new chrome | Parity with today |

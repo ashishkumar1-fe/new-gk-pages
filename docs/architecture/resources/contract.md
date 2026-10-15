@@ -81,7 +81,7 @@ interface DetailConfig<T> {
 
 ## Notes
 
-- **Detail vs editor.** Most resources edit in place (editor). Orders are a read view with actions plus a separate edit route, because editing an order goes through server recalculation.
+- **Detail vs editor.** Most resources edit in place (editor). Orders are a read view with actions plus a separate edit route, because editing an order goes through an os-order edit session (begin → stage → preview → commit).
 - **Status-driven actions.** POs and transfers change their main button and menu by status; `primary` and `more` express that instead of hard-coded buttons.
 - **Scoped lists.** A relation `via` a list param (`customer_id`) gives "View all orders" from the customer page with no extra code.
 - **Commands are IDs.** The registry resolves them, checks permission and `enabled`, and asks for confirmation.

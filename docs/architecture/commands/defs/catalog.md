@@ -24,7 +24,7 @@ Columns: **Effect** R read-only · D destructive · I idempotent · X external. 
 | `product.generateContent` | record | `POST /content/title-and-description`; apply with `PATCH /content/:requestId/smart` | — | — | P | fills title and description in the draft; does not save |
 
 Notes:
-- **`product.save` payload**, as today: product fields, options with IDs, variants with IDs, each variant's stock per location in `inventory.warehouseQt` (product-level `warehouseQt` when no variants), metafields and `metadata`, flags `replaceVariants`, `replaceOptions`, `replaceOptionValues`. Stock is saved in the same call; no separate inventory request.
+- **`product.save` payload**, as today: product fields, options with IDs, variants with IDs, variant tracking and policy not echoed for real variants (only the "Default Title" variant carries the product's Track inventory), metafields and `metadata`, flags `replaceVariants`, `replaceOptions`, `replaceOptionValues`. Per-location stock is written separately through v3 inventory commands (`inventory.adjust`).
 - **`product.setStatus`** sends the full product per item, as today. Input: `{ ids, status: 'active' | 'draft' | 'archived' }`. Labels by status: "Set as active", "Set as draft", "Archive products".
 - **`product.duplicate`** prefill as today: title "{title} (Copy)", handle "{handle}-copy", variant stock 0, no locations, weight 0, policy deny, tracking on, no collections. Saved with `product.create`.
 - **`product.copyLink`**: `{storefront_url}/{productsRoute}/{handle}`; disabled with reason "Set the storefront URL in Settings" when not configured.

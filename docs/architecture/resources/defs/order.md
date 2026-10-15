@@ -1,6 +1,6 @@
 # Order
 
-[← Resources](../README.md) · Schema: [orders.md](../../schema/orders.md) · Today: `pages/orders/OrdersHome.tsx`, `components/orders/OrderDetails.tsx`, `EditOrder.tsx`, `components/refunds/RefundDrawer.tsx`
+[← Resources](../README.md) · Schema: [orders.md](../../schema/orders.md) · Today: `pages/orders/OrdersHome.tsx`, `components/orders/OrderDetails.tsx`, `EditOrder.tsx`, `hooks/useOrderEditSession.ts`, `components/orders/FulfillmentCards.tsx`, `components/refunds/RefundDrawer.tsx`
 
 Not yet in the Ratio design; definition follows today's behaviour.
 
@@ -15,8 +15,10 @@ list: {
     { id: 'total',       header: 'Total',              cell: money },
     { id: 'payment',     header: 'Payment status',     cell: financialBadge },
     { id: 'status',      header: 'Order status',       cell: orderStatusBadges },   // from cancelledAt and closedAt: both can show
-    { id: 'fulfillment', header: 'Fulfillment status', cell: fulfillmentBadge },
+    { id: 'fulfillment', header: 'Fulfillment status', cell: fulfillmentBadge },   // + "Held · N" when activeHoldsCount > 0
     { id: 'items',       header: 'Items' },
+    { id: 'createdAt',   header: 'Created At',         cell: date, hidden: true },
+    { id: 'updatedAt',   header: 'Updated At',         cell: date, hidden: true },
   ],
   search: {
     param: 'search', placeholder: 'Search orders, customers, or products', debounceMs: 400,
@@ -47,42 +49,45 @@ Scoped list: `customer_id` (from customer page "View all orders").
 | Column | Section | Content |
 |---|---|---|
 | main | Items | line items; removed items (current quantity 0) listed separately |
+| main | Fulfillment | unfulfilled / fulfilled cards per location, tracking, holds (`GET /orders/:id/fulfillments`); fulfil, hold, release and tracking on the card (`order.fulfil`, `order.hold`, `order.releaseHold`, `order.updateTracking`) |
 | main | Payment | server totals (`current_*` values) |
 | main | Info tabs | Payment, Checkout, UTM, Refunds (`GET /orders/:id/refunds`) |
 | main | Custom fields | read-only |
 | main | Timeline | events + internal comments (`order.comment`) |
-| aside | Customer | contact and addresses; editable unless fulfilled (`order.updateContact`) |
+| aside | Customer | contact and shipping address; editable unless fulfilled; billing address read-only (`order.updateContact`) |
 | aside | Note | ≤ 1000 chars, not empty; shows cancel reason (`order.updateNote`) |
 | aside | Tags | per-order tags (entities), create new tag; ≤ 50 chars (`order.addTags`, `order.removeTag`) |
 
 ```ts
 detail: {
   pager: (o) => o.neighbors,               // previous / next from the detail response; J/K keys
-  editRoute: (o) => o.status === 'cancelled' ? undefined : `/orders/${o.id}/edit`,   // Shopify-sourced: blocked with a message
+  editRoute: (o) => editBlockReason(o) ? undefined : `/orders/${o.id}/edit`,   // cancelled, fully fulfilled or edit-blocking discount: disabled with reason; Shopify-sourced: blocked with a message
 }
 ```
 
 ## Edit order (`/orders/$id/edit`)
 
-Editor with server calculation:
+Editor driven by an os-order edit session (one lock per order):
 
-- `calculate`: `POST /orders/:id/calculate`, debounced, skipped with no line items.
-- Summary: updated total; paid = total − outstanding; "Refund owed" or "Amount to collect" by the sign of outstanding.
-- `editor: { save: 'order.edit', calculate: { query: ordersApi.calculate, debounceMs: 500 } }` on this route.
-- Save enabled when changed, not calculating and quantities valid. Sends `PATCH /orders/:id` as today (removed items merged, calculated prices, billing = shipping when "same as shipping").
+- Session: `POST /orders/:id/edit/begin` on open (`ACTIVE_SESSION_EXISTS`: offer take-over; `STALE_SESSION_COLLISION`: retry every 15 s, ≤ 6 min); discard on leave (`POST …/edit/:sid/discard`, keepalive on unload).
+- Changes: debounced 500 ms, staged as ops (`set_qty` absolute, `remove_line`, `apply_line_item_discount` fixed per unit or %), then `POST …/preview`. No adding items. Increases only on unfulfilled, unpaid COD orders; fulfilled quantities are a floor.
+- Summary: updated total from the preview; paid = total − outstanding; "Refund owed", "Additional collection required" or "No amount due" by the sign of the preview's refund amount.
+- `editor: { save: 'order.edit', preview: { session: 'orderEditSession', debounceMs: 500 } }` on this route.
+- Save enabled when changed, quantities valid and (with line changes) the preview is current. Line changes commit the session; customer, address, metafield and reason changes go through `PATCH /orders/:id` without `line_items`.
 
 ## Commands
 
 ```ts
 commands: {
   page: ['order.export', 'order.import', 'draftOrder.create'],          // "Create order" opens a new draft
-  bulk: ['order.bulkCancel', 'order.bulkTags', 'order.archive', 'order.unarchive'],   // unarchive only if all selected are archived
-  more: (o) => ['order.openStatusPage', 'order.duplicate', o.closedAt ? 'order.unarchive' : 'order.archive', 'order.cancel'],
+  bulk: ['order.bulkCancel', 'order.bulkTags', 'order.archive', 'order.unarchive', 'order.bulkFulfil'],   // unarchive only if all selected are archived; bulkCancel only if all are cancellable
+  more: (o) => ['order.openStatusPage', 'order.duplicate', o.closedAt ? 'order.unarchive' : 'order.archive', ...(anyFulfilled(o) ? [] : ['order.cancel'])],
+  row:  ['order.fulfil', 'order.hold', 'order.releaseHold', 'order.updateTracking'],   // on the Fulfillment card
   primary: (o) => canRefund(o) ? 'refund.create' : undefined,
 }
 ```
 
-- `order.cancel`: reasons (6 fixed), staff note, restock (default on), notify (always on, as today), auto-refund when amount > 0, not COD and not already refunded.
+- `order.cancel`: hidden once any item is fulfilled (fulfilled, partially fulfilled, shipped, delivered). Reasons (6 fixed), staff note, restock (default on), notify (always on, as today), auto-refund when amount > 0, not COD and not already refunded.
 - `refund.create`: hidden if cancelled; blocked for COD, refunded, partially refunded and refund pending. Flow: select items → preview (note, restock, include shipping) → confirm with idempotency key → poll status (machine).
 - `order.duplicate`: builds a draft from the order and opens it.
 - Export and import: bulk-ops jobs ([commands](../../commands/defs/bulk-ops.md)); the export file is emailed.

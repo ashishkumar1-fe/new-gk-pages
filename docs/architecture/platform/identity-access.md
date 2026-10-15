@@ -24,10 +24,10 @@ GET /api/dashboard/user/details
 | `false` | Every route blocked; "You don't have access. Talk to sales." screen |
 
 - Today the flag only shows the sidebar item (`dashboard-ui` `sideNav/index.tsx:1476`, `SideNavMerger.tsx:667`); gk-pages still mounts by URL.
-- Ratio's guard makes it real: it runs in the boot flow ([auth-session](auth-session.md#boot-flow)), before any route renders.
+- Ratio's guard makes it real: it runs in the boot flow ([machines](../docs/machines.md#app-boot)), before any route renders.
 
 ## Permissions
 
 - Permission keys are declared on every command and resource ([commands registry](../commands/registry.md#permissions)).
 - gk-pages `main` checks permissions only in Ratio Reports (`validatePermission(PermissionValues.reports.view)`, `reports.viewUnmaskedReport`). Those two checks carry over; everything else stays unchecked in v1, as today.
-- The permission list comes with user details; `can(permission)` reads it. Enforcing the declared keys everywhere is one switch once roles are defined.
+- Backend permissions are strings in `user_details.role.permissions` (`view_order`, `refund`, `view_unmasked_report`, `live_mode`, …). Our scopes (`read_orders`, `write_refunds`, …) map to them in one table in `platform/permissions`; `can(scope)` reads it. Unmapped scopes pass while enforcement is off; turning it on is one switch once roles are defined.

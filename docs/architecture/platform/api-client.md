@@ -36,7 +36,7 @@ Paths in [command definitions](../commands/registry.md) are relative to the base
 | Errors | Typed errors mapped to the command result type ([execution](../commands/execution.md#errors-from-the-server)) |
 | Uploads | Presign → upload to storage → confirm. The storage upload bypasses the client (no cookie, no merchant headers) |
 
-Feature code calls services through `api/<service>` modules (client + transformer), never `fetch` directly ([structure](../docs/structure.md)).
+Only resources and commands call `api/<service>` modules (client + transformer); nothing calls `fetch` directly ([structure](../docs/structure.md#layers-and-imports)).
 
 ## Query keys
 

@@ -80,7 +80,11 @@ commands: {
 }
 ```
 
-`draftOrder.complete` keeps today's single call: saved and clean draft required; customer required if a coupon is applied → `POST /draft-orders/:id/complete` → open the new order. While a payment link is live, the page polls the draft and opens the order when it converts (`useDraftPaymentWatch`).
+`draftOrder.complete` keeps today's single call:
+
+- Requires a saved, clean draft, and a customer when a coupon is applied.
+- `POST /draft-orders/:id/complete`, then opens the new order.
+- While a payment link is live, the page polls the draft and opens the order when it converts (`useDraftPaymentWatch`).
 
 ## Other
 

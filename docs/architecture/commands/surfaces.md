@@ -46,12 +46,19 @@ Read tools come from resources (list, get, search) with their `assistant.readabl
 
 **Proposal flow.**
 
-```
-user asks → assistant picks a command and fills input
-          → proposal card: action, target(s), the filled form with AI-filled fields highlighted
-          → user edits or approves (destructive: second confirm)
-          → runCommand(surface: 'assistant')
-          → result shown in the conversation, with links to affected records
+```mermaid
+sequenceDiagram
+  actor P as Person
+  participant AI as Assistant
+  participant C as Proposal card
+  participant X as runCommand
+  P->>AI: asks
+  AI->>C: picks a command, fills its input
+  Note over C: action, target(s), filled form<br/>AI-filled fields highlighted
+  P->>C: edits or approves (destructive: second confirm)
+  C->>X: runCommand(surface: 'assistant')
+  X-->>AI: result
+  AI-->>P: result in the conversation, links to affected records
 ```
 
 - No write runs without the person's approval in that conversation.

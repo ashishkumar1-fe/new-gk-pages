@@ -4,7 +4,14 @@
 
 Permission: `write_discounts` for every command (enforcement off in v1).
 
-Effect: R read-only · D destructive · I idempotent · X external. Mode: P pessimistic. Payloads come from the transformer per API, exactly as today: V2 (`formToV2Payload`): paise, unlimited and no end date omitted; v1 (sets): rules engine, "unlimited" = 1,000,000, no end = `9999-12-31T23:59:59Z`.
+Effect: R read-only · D destructive · I idempotent · X external. Mode: P pessimistic.
+
+Payloads come from the transformer per API, exactly as today:
+
+| API | Money | Unlimited | No end date |
+|---|---|---|---|
+| V2 (`formToV2Payload`) | paise | field omitted | field omitted |
+| v1 (sets), rules engine | paise | 1,000,000 | `9999-12-31T23:59:59Z` |
 
 | Command | Scope | Steps | Confirm | Effect | Mode | After |
 |---|---|---|---|---|---|---|
@@ -31,11 +38,20 @@ Notes:
 
 Uses the existing os-discount AI session API, not a second path:
 
-```
-POST /sessions {title?} → POST /sessions/:id/message {content}
-  → (choices) POST /sessions/:id/select {selection_token, selected_ids, picked_metadata?}
-  → POST /sessions/:id/confirm {action_token}   (410 → "That confirmation expired. Ask again.")
-  → legacy v1 form opens filled (AI-filled fields highlighted) → user saves with v1 os-discount /create (not V2 discount.create)
+```mermaid
+sequenceDiagram
+  participant A as Assistant panel
+  participant S as os-discount sessions
+  participant F as Legacy v1 form
+  A->>S: POST /sessions {title?}
+  A->>S: POST /sessions/:id/message {content}
+  opt choices offered
+    A->>S: POST /sessions/:id/select {selection_token, selected_ids, picked_metadata?}
+  end
+  A->>S: POST /sessions/:id/confirm {action_token}
+  Note over A,S: 410 → "That confirmation expired. Ask again."
+  S-->>F: form opens filled, AI-filled fields highlighted
+  F->>F: user saves with v1 os-discount /create (not V2 discount.create)
 ```
 
 In the new admin this flow runs inside the assistant panel (topic: discounts); the confirm step is the proposal card.

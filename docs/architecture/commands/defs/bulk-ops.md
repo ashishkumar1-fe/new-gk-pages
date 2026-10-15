@@ -14,13 +14,11 @@ Products and orders import and export run as background jobs on the bulk-ops ser
 
 ## Export (`product.export`, `order.export`)
 
-```
-1 GET  /export/template/{entity}                     → column groups to include
-2 POST /export/preview?user-email&user-name&store-id
-       {entities:[{entityType, configuration:{groups}, filters?:{dateFrom, dateTo}}], fileFormat: 'csv' | 'xlsx'}
-       → jobId
-3 POST /export/process/{jobId}                       → job runs; file emailed to the staff member
-```
+| # | Call | Result |
+|---|---|---|
+| 1 | `GET /export/template/{entity}` | column groups to include |
+| 2 | `POST /export/preview?user-email&user-name&store-id` `{entities:[{entityType, configuration:{groups}, filters?:{dateFrom, dateTo}}], fileFormat: 'csv' \| 'xlsx'}` | `jobId` |
+| 3 | `POST /export/process/{jobId}` | job runs; file emailed to the staff member |
 
 Input: `{ entity, groups, dateRange?, format }`. Toast after step 3: "Export started. The file will be emailed to {email}."
 
@@ -28,10 +26,10 @@ Input: `{ entity, groups, dateRange?, format }`. Toast after step 3: "Export sta
 
 Two commands, as today's two buttons:
 
-```
-*.importPreview   POST /preview/import (multipart file, entityType)   → jobId + validation (row errors)
-*.import          POST /import/{jobId}                                → job runs
-```
+| Command | Call | Result |
+|---|---|---|
+| `*.importPreview` | `POST /preview/import` (multipart file, `entityType`) | `jobId` + validation (row errors) |
+| `*.import` | `POST /import/{jobId}` | job runs |
 
 - `*.import` is enabled only when the preview is valid.
 - Sample file: `GET /s3/sample-url?pathType=`.

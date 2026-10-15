@@ -4,18 +4,17 @@
 
 Every command, from every surface, runs through `runCommand(id, input?, ctx)`.
 
-```
-1. resolve       ID → definition; unknown or capability off → not found
-2. availability  visible? permission? enabled? → else 'denied' with reason
-3. input         fromContext + caller input → form if incomplete → schema validate → else 'invalid'
-4. confirm       policy (definition + effect + surface) → dialog → dismissed = 'cancelled'
-5. optimistic    apply cache updates (optimistic / undoable modes)
-6. run           steps in order; idempotency key; timeout
-7. settle        success → set detail cache, invalidate keys
-                 failure → roll back optimistic, compensate finished steps in reverse
-8. feedback      toast (with Undo for undoable), field errors to the form, navigate
-9. audit         event: command, input summary, staff, surface, result, duration
-```
+| # | Step | What happens | Ends as |
+|---|---|---|---|
+| 1 | Resolve | ID → definition | not found (unknown, or capability off) |
+| 2 | Availability | visible? permission? enabled? | `denied`, with reason |
+| 3 | Input | `fromContext` + caller input → form if incomplete → schema validate | `invalid` |
+| 4 | Confirm | policy from definition + effect + surface → dialog | `cancelled` (dismissed) |
+| 5 | Optimistic | apply cache updates (optimistic / undoable modes) | — |
+| 6 | Run | steps in order; idempotency key; timeout | — |
+| 7 | Settle | success → set detail cache, invalidate keys; failure → roll back optimistic, compensate finished steps in reverse | `success` / `partial` / `error` |
+| 8 | Feedback | toast (Undo when undoable), field errors to the form, navigate | — |
+| 9 | Audit | event: command, input summary, staff, surface, result, duration | — |
 
 ## Availability
 
@@ -85,7 +84,9 @@ Confirm labels state the action and count ("Archive 12 orders"), never "OK".
 
 ## Audit and analytics
 
-Each run emits one PostHog event: command ID, resource, target IDs (not full input), actor (`Actor`: staff, app or assistant), surface, result status, duration. Assistant runs also record the conversation ID and the approved proposal. A staff-visible activity log can use the Audit Service gk-pages already writes field-level changes to (`AUDIT_SERVICEURL`; [open question 15](../docs/open-questions.md)).
+- Each run emits one PostHog event: command ID, resource, target IDs (not full input), actor (`Actor`: staff, app or assistant), surface, result status, duration.
+- Assistant runs also record the conversation ID and the approved proposal.
+- A staff-visible activity log can use the Audit Service gk-pages already writes field-level changes to (`AUDIT_SERVICEURL`; [open question 15](../docs/open-questions.md)).
 
 ## Errors from the server
 

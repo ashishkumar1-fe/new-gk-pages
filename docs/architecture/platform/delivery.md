@@ -12,9 +12,18 @@
 
 ## Pipeline
 
-```
-PR ──▶ lint · tsc --noEmit · tests · initial-bundle budget · audit high/critical (all blocking) ──▶ preview deploy (QA backend, non-prod badge)
-merge ──▶ build (contenthash) ──▶ S3 ──▶ CDN invalidate index.html ──▶ Playwright smoke on staging (login → pick merchant → products list → one save; deploy gate) ──▶ release
+```mermaid
+flowchart LR
+  subgraph pr["Pull request"]
+    direction LR
+    PR([PR]) --> Gates["lint · tsc --noEmit · tests<br/>initial-bundle budget · audit high/critical<br/>(all blocking)"]
+    Gates --> Prev["Preview deploy<br/>QA backend · non-prod badge"]
+  end
+  subgraph rel["Merge to main"]
+    direction LR
+    MG([merge]) --> Build["Build<br/>contenthash"] --> S3[(S3)] --> CDN["CDN: invalidate index.html"]
+    CDN --> Smoke["Playwright smoke on staging<br/>login → pick merchant → products list → one save<br/>(deploy gate)"] --> Rel([Release])
+  end
 ```
 
 | Concern | Rule |

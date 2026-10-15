@@ -27,7 +27,10 @@ list: {
 
 ## Editor
 
-One route: `/discounts/new`, a 5-step wizard (offer type · offer & code · eligibility · usage & stacking · review). Edit at `/discounts/$id` opens the same wizard at step 2 with kind and mode locked. Code availability is checked on leaving step 2 (`discount.checkCode`). Finish: "Publish now" or "Save as draft" (draft needs only kind and title), then back to the list.
+- **Create**: one route, `/discounts/new`, a 5-step wizard: offer type · offer & code · eligibility · usage & stacking · review.
+- **Edit**: `/discounts/$id` opens the same wizard at step 2, kind and mode locked.
+- **Code check**: on leaving step 2 (`discount.checkCode`).
+- **Finish**: "Publish now" or "Save as draft" (draft needs only kind and title), then back to the list.
 
 `editor: { save: 'discount.update', create: { route: '/discounts/new', command: 'discount.create' } }`
 

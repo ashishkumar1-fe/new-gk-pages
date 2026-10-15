@@ -2,7 +2,9 @@
 
 [← Schema](README.md)
 
-Service: os-order (`/api/v1/admin/orders`, `/draft-orders`, `/refunds`) and timeline service. Money in paise. Totals, tax and discounts are calculated exactly as today (server `/draft-orders/calculate` for drafts, edit-session `preview` for order edits); the schema mirrors, it doesn't redefine.
+- Services: os-order (`/api/v1/admin/orders`, `/draft-orders`, `/refunds`) and timeline.
+- Money in paise.
+- Totals, tax and discounts are calculated by the server exactly as today: `/draft-orders/calculate` for drafts, edit-session `preview` for order edits. The schema mirrors them; it doesn't redefine them.
 
 ## Order
 

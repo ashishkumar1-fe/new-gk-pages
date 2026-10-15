@@ -49,7 +49,9 @@ Reference number, supplier and destination required; quantity ≥ 1; cost ≥ 0;
 
 ## Receive (`/purchase-orders/$id/receive`)
 
-Columns: Product, Ordered, Previously received, Accept, Reject, Remaining. Accept and reject are capped at remaining and clamp each other (`ReceiveInventory.tsx:43-100`). Command `purchaseOrder.receive` sends `{po_item_id, quantity_received, quantity_rejected}` per line.
+- Columns: Product, Ordered, Previously received, Accept, Reject, Remaining.
+- Accept and reject are capped at remaining and clamp each other (`ReceiveInventory.tsx:43-100`).
+- `purchaseOrder.receive` sends `{po_item_id, quantity_received, quantity_rejected}` per line.
 
 ## Commands (status-driven)
 

@@ -46,10 +46,18 @@ Effect: R read-only · D destructive · I idempotent · X external. Mode: P pess
 
 ### Refund flow
 
-```
-select items ──calculate (debounce 300 ms)──▶ preview (note, restock, include shipping)
-   ──confirm "Refund ₹X"──▶ POST /refunds  (x-idempotency-key per attempt, notify_customer: true)
-   ──▶ poll GET /refunds/:id every 5 s, ≤ 24 times ──▶ success | failed | still processing
+```mermaid
+stateDiagram-v2
+  [*] --> SelectItems
+  SelectItems --> Calculating: change (debounce 300 ms)
+  Calculating --> Preview: POST /refunds/calculate
+  Preview --> SelectItems: edit items
+  Preview --> Submitting: confirm "Refund ₹X"
+  note right of Preview: note · restock · include shipping
+  Submitting --> Polling: POST /refunds (x-idempotency-key per attempt, notify_customer true)
+  Polling --> Success: GET /refunds/:id every 5 s
+  Polling --> Failed
+  Polling --> StillProcessing: 24 polls, no terminal status
 ```
 
 - The refund machine drives the drawer. Calculate is a query (`POST /refunds/calculate {order_id, line_items:[{line_item_id, quantity}], include_shipping}`), not a command.
@@ -80,7 +88,9 @@ select items ──calculate (debounce 300 ms)──▶ preview (note, restock, 
 | Customer when a coupon is applied | `invalid` "Please select customer to redeem discount" |
 | COD selected | sent as `payment_pending` + `payment_method: 'cod'` |
 
-One call; the server prices the saved draft, redeems coupons and links the order. One `idempotency_key` per mounted button, reused on retry (same key returns the existing order, `reused: true`). `DRAFT_COMPLETION_DISCOUNT_REMOVED`: no order created, coupon removed, draft re-read, warning shown.
+- One call: the server prices the saved draft, redeems coupons and links the order.
+- One `idempotency_key` per mounted button, reused on retry; the same key returns the existing order (`reused: true`).
+- `DRAFT_COMPLETION_DISCOUNT_REMOVED`: no order created, coupon removed, draft re-read, warning shown.
 
 ## Exposure
 

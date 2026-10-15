@@ -11,10 +11,15 @@
 
 ## Cookie session
 
-```
-login (email + password → OTP, or Google) ──▶ gateway
-gateway ──▶ Set-Cookie: token; Domain=.gokwik.in; HttpOnly; Secure        (no SameSite → browsers treat it as Lax)
-every API call ──▶ credentials: 'include' ──▶ browser attaches the cookie ──▶ gateway validates
+```mermaid
+sequenceDiagram
+  participant U as Ratio (browser)
+  participant G as Gateway
+  U->>G: login (email + password → OTP, or Google)
+  G-->>U: Set-Cookie token · Domain=.gokwik.in · HttpOnly · Secure
+  Note over U,G: no SameSite attribute → browsers treat it as Lax
+  U->>G: every API call, credentials: 'include' (browser attaches the cookie)
+  G-->>U: validated response
 ```
 
 - JavaScript never reads or sends the token (`document.cookie` shows nothing; checked in prod DevTools by the tracker).
@@ -34,10 +39,16 @@ The cookie is effectively `SameSite=Lax`: the browser attaches it only when the 
 
 Runs as the app boot machine ([machines](../docs/machines.md)):
 
-```
-checking session ─┬─ no session ──▶ login (machine: form → OTP → loading) ──▶ checking session
-                  └─ session ─────▶ loading user details ─▶ picking merchant ─▶ checking entitlement ─┬─▶ ready
-                                                                                                    └─▶ no access
+```mermaid
+stateDiagram-v2
+  [*] --> CheckingSession
+  CheckingSession --> Login: no session
+  Login --> CheckingSession: form → OTP → loading
+  CheckingSession --> LoadingUserDetails: session
+  LoadingUserDetails --> PickingMerchant
+  PickingMerchant --> CheckingEntitlement
+  CheckingEntitlement --> Ready: pages = true
+  CheckingEntitlement --> NoAccess: pages = false
 ```
 
 ## Merchant context

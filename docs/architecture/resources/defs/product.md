@@ -88,7 +88,10 @@ editor: { save: 'product.update', create: { route: '/products/new', command: 'pr
 quickCreate: { fields: ['title', 'status', 'vendor'], command: 'product.create' },   // design
 ```
 
-`product.update` → `PUT /products/:id` with `replaceVariants`, `replaceOptions`, `replaceOptionValues`; per-location stock is not edited through it (the payload still echoes `inventory.warehouseQt` as loaded, which the editor no longer fills). Product-level SKU, price and inventory fields in today's payload are written from the default variant by the transformer.
+`product.update` → `PUT /products/:id` with `replaceVariants`, `replaceOptions`, `replaceOptionValues`:
+
+- Per-location stock is not edited through it; the payload still echoes `inventory.warehouseQt` as loaded, which the editor no longer fills.
+- Product-level SKU, price and inventory fields in today's payload are written from the default variant by the transformer.
 
 ### Validation (from `ProductForm.tsx`)
 

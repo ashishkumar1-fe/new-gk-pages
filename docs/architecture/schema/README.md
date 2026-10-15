@@ -2,7 +2,11 @@
 
 [← Architecture](../README.md)
 
-The data model for the admin: the common commerce shape (Shopify Admin API, commercetools, Medusa) plus Indian needs (MRP, GST, HSN, COD), aligned with what the services return to gk-pages today. Design gaps are in [deferred.md](deferred.md). Types are TypeScript for readability; the Zod schemas in code follow them.
+The data model for the admin:
+
+- The common commerce shape (Shopify Admin API, commercetools, Medusa) plus Indian needs (MRP, GST, HSN, COD).
+- Aligned with what the services return to gk-pages today; design gaps in [deferred.md](deferred.md).
+- Types are TypeScript for readability; the Zod schemas in code follow them.
 
 ## Entity map
 
@@ -55,4 +59,11 @@ erDiagram
 
 ## Verification
 
-Status: v1 draft. Shapes are inferred from gk-pages client code (interfaces, transformers, payload builders), not backend specs. Freeze an entity only after its schema parses a real sandbox response (list and detail) without errors, and its write payload matches what today's gk-pages sends. Order of checks follows the build order: product, variant, collection, inventory, then orders.
+Status: **v1 draft**. Shapes are inferred from gk-pages client code (interfaces, transformers, payload builders), not backend specs.
+
+Freeze an entity only when:
+
+- its schema parses a real sandbox response (list and detail) without errors, and
+- its write payload matches what today's gk-pages sends.
+
+Order of checks follows the build order: product, variant, collection, inventory, then orders.

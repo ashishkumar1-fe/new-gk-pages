@@ -17,23 +17,38 @@ This file is the map. Each linked doc is short and covers one topic.
 
 ## Layers
 
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│ SURFACES   Tables · Forms · Detail pages · ⌘K · AI assistant · Ext.  │  render + interact
-├──────────────────────────────────────────────────────────────────────┤
-│ CONTRACTS  defineResource()  ·  defineCommand()  ·  extension targets │  what exists, what can be done
-├──────────────────────────────────────────────────────────────────────┤
-│ LOGIC      domain schemas · pure rules · state machines              │  business truth, flows
-├──────────────────────────────────────────────────────────────────────┤
-│ STATE      server cache (Query) · URL · tiny UI store                │  where data lives
-├──────────────────────────────────────────────────────────────────────┤
-│ PLATFORM   session · API client · merchant · permissions · telemetry │  plumbing
-├──────────────────────────────────────────────────────────────────────┤
-│ GATEWAY    os-item · os-order · os-resources …  (unchanged)          │
-└──────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+  S["<b>6 · Surfaces</b><br/>tables · forms · buttons · detail pages · ⌘K · assistant · extensions · chrome"]
+  O["<b>5 · Orchestration</b><br/>state machines · app boot · entitlement guard"]
+  C["<b>4 · Contracts</b><br/>defineResource() — reads, query cache<br/>defineCommand() — writes, runCommand"]
+  A["<b>3 · Service API</b><br/>one module per service: endpoints · transformer · response validation"]
+  D["<b>2 · Domain</b><br/>Zod schemas · pure rules · formatters"]
+  P["<b>1 · Platform core</b><br/>HTTP client · session · storeId · permissions · query client · telemetry · config"]
+  U["<b>UI kit</b><br/>tokens · primitives · patterns"]
+  G[("<b>Gateway</b> (unchanged)<br/>os-item · os-order · os-discount · os-resources …")]
+
+  S --> O --> C --> A
+  A --> D
+  A --> P
+  S -.-> U
+  P ==>|HTTPS + cookie| G
+
+  classDef top fill:#e8f0fe,stroke:#4a6fa5,color:#1a2b45
+  classDef mid fill:#eef7ee,stroke:#4f8a4f,color:#1d3a1d
+  classDef low fill:#fdf3e7,stroke:#b07a3a,color:#45300f
+  classDef side fill:#f3eefa,stroke:#7a5aa5,color:#2e1f45
+  classDef ext fill:#f2f2f2,stroke:#888,color:#333
+  class S,O top
+  class C,A mid
+  class D,P low
+  class U side
+  class G ext
 ```
 
-Dependencies point **down only**. A layer never imports from a layer above it.
+A layer uses only layers below it (any of them, not just the next), never one above. The UI kit is a side layer used only by surfaces. Who may import what: [structure](docs/structure.md#layers-and-imports).
+
+State is not a layer: server data sits in the query cache (client in platform core, queries and keys in contracts), view state in the URL (router, in surfaces), UI flags in components or a small store ([state](docs/state.md)).
 
 ## Principles
 

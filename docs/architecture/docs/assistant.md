@@ -10,14 +10,10 @@ The design names it **Arya**: a side panel that stays open while the user moves 
 
 The assistant is another surface over the same contracts. It gets no special access.
 
-```
-User message + screen context
-        │
-        ▼
-Backend LLM call ── tools = commands the user may run + read queries
-        │
-        ▼
-Tool call proposed ─▶ UI renders a confirm card ─▶ runCommand() ─▶ cache refresh
+```mermaid
+flowchart LR
+  Q["User message<br/>+ screen context"] --> L["Backend LLM call<br/>tools = commands the user may run + read queries"]
+  L --> T["Tool call proposed"] --> C["Confirm card"] --> R["runCommand()"] --> F["Cache refresh"]
 ```
 
 ## Screen context

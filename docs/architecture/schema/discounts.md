@@ -84,7 +84,10 @@ interface Discount extends Entity {
 }
 ```
 
-The transformers must write exactly what today's UI writes, including its quirks. V2 (`formToV2Payload`): money in paise, free gift as `CART` + `FREE_GIFT` action, unlimited and no end date omitted. Legacy v1: for buy X get Y, today's UI stores `X + Y` as `min_cart_quantity` (Shopify-synced discounts store `X` as `min_product_quantity`). Discount behaviour does not change.
+The transformers write exactly what today's UI writes, quirks included. Discount behaviour does not change.
+
+- **V2** (`formToV2Payload`): money in paise; free gift as `CART` + `FREE_GIFT` action; unlimited and no end date omitted.
+- **Legacy v1**: buy X get Y stores `X + Y` as `min_cart_quantity` (Shopify-synced discounts store `X` as `min_product_quantity`).
 
 One route for every kind today (`/discounts/new`, edit at `/discounts/:id`). API types per kind:
 

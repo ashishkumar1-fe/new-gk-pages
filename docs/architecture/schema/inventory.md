@@ -83,7 +83,17 @@ interface InventoryRow extends InventoryLevel {
 
 ## Editing stock
 
-Same as today, through v3: `set-on-hand` / `set-quantities` (absolute, with `compare_quantity`) and `adjust-quantities` (delta), each with a `reason` (correction, received, damaged, safety_stock_set, import, other) and an optional note. Every write is logged and readable through `GET /v3/admin/inventory/adjustments` (today: the variant adjustment history page). `move-quantities` and `bulk-adjust` exist but are unused. `bulk-edit/multi-warehouse` remains only for the product editor's variant quantity bulk edit. See [deferred.md](deferred.md).
+Same as today, through v3 ([deferred.md](deferred.md)):
+
+| Endpoint | Kind | Used by |
+|---|---|---|
+| `set-on-hand`, `set-quantities` | absolute, with `compare_quantity` | inventory list, bulk edit, variant page |
+| `adjust-quantities` | delta | adjust popover |
+| `move-quantities`, `bulk-adjust` | — | exist, unused |
+| `bulk-edit/multi-warehouse` (v1) | absolute | product editor's variant quantity bulk edit only |
+
+- Every write carries a `reason` (correction, received, damaged, safety_stock_set, import, other) and an optional note.
+- Every write is logged, readable through `GET /v3/admin/inventory/adjustments` (today: the variant adjustment history page).
 
 ## Supplier
 

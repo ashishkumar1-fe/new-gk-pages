@@ -17,7 +17,13 @@ domain/order/
 
 ## Schemas
 
-One schema per shape: it parses the API response ([ADR 0004](../adr/0004-validate-every-response.md)), drives the form (Zod resolver) and becomes the command / AI tool input. Backend shapes are mapped once in the API module ([data flow](../schema/conventions.md#data-flow-transform-once-never-mutate)).
+One schema per shape, used three ways:
+
+- Parses the API response ([ADR 0004](../adr/0004-validate-every-response.md)).
+- Drives the form (Zod resolver).
+- Becomes the command / AI tool input.
+
+Backend shapes are mapped once in the API module ([data flow](../schema/conventions.md#data-flow-transform-once-never-mutate)).
 
 ## Rules
 

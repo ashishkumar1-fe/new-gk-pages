@@ -30,7 +30,11 @@ list: {
 }
 ```
 
-Search, as today: `contains` conditions OR-ed across email, firstName, lastName, name, phone, company, tags, address; when other filters are active, conditions are AND-ed (`CustomerHome.tsx:94-166`). Today's tag options come from the loaded page only; v1 uses the same until a tags lookup exists.
+Search, as today (`CustomerHome.tsx:94-166`):
+
+- `contains` conditions OR-ed across email, firstName, lastName, name, phone, company, tags, address.
+- When other filters are active, conditions are AND-ed.
+- Tag options come from the loaded page only; v1 keeps this until a tags lookup exists.
 
 ## Editor
 

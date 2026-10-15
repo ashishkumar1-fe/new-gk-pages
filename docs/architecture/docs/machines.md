@@ -35,7 +35,7 @@ Every machine is a folder; `machine.ts` only orchestrates.
 ```
 machines/refund/
   machine.ts   # states and transitions only
-  actors.ts    # async work (queries, runCommand)
+  actors.ts    # async work (resource queries, runCommand), replaceable in tests
   actions.ts   # pure assign helpers
   types.ts     # context and events
   index.ts

@@ -46,7 +46,11 @@ const keys = {
 
 ## Cache policy
 
-Today's gk-pages has no cache: every navigation refetches. Freshness is one setting, not per-screen code: every query takes its `staleTime` from a named class, and the classes come from one policy object in `platform/query/cachePolicy.ts`. Switching policy is a one-line change.
+Today's gk-pages has no cache: every navigation refetches. In Ratio, freshness is one setting, not per-screen code:
+
+- Every query takes its `staleTime` from a named class.
+- The classes come from one policy object in `platform/query/cachePolicy.ts`.
+- Switching policy is a one-line change.
 
 ```ts
 type CacheClass = 'list' | 'detail' | 'lookup' | 'calc';
@@ -66,7 +70,9 @@ export const ACTIVE_POLICY: keyof typeof policies = 'fresh';   // ← the switch
 | `lookup` | vendors, types, tags, taxonomy, locations, suppliers, sort options, views | Rarely change |
 | `calc` | server calculations (`/calculate`, edit-session preview) | Always current |
 
-Resource data providers declare a class, never a number; a per-resource override is allowed only with a comment saying why. Either policy renders cached data instantly while the background refetch runs. Polling stays per command (refund status: 5 s, up to 24 times, as today).
+- Data providers declare a class, never a number; a per-resource override needs a comment saying why.
+- Either policy renders cached data instantly while the background refetch runs.
+- Polling stays per command (refund status: 5 s, up to 24 times, as today).
 
 ## Invalidation
 

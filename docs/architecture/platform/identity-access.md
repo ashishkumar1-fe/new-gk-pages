@@ -23,7 +23,8 @@ GET /api/dashboard/user/details
 | `true` | App opens |
 | `false` | Every route blocked; "You don't have access. Talk to sales." screen |
 
-Today the dashboard uses this flag only to show the sidebar item (`dashboard-ui` `sideNav/index.tsx:1476`, `SideNavMerger.tsx:667`); gk-pages still mounts by URL. Ratio's guard makes it real. It runs in the boot flow ([auth-session](auth-session.md#boot-flow)), before any route renders.
+- Today the flag only shows the sidebar item (`dashboard-ui` `sideNav/index.tsx:1476`, `SideNavMerger.tsx:667`); gk-pages still mounts by URL.
+- Ratio's guard makes it real: it runs in the boot flow ([auth-session](auth-session.md#boot-flow)), before any route renders.
 
 ## Permissions
 

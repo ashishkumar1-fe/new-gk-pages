@@ -4,22 +4,34 @@
 
 Everything the GoKwik dashboard shell provides today, now owned by Ratio: HTML, login, session, merchant context, chrome, API access, delivery and quality. No feature code lives here.
 
+These are topics; in code they span [layers](../README.md#layers):
+
+| Topic | Layer | Folder |
+|---|---|---|
+| HTTP client, session, permissions, telemetry | Platform core | `platform/` |
+| Login, boot | Orchestration | `machines/` |
+| Chrome | Surfaces | `routes/`, `ui/` shell |
+
 Decisions are from the standalone decision tracker (`d01`–`d36`, all closed); each page cites the ones it carries. Counts and code facts were re-checked against gk-pages `main` on 2026-10-14.
 
 ## Before and after
 
-```
-Today
-  Browser ─▶ dashboard.gokwik.in
-             Root config (import map + only HTML page)
-               ─▶ Dashboard shell (login · session · sidebar · breadcrumbs)
-                    ─▶ GK Pages (content area only; borrows shell utilities and store)
-                         ─▶ API gateway ─▶ os-item · os-order · os-discount · os-resources …
-
-Ratio
-  Browser ─▶ <ratio>.gokwik.in
-             Ratio app (own index.html · login · chrome · platform layer)
-               ─▶ API gateway (new origin allowed) ─▶ same services, zero changes
+```mermaid
+flowchart LR
+  subgraph today["Today"]
+    direction LR
+    B1([Browser]) --> RC["Root config<br/>import map · only HTML page"]
+    RC --> SH["Dashboard shell<br/>login · session · sidebar · breadcrumbs"]
+    SH --> GP["GK Pages<br/>content area only; borrows shell utilities and store"]
+    GP --> GW1[(API gateway)]
+  end
+  subgraph ratio["Ratio"]
+    direction LR
+    B2([Browser]) --> RA["Ratio app on &lt;ratio&gt;.gokwik.in<br/>own index.html · login · chrome · platform layer"]
+    RA --> GW2[("API gateway<br/>new origin allowed")]
+  end
+  GW1 --> SV["os-item · os-order · os-discount · os-resources …<br/>zero changes"]
+  GW2 --> SV
 ```
 
 The root config and the dashboard shell leave the path. Their jobs become this folder. Nothing behind the gateway changes.

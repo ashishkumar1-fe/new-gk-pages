@@ -55,7 +55,12 @@ One external check every minute (login page + one API round trip), CloudFront er
 
 ## Feature flags
 
-PostHog flags: percentage and per-merchant rollout, kill switches (rollback is a toggle, not a deploy). Launch itself can be a flag. Flags are removed once a feature is stable at 100%. Features without a backend use the same mechanism (capability flags in [resources](../resources/contract.md) and [commands](../commands/contract.md)).
+PostHog flags:
+
+- Percentage and per-merchant rollout.
+- Kill switches: rollback is a toggle, not a deploy. Launch itself can be a flag.
+- Removed once a feature is stable at 100%.
+- Features without a backend use the same mechanism (capability flags in [resources](../resources/contract.md) and [commands](../commands/contract.md)).
 
 ## Performance
 
@@ -68,4 +73,11 @@ Every screen: loading skeleton, empty state with an action, error state with ret
 
 ## Team documents
 
-Runbook (before launch), decision records, tracking plan (`object_verb` snake_case event names, before the first event), PII masking policy. They live in this repo for now (the tracker said Confluence only); the folder can move later as a whole ([ADR 0002](../adr/0002-new-codebase.md#docs)).
+| Document | When |
+|---|---|
+| Runbook | before launch |
+| Decision records | [adr/](../adr/README.md) |
+| Tracking plan (`object_verb` snake_case event names) | before the first event |
+| PII masking policy | before launch |
+
+They live in this repo for now (the tracker said Confluence only); the folder can move later as a whole ([ADR 0002](../adr/0002-new-codebase.md#docs)).

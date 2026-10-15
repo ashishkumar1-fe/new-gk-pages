@@ -2,20 +2,22 @@
 
 [← Architecture](../README.md)
 
-A **command** is every action that changes data or has an effect outside the page: save a product, cancel an order, export customers. Each is defined once. Buttons, menus, the bulk bar, ⌘K, shortcuts, the assistant and extensions all run the same definition through one execution path.
+A **command** is every action that changes data or has an effect outside the page: update a product, cancel an order, export customers.
+
+- Each is defined once.
+- Buttons, menus, the bulk bar, ⌘K, shortcuts, the assistant and extensions all run the same definition through one execution path.
 
 Background on the model and the products it draws from: [ADR 0001](../adr/0001-resources-and-commands.md).
 
 ## Layers
 
-```
-surfaces        buttons · menus · bulk bar · ⌘K · shortcuts · assistant · extensions     surfaces.md
-   ▼
-registry        resolve ID → definition, check visibility, enablement, permission
-   ▼
-execution       validate → confirm → run steps → update cache → notify → audit           execution.md
-   ▼
-API modules     the service calls (same modules resources read through)
+```mermaid
+flowchart TB
+  S["<b>Surfaces</b> — buttons · menus · bulk bar · ⌘K · shortcuts · assistant · extensions<br/><i>surfaces.md</i>"]
+  R["<b>Registry</b> — resolve ID → definition; check visibility, enablement, permission"]
+  E["<b>Execution</b> — validate → confirm → run steps → update cache → notify → audit<br/><i>execution.md</i>"]
+  A["<b>API modules</b> — the service calls (same modules resources read through)"]
+  S --> R --> E --> A
 ```
 
 ## Files

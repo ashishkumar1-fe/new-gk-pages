@@ -2,7 +2,7 @@
 
 [← Architecture](../README.md)
 
-State has three homes.
+State has three homes. It is not a layer of its own; where each home sits in the stack is in the [README](../README.md#layers).
 
 | Kind | Home | Examples |
 |---|---|---|
@@ -14,11 +14,11 @@ Flow state (multi-step processes) lives in a state machine; see [machines.md](ma
 
 ## The table loop
 
-```
-URL params ─▶ query key ─▶ cache ─▶ table
-    ▲                                 │
-    └── user changes filter           ▼
-                         command ─▶ API ─▶ set detail / invalidate lists ─▶ refetch
+```mermaid
+flowchart LR
+  URL["URL params"] --> K["Query key"] --> Cache["Query cache"] --> T["Table"]
+  T -- "user changes filter" --> URL
+  T -- "user acts" --> Cmd["Command"] --> API["API"] --> Upd["Set detail · invalidate lists"] --> Cache
 ```
 
 ## Query keys

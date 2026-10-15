@@ -22,7 +22,15 @@ type Id = string;            // opaque; never parse or build IDs in the UI
 type Handle = string;        // URL-safe slug, unique per store per entity type
 ```
 
-Tenant: the frontend calls it **`storeId`** everywhere (URL `/store/$storeId`, query keys, command context). It is the merchant's `m_id`; the backend names it `merchant_id`, `merchantId`, `store_id`, `storeId` and the `merchant-mid` / `gk-merchant-id` headers. The API client maps `storeId` to each service's name on the way out; nothing above `api/` sees the backend names. Entities don't carry it.
+Tenant: **`storeId`**, the merchant's `m_id`.
+
+| Where | Name |
+|---|---|
+| Frontend: URL `/store/$storeId`, query keys, command context | `storeId` |
+| Backend | `merchant_id`, `merchantId`, `store_id`, `storeId`; headers `merchant-mid`, `gk-merchant-id` |
+
+- The API client maps `storeId` to each service's name on the way out; nothing above `api/` sees the backend names.
+- Entities don't carry it.
 
 ## Naming
 

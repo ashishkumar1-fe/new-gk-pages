@@ -4,7 +4,7 @@
 
 Every resource in the admin. Nav groups follow the Ratio design sidebar.
 
-All routes live under `/store/$storeId` ([routing](../platform/routing.md)); paths here and in resource and command definitions are relative to it.
+All routes live under `/store/$storeId` ([routing](../surfaces/routing.md)); paths here and in resource and command definitions are relative to it.
 
 | Resource | Service | Routes | Screen | Nav | Definition |
 |---|---|---|---|---|---|

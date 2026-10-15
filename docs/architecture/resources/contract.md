@@ -16,7 +16,7 @@ interface ResourceDefinition<
   subtitle?: (r: T | TItem) => string;
 
   // ── Data ────────────────────────────────────────────────
-  service: 'item' | 'inventory' | 'os-order' | 'os-customer' | 'os-discount' | 'os-resources' | 'apps' | 'timeline' | 'bulk-ops';   // see platform/api-client.md#services
+  service: 'item' | 'inventory' | 'os-order' | 'os-customer' | 'os-discount' | 'os-resources' | 'apps' | 'timeline' | 'bulk-ops';   // see gateway/README.md#services
   schema: { detail: ZodType<T>; item: ZodType<TItem>; input?: ZodType<TInput> };
   data: DataProvider<T, TItem>;                  // data-access.md
   keys: QueryKeys;

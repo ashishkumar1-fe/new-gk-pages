@@ -20,6 +20,9 @@
 | 16 | Fix the data-affecting defects in today's writes | Product, QA | List in [commands README](../commands/README.md#defects-in-todays-writes); product bulk edit price bug first |
 | 14 | Business-logic changes the design implies (GST rate, tax split, MRP label, marketplaces, inventory history, variant save, validations) | Product | Kept as today in v1; list and seams in [deferred.md](../schema/deferred.md#b-business-logic-keep-todays-behaviour-change-only-with-product-sign-off) |
 | 19 | Default cache policy: `fresh` (revalidate on every mount) or `balanced` (30 s lists, 60 s detail)? | Product, Engineering | Starts as `fresh`; switching is one line ([data access](../resources/data-access.md#cache-policy)) |
+| 20 | OpenAPI specs for os-order, item, inventory, os-customer, discount V2, bulk-ops? | Backend | Upgrades the [gateway API docs](../gateway/README.md) from inferred to confirmed; otherwise sandbox HAR captures |
+| 21 | Does the server need `POST /team/switch-merchant` when every call already carries `merchant-mid`? Does it break two tabs on different stores? | Backend | Decides whether store switching is per tab ([merchant context](../platform/auth-session.md#merchant-context)) |
+| 22 | What does `@gokwik/utilities` `makeAPICall` do exactly: headers added, envelope unwrapped, errors swallowed? | Dashboard team | The new client must match it; the package isn't in either repo |
 
 ## Decided
 

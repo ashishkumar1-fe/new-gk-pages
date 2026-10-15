@@ -1,6 +1,6 @@
 # Quality
 
-[← Platform](README.md)
+[← Operations](README.md)
 
 | # | Decision |
 |---|---|

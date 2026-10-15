@@ -12,4 +12,19 @@ One file per settled decision: `NNNN-short-title.md` with Context, Decision, Con
 | [0004](0004-validate-every-response.md) | Every response parsed with its schema, the same way |
 | [0005](0005-cache-policy-switch.md) | Cache freshness is one switch (`fresh` / `balanced`) |
 
-Platform decisions `d01`–`d36` come from the standalone decision tracker and are recorded in [../platform/](../platform/README.md), each page citing its decisions.
+## Tracker decisions d01–d36
+
+From the standalone decision tracker (all closed); each page lists the ones it carries.
+
+| Decisions | Page |
+|---|---|
+| d01–d04, d08, d36 | [platform › identity and access](../platform/identity-access.md) |
+| d05–d07, d12 | [platform › auth and session](../platform/auth-session.md) |
+| d11, d31 | [platform › API client](../platform/api-client.md) |
+| d09, d10 | [surfaces › routing](../surfaces/routing.md) |
+| d13–d16 | [surfaces › chrome](../surfaces/chrome.md) |
+| d17, d18 | [gateway › access](../gateway/access.md) |
+| d19–d21, d32, d34 | [operations › delivery](../operations/delivery.md) |
+| d22–d30, d33, d35 | [operations › quality](../operations/quality.md) |
+
+Still open: exact subdomain (d02, [open questions](../docs/open-questions.md) #2), phased rollout (d03, at cutover), detailed deploy process (d19, near launch).

@@ -1,6 +1,6 @@
 # Order commands
 
-[← Commands](../README.md) · Resources: [order](../../resources/defs/order.md), [draft order](../../resources/defs/draft-order.md) · Service: os-order. Paths are relative to `{ORDER}/api/v1/admin` unless they start with a token ([services](../../platform/api-client.md#services)).
+[← Commands](../README.md) · Resources: [order](../../resources/defs/order.md), [draft order](../../resources/defs/draft-order.md) · Service: os-order. Paths are relative to `{ORDER}/api/v1/admin` unless they start with a token ([base URLs](../../platform/api-client.md#base-urls)).
 
 Permission: `write_orders`; refund commands `write_refunds` (enforcement off in v1).
 

@@ -21,4 +21,4 @@ Architecture and team docs live in this repo for now (`docs/`), one home per doc
 ## Consequences
 
 - No compatibility layer for `@gokwik/utilities`, Redux slices or antd.
-- gk-pages keeps running in the dashboard until cutover ([delivery](../platform/delivery.md#cutover)); fixes landing there must be checked against these docs.
+- gk-pages keeps running in the dashboard until cutover ([delivery](../operations/delivery.md#cutover)); fixes landing there must be checked against these docs.

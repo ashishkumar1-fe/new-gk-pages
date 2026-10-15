@@ -1,6 +1,6 @@
 # Discount commands
 
-[← Commands](../README.md) · Resource: [discount](../../resources/defs/discount.md) · Services: Discount Service V2 via the gateway for `discount.*` (paths relative to `{BASE}/dashboard/v2/discount`); os-discount for `discountSet.*` and the assistant session (paths relative to `{DISCOUNT}/api/v1/admin/os-discount`). Paths that start with a token are full ([services](../../platform/api-client.md#services)).
+[← Commands](../README.md) · Resource: [discount](../../resources/defs/discount.md) · Services: Discount Service V2 via the gateway for `discount.*` (paths relative to `{BASE}/dashboard/v2/discount`); os-discount for `discountSet.*` and the assistant session (paths relative to `{DISCOUNT}/api/v1/admin/os-discount`). Paths that start with a token are full ([base URLs](../../platform/api-client.md#base-urls)).
 
 Permission: `write_discounts` for every command (enforcement off in v1).
 

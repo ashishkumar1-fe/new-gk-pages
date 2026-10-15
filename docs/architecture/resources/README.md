@@ -15,7 +15,7 @@ Built on the [schema](../schema/README.md) → [data access](data-access.md) →
 | [list.md](list.md) | List screen behaviour: URL state, search, filters, views, sort, selection, cell edit |
 | [editor.md](editor.md) | Record editor: draft, sections, server calculation, save, sub-routes |
 | [registry.md](registry.md) | Every resource: service, routes, screen kind, nav |
-| [defs/](defs/) | One file per resource with its real definition (index: [registry](registry.md)) |
+| [defs/](defs) | One file per resource with its real definition (index: [registry](registry.md)) |
 
 ## Rules
 

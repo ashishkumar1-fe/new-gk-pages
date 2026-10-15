@@ -29,7 +29,7 @@ Tenant: **`storeId`**, the merchant's `m_id`.
 | Frontend: URL `/store/$storeId`, query keys, command context | `storeId` |
 | Backend | `merchant_id`, `merchantId`, `store_id`, `storeId`; headers `merchant-mid`, `gk-merchant-id` |
 
-- The API client maps `storeId` to each service's name on the way out; nothing above `api/` sees the backend names.
+- The HTTP client sends it as the two headers; each service module adds any query or body name its service also wants. Nothing above `api/` sees the backend names.
 - Entities don't carry it.
 
 ## Naming
@@ -42,17 +42,26 @@ One name per concept across the frontend. Where a choice is open, follow the Sho
 | Write that changes an existing record | `resource.update` (Shopify `productUpdate`) | `.save`, `.edit` |
 | Create / delete | `resource.create` / `resource.delete` | `.add`, `.remove` |
 | Permission | Shopify-style scope `read_products`, `write_orders` | `products:view` |
-| Service ids in definitions | lowercase, as in [services](../platform/api-client.md#services) (`'item'`, `'os-order'`) | `'ITEM'` |
+| Service ids in definitions | lowercase, as in [gateway services](../gateway/README.md#services) (`'item'`, `'os-order'`) | `'ITEM'` |
 
 Backend names that differ are converted once in the service's API module.
 
 ## Data flow: transform once, never mutate
 
-1. **At the boundary** (`api/<service>/transformer.ts`): parse the response with its schema and build a **new** domain object (camelCase, `Money`, `Page<T>`). This is the only place backend shapes change, and only for consistency.
+1. **At the boundary** (`api/<service>/`): parse the response with its **wire schema** (`wire.ts`, exactly what the service sends), then the transformer (`transformer.ts`) builds a **new** domain object (camelCase, `Money`, `Page<T>`). This is the only place backend shapes change, and only for consistency.
 2. **Everywhere above**: domain objects are read-only. Code never mutates query data, never reshapes it in hooks, never stores a copy.
 3. **At the point of display**: anything a screen needs in another form (labels, formatted money, grouped rows) is derived at render time by a pure function (`domain/<entity>/format.ts`) that returns a new value.
 
 Writes go the other way: the command builds the request payload from its input as a new object.
+
+Two schemas per entity:
+
+| | Wire schema | Domain schema |
+|---|---|---|
+| Describes | What one backend service sends | What the app means by the entity |
+| Lives in | `api/<service>/wire.ts` | `domain/<entity>/schema.ts` |
+| Changes when | The backend changes | The business meaning changes |
+| Source | [Gateway APIs](../gateway/README.md) | This folder |
 
 ## Money
 
@@ -127,7 +136,7 @@ Orders already expose server-defined views (`{name, query}`) and sort options (`
 
 ## Write metadata
 
-Writes carry the acting staff member, added by the API client from the session, in the service's casing:
+Writes carry the acting staff member, added by the service module from the session, in the service's casing:
 
 | Service | Fields |
 |---|---|

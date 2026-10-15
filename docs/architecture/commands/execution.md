@@ -90,7 +90,7 @@ Confirm labels state the action and count ("Archive 12 orders"), never "OK".
 
 ## Errors from the server
 
-API modules map service errors to the result type:
+API modules map `ApiError` ([client](../platform/api-client.md#what-the-client-does)) and soft failures to the result type:
 
 | Server says | Result |
 |---|---|
@@ -98,4 +98,6 @@ API modules map service errors to the result type:
 | 403 | `denied` |
 | 409 / version mismatch | `error` with "changed elsewhere", editor offers reload |
 | Known business code (`ALREADY_ARCHIVED`) | `success` with a warning, when harmless |
+| 2xx body with `success: false` | `error` (never shown as success) |
+| 401 | session expired; boot sends the user to login |
 | 5xx / network | `error`, retryable |

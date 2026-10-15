@@ -13,7 +13,7 @@ The [resource](../resources/registry.md) and [command](../commands/registry.md) 
 | 5. Remaining resources | Inventory, purchase orders, transfers, customers, segments, discounts | Ported through the registries |
 | 6. Extensions | Extension targets on resources, app bridge in new chrome | Parity with today |
 
-Steps 4 and 6 can move earlier if business priority demands, once step 3 is done. Going live follows the [cutover plan](../platform/delivery.md#cutover).
+Steps 4 and 6 can move earlier if business priority demands, once step 3 is done. Going live follows the [cutover plan](../operations/delivery.md#cutover).
 
 ## Done means
 

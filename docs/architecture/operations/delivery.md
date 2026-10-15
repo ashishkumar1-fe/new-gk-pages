@@ -1,6 +1,6 @@
 # Delivery
 
-[← Platform](README.md)
+[← Operations](README.md)
 
 | # | Decision |
 |---|---|
@@ -39,7 +39,7 @@ flowchart LR
 | Step | Rollback |
 |---|---|
 | 1. Ratio live on its domain; smoke test | Take the domain down |
-| 2. Dashboard sidebar link and `/gk-pages/*` redirect to Ratio ([routing](routing.md#old-urls)) | Remove the redirect |
+| 2. Dashboard sidebar link and `/gk-pages/*` redirect to Ratio ([routing](../surfaces/routing.md#old-urls)) | Remove the redirect |
 | 3. Remove the `@gokwik/gk-pages` import-map entry | Restore the entry |
 
 Both stay deployable until step 3 has held. Phased rollout (d03) can use a PostHog flag on the redirect.

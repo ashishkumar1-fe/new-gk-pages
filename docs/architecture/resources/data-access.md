@@ -42,7 +42,7 @@ const keys = {
 };
 ```
 
-`storeId` is in every key, so one store's cache never shows in another ([API client](../platform/api-client.md#query-keys)).
+`storeId` is in every key, so one store's cache never shows in another.
 
 ## Cache policy
 

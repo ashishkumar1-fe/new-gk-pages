@@ -25,7 +25,7 @@ What each backend service accepts and returns, inferred from how gk-pages `main`
 | [bulk-ops](bulk-ops.md) | Import and export jobs | `{BULK_OPS}` | 9 |
 | [media-apps](media-apps.md) | Media library and uploads, app store | `{RESOURCES}`, `{APPS}` | 18 |
 
-Tokens → env vars: [API client › services](../platform/api-client.md#services).
+Tokens → env vars: [API client › base URLs](../platform/api-client.md#base-urls).
 
 Not in v1, not documented: analytics, session analytics, search-discovery, loyalty, mega-menu, reviews, A/B testing, visual editor, brand mappings.
 

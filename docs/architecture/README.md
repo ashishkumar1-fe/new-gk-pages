@@ -22,7 +22,7 @@ flowchart TB
   S["<b>6 · Surfaces</b><br/>tables · forms · buttons · detail pages · ⌘K · assistant · extensions · chrome"]
   O["<b>5 · Orchestration</b><br/>state machines · app boot · entitlement guard"]
   C["<b>4 · Contracts</b><br/>defineResource() — reads, query cache<br/>defineCommand() — writes, runCommand"]
-  A["<b>3 · Service API</b><br/>one module per service: endpoints · transformer · response validation"]
+  A["<b>3 · Service API</b><br/>one module per service: endpoints · wire schema · transformer"]
   D["<b>2 · Domain</b><br/>Zod schemas · pure rules · formatters"]
   P["<b>1 · Platform core</b><br/>HTTP client · session · storeId · permissions · query client · telemetry · config"]
   U["<b>UI kit</b><br/>tokens · primitives · patterns"]
@@ -62,24 +62,22 @@ State is not a layer: server data sits in the query cache (client in platform co
 
 ## Docs
 
-| Area | Doc | One line |
-|---|---|---|
-| Context | [context.md](docs/context.md) | What today's GK does, and what we keep or drop |
-| Design mapping | [design-mapping.md](docs/design-mapping.md) | Features in the Ratio design → resources, commands, machines |
-| Schema | [schema/](schema/README.md) | The data model: entities, fields, statuses, money, stock |
-| Platform | [platform/](platform/README.md) | Identity, auth and session, routing, API client, chrome, gateway, delivery, quality (tracker decisions d01–d36) |
-| State | [state.md](docs/state.md) | The three homes for state and the rules between them |
-| Domain | [domain.md](docs/domain.md) | Schemas and pure business rules per entity |
-| Resources | [resources/](resources/README.md) | Resource contract, data access, list and editor standards |
-| Commands | [commands/](commands/README.md) | Command contract, execution path, bulk and jobs, surfaces (assistant, ⌘K, extensions) |
-| Machines | [machines.md](docs/machines.md) | When to use XState, and how files are laid out |
-| Assistant | [assistant.md](docs/assistant.md) | AI panel, tools from commands, human-in-the-loop |
-| Extensions | [extensions.md](docs/extensions.md) | UI extensions + embedded apps on top of contracts |
-| UI kit | [ui-kit.md](docs/ui-kit.md) | Own components on Radix + Tailwind |
-| Stack | [stack.md](docs/stack.md) | Library choices with reasons and alternatives |
-| Structure | [structure.md](docs/structure.md) | Folder layout and import rules |
-| Build order | [build-order.md](docs/build-order.md) | Sequence from platform shell to all domains |
-| Open questions | [open-questions.md](docs/open-questions.md) | Decisions still needed, with owners |
+| Layer | Docs |
+|---|---|
+| Gateway (backend) | [gateway/](gateway/README.md): every endpoint gk-pages uses, CORS and bypass audit |
+| 1 · Platform core | [platform/](platform/README.md): HTTP client, session, merchant, permissions, config |
+| 2 · Domain | [schema/](schema/README.md) entities and conventions · [domain.md](docs/domain.md) rules and formatters |
+| 3 · Service API | [data flow](schema/conventions.md#data-flow-transform-once-never-mutate): wire schema → transformer (per-service pages to come) |
+| 4 · Contracts | [resources/](resources/README.md) reads · [commands/](commands/README.md) writes |
+| 5 · Orchestration | [machines.md](docs/machines.md): boot, login, refund, editor, import… |
+| 6 · Surfaces | [surfaces/](surfaces/README.md) routing, chrome · [assistant.md](docs/assistant.md) · [extensions.md](docs/extensions.md) · [ui-kit.md](docs/ui-kit.md) |
+
+| Cross-cutting | Docs |
+|---|---|
+| State | [state.md](docs/state.md): where data lives |
+| Operations | [operations/](operations/README.md): delivery, quality |
+| Code | [structure.md](docs/structure.md) folders and imports · [stack.md](docs/stack.md) libraries |
+| Planning | [context.md](docs/context.md) · [design-mapping.md](docs/design-mapping.md) · [build-order.md](docs/build-order.md) · [open-questions.md](docs/open-questions.md) · [adr/](adr/README.md) |
 
 ## Decisions log
 

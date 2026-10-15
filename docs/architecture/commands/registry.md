@@ -2,7 +2,7 @@
 
 [← Commands](README.md)
 
-All v1 commands by resource. Definitions in [defs/](defs/).
+All v1 commands by resource. Definitions in [defs/](defs).
 
 | Resource | Commands | File |
 |---|---|---|
@@ -26,7 +26,7 @@ All v1 commands by resource. Definitions in [defs/](defs/).
 
 ## Assistant topics (v1)
 
-Topics: catalog, inventory, orders, customers, discounts. What each command exposes to the palette, assistant and extensions is in the Exposure table of its [defs](defs/) file. Every proposal still needs the person's approval.
+Topics: catalog, inventory, orders, customers, discounts. What each command exposes to the palette, assistant and extensions is in the Exposure table of its [defs](defs) file. Every proposal still needs the person's approval.
 
 ## Permissions
 

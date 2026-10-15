@@ -1,6 +1,6 @@
 # Gateway
 
-[← Platform](README.md)
+[← Gateway](README.md)
 
 | # | Decision |
 |---|---|
@@ -12,18 +12,19 @@
 ```
 allowed_origins   += https://<ratio>.gokwik.in       (exact origin; wildcards don't work with credentials)
 Access-Control-Allow-Credentials: true
-allowed_headers   += gk-merchant-id, merchant-mid
+allowed_headers   += gk-merchant-id, merchant-mid, idempotency-key, x-idempotency-key
 ```
 
-Auth (cookie) and CORS are both enforced at the gateway, so this one change opens every gateway-routed API.
+- Auth (cookie) and CORS are both enforced at the gateway, so this one change opens every gateway-routed API.
+- The idempotency headers are needed by v3 inventory writes and refunds ([inventory](inventory.md), [os-order](os-order.md)). Any other custom header fails the preflight, as it does today.
 
 ## Bypass audit
 
 | Step | |
 |---|---|
-| 1 | List every call per service from the [services table](api-client.md#services) |
+| 1 | List every call per service from the [service pages](README.md#services) |
 | 2 | Tag gateway-routed (safe) vs bypass: direct service hosts, storage uploads, third-party endpoints |
 | 3 | Smoke-test the bypass list from the new origin on staging: login → products → one save → one upload |
 | 4 | Backend fixes what fails |
 
-Known candidates: presigned media uploads, discount service calls on a direct host (the discount V2 CORS issue), the separate customer host (`{KWIKPASS_CUSTOMER}`).
+Known candidates: presigned media uploads, the separate customer host (`{KWIKPASS_CUSTOMER}`). Discount V2 already goes through the gateway (`{BASE}/dashboard/v2/discount`).

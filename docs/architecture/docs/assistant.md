@@ -1,0 +1,48 @@
+# Assistant
+
+[← Architecture](../README.md)
+
+An in-app AI panel, similar to Rovo in Jira. It reads what the user is looking at and can propose actions. The user confirms every write.
+
+The design names it **Arya**: a side panel that stays open while the user moves between pages. Its conversation state lives at the app root, not in a page.
+
+## How it fits
+
+The assistant is another surface over the same contracts. It gets no special access.
+
+```
+User message + screen context
+        │
+        ▼
+Backend LLM call ── tools = commands the user may run + read queries
+        │
+        ▼
+Tool call proposed ─▶ UI renders a confirm card ─▶ runCommand() ─▶ cache refresh
+```
+
+## Screen context
+
+Sent with each message so "refund these" works:
+
+- current route and resource,
+- active filters (from the URL),
+- selected row ids,
+- open record id.
+
+## Tools
+
+- **Read tools** — list/get queries per resource (search orders, get product).
+- **Write tools** — generated from command input schemas. Same permissions, same confirm policy, same execution path.
+
+## Rules
+
+- LLM calls and API keys stay on the backend; the browser streams responses.
+- Writes always need user confirmation. No silent writes, no "auto-approve" in v1.
+- Tool results are rendered as UI (tables, record cards), not only text.
+- Every proposed and executed action is logged for audit.
+
+## Open
+
+- Is Arya part of the core product or an installed app? The design lists it under Settings → Apps.
+- Which backend hosts the assistant endpoint (see [open-questions.md](open-questions.md)).
+- Model and cost limits per merchant.

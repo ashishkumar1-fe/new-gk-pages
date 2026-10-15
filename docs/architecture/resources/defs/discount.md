@@ -29,7 +29,7 @@ list: {
 
 One route: `/discounts/new`, a 5-step wizard (offer type · offer & code · eligibility · usage & stacking · review). Edit at `/discounts/$id` opens the same wizard at step 2 with kind and mode locked. Code availability is checked on leaving step 2 (`discount.checkCode`). Finish: "Publish now" or "Save as draft" (draft needs only kind and title), then back to the list.
 
-`editor: { save: 'discount.save', create: { route: '/discounts/new', command: 'discount.create' } }`
+`editor: { save: 'discount.update', create: { route: '/discounts/new', command: 'discount.create' } }`
 
 Hidden in today's wizard, round-tripped on save: `stacking`, `payment` flags, `crossDomainEffects` (`StepLimits.tsx:60-111`).
 
@@ -92,7 +92,7 @@ Same list and editor at `/discount-sets`, with:
 - Edit shows the generated codes with CSV download.
 
 ```ts
-editor:   { save: 'discountSet.save', create: { route: '/discount-sets/new/$kind', command: 'discountSet.create' } },
+editor:   { save: 'discountSet.update', create: { route: '/discount-sets/new/$kind', command: 'discountSet.create' } },
 commands: { more: (d) => d.bulkCampaign?.status === 'completed' ? ['discountSet.downloadCodes'] : [] },
 ```
 
@@ -101,6 +101,6 @@ commands: { more: (d) => d.bulkCampaign?.status === 'completed' ? ['discountSet.
 ```ts
 service:     'os-discount',   // discounts on Discount Service V2 via the gateway; sets on os-discount
 nav:         { group: 'discounts', position: 1 },
-permissions: { read: 'discounts:read', write: 'discounts:write' },
+permissions: { read: 'read_discounts', write: 'write_discounts' },
 assistant:   { description: 'Discount codes and automatic discounts.', readableFields: ['title', 'code', 'kind', 'status', 'value', 'startsAt', 'endsAt', 'limits'] },
 ```

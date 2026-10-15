@@ -52,7 +52,7 @@ Dependencies point **down only**. A layer never imports from a layer above it.
 | Context | [context.md](docs/context.md) | What today's GK does, and what we keep or drop |
 | Design mapping | [design-mapping.md](docs/design-mapping.md) | Features in the Ratio design → resources, commands, machines |
 | Schema | [schema/](schema/README.md) | The data model: entities, fields, statuses, money, stock |
-| Platform | [platform.md](docs/platform.md) | Session, API client, merchant context, permissions |
+| Platform | [platform/](platform/README.md) | Identity, auth and session, routing, API client, chrome, gateway, delivery, quality (tracker decisions d01–d36) |
 | State | [state.md](docs/state.md) | The three homes for state and the rules between them |
 | Domain | [domain.md](docs/domain.md) | Schemas and pure business rules per entity |
 | Resources | [resources/](resources/README.md) | Resource contract, data access, list and editor standards |
@@ -68,4 +68,4 @@ Dependencies point **down only**. A layer never imports from a layer above it.
 
 ## Decisions log
 
-Short records of settled decisions go in [`adr/`](adr/). One file per decision, written once, never edited except to mark it superseded.
+Settled decisions: [`adr/`](adr/README.md).

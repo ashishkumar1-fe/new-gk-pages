@@ -40,7 +40,7 @@ Seams used throughout:
 | 3 | Compare-at price | `compare_at_price` | Labelled MRP | Label from the copy dictionary |
 | 4 | Sales channels | online, pos | Marketplaces | Modelled as channel rows now (`channels: { channelId, published }[]`); marketplaces are more rows |
 | 5 | Inventory edits | v3 set / adjust with a reason; adjustment history page per variant | Reasons and history across the list | All stock writes go through `inventory.adjust` and `inventory.bulkEdit` (v3); the endpoint stays inside the command. Stock model already has named states |
-| 6 | Variant save | Full replace | Diff-based save | Replace vs diff decided inside `product.save` only |
+| 6 | Variant save | Full replace | Diff-based save | Replace vs diff decided inside `product.update` only |
 | 7 | Validations, discount %, margin | As in gk-pages | Ported as is | One rules module per entity with characterization tests |
 | 7a | Product status names | Active / Draft / Archived | Active / Draft / Hidden | Status labels from the copy dictionary |
 | 7b | Pricing with variants | Pricing section hidden when variants exist | Pricing shown with the variants table | Pricing is its own section with `visibleWhen`; one predicate changes |

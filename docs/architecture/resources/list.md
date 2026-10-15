@@ -24,7 +24,7 @@ interface ListConfig<TItem> {
        | { source: 'column' };                           // discounts: sort_by on column click; orders, drafts: sort_field / sort_direction
   pageSize: number;                        // 50 everywhere
   selection?: { enabled: boolean; max?: number };   // orders: max 100
-  inlineEdit?: InlineEditConfig<TItem>;    // inventory grid
+  cellEdit?: { cells: string[]; command: CommandId };   // inventory: per-cell popover, immediate save
   insights?: { component: ComponentType; capability: string };   // design: strip above the products table
   rowLink?: 'detail' | ((r: TItem) => string) | false;
   empty: { title: string; body?: string; action?: CommandId };
@@ -56,12 +56,6 @@ interface SortOption { field: string; direction: 'asc' | 'desc'; label?: string 
 interface ScopeSelector { param: string; source: () => Promise<Option[]>; required: boolean }
 interface ConditionField { field: string; type: 'text' | 'number' | 'money' | 'date' | 'boolean' | 'tags' }
 interface Option { value: string; label: string }
-
-interface InlineEditConfig<TItem> {
-  editable: string[];                      // column ids
-  derive?: (row: TItem, changed: string) => Partial<TItem>;   // inventory: on hand ↔ available
-  save: CommandId;                         // one call with changed rows
-}
 ```
 
 `toParams` is required because each service encodes filters differently: comma-joined (products), repeated arrays (inventory), min/max pairs (orders), condition objects (customers).
@@ -97,10 +91,6 @@ Changing search, filters, sort, view or scope resets `page`.
 - Optional cap (orders: 100, with a warning).
 - Some bulk commands are conditional on the selection (orders: Unarchive only if all selected are archived).
 - Selection clears when the URL changes.
-
-## Inline edit
-
-Inventory edits quantities in the table. Changed rows are tracked; a save bar shows "N items modified" with Cancel and Save. Save sends only changed rows in one command. Cancel restores the loaded values.
 
 ## Column preferences
 

@@ -33,7 +33,7 @@ Status tabs filter the current page client-side today; kept until the API suppor
 | aside | Shipping | expectedAt, shipping.carrier, shipping.trackingNumber | |
 | aside | Additional | referenceNumber, note, tags | |
 
-Save: `editor: { save: 'transfer.save', create: { route: '/transfers/new', command: 'transfer.create' } }`.
+Save: `editor: { save: 'transfer.update', create: { route: '/transfers/new', command: 'transfer.create' } }`.
 
 Products child (create): columns Product, SKU, Quantity; picker searches inventory of the origin location (debounce 500 ms). Create still accepts `?selectedItems` prefill, but the inventory list no longer offers it.
 
@@ -61,6 +61,6 @@ commands: {
 ```ts
 service:     'inventory',
 nav:         { group: 'products', parent: 'product', position: 5 },
-permissions: { read: 'inventory:read', write: 'inventory:write' },
+permissions: { read: 'read_inventory', write: 'write_inventory' },
 assistant:   { description: 'Stock moved between locations.', readableFields: ['referenceNumber', 'status', 'originLocationId', 'destinationLocationId', 'expectedAt', 'lines.title', 'lines.quantityOrdered', 'lines.quantityReceived'] },
 ```

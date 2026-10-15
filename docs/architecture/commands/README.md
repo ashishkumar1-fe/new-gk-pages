@@ -4,13 +4,6 @@
 
 A **command** is every action that changes data or has an effect outside the page: save a product, cancel an order, export customers. Each is defined once. Buttons, menus, the bulk bar, ⌘K, shortcuts, the assistant and extensions all run the same definition through one execution path.
 
-Resources read; commands write. Nothing else calls a write endpoint.
-
-Written in passes:
-
-1. **Industry baseline**: the contract mature tools converge on. ✓
-2. **Production definitions**: every command the resources use, with real endpoints, confirmations and results from gk-pages. ✓ See [registry.md](registry.md) and [defs/](defs/).
-
 Background on the model and the products it draws from: [ADR 0001](../adr/0001-resources-and-commands.md).
 
 ## Layers

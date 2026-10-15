@@ -66,7 +66,7 @@ interface ChildConfig {
 }
 ```
 
-When a child is saved through its own endpoint (customer addresses, variant stock per warehouse), the save command orchestrates the calls in today's order. The UI never calls child endpoints directly.
+When a child is saved through its own endpoint (customer addresses), the save command orchestrates the calls in today's order. The UI never calls child endpoints directly.
 
 ## Create
 

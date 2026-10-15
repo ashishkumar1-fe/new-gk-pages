@@ -2,7 +2,7 @@
 
 [← Commands](../README.md) · Resources: [inventory](../../resources/defs/inventory.md), [purchase order](../../resources/defs/purchase-order.md), [transfer](../../resources/defs/transfer.md) · Service: inventory. Paths are relative to `{INVENTORY}/v1/admin` unless they start with `/v3`.
 
-Permission: `inventory:write` for every command (enforcement off in v1).
+Permission: `write_inventory` for every command (enforcement off in v1).
 
 Effect: R read-only · D destructive · I idempotent · X external. Mode: P pessimistic.
 
@@ -29,7 +29,7 @@ Notes:
 | Command | Scope | Steps | Confirm | Effect | Mode | After |
 |---|---|---|---|---|---|---|
 | `purchaseOrder.create` | page | `POST /purchase-orders` | — | — | P | toast "Purchase order created"; open detail |
-| `purchaseOrder.save` | record | `PATCH /purchase-orders/:id` (full body) | — | I | P | set detail |
+| `purchaseOrder.update` | record | `PATCH /purchase-orders/:id` (full body) | — | I | P | set detail |
 | `purchaseOrder.markOrdered` | record | same PATCH with status `Ordered` | "Mark {number} as ordered?" | — | P | invalidate inventory (incoming) |
 | `purchaseOrder.close` | record | same PATCH with status `Closed` | "Close {number}?" | — | P | — |
 | `purchaseOrder.reopen` | record | same PATCH with status `Draft` | — | — | P | — |
@@ -49,7 +49,7 @@ Notes:
 | Command | Scope | Steps | Confirm | Effect | Mode | After |
 |---|---|---|---|---|---|---|
 | `transfer.create` | page | `POST /transfers` | — | — | P | open detail |
-| `transfer.save` | record | `PATCH /transfers/:id` | — | I | P | set detail |
+| `transfer.update` | record | `PATCH /transfers/:id` | — | I | P | set detail |
 | `transfer.markPending` | record | same PATCH with status `Pending` | "Mark as ready to ship?" | — | P | invalidate inventory (incoming) |
 | `transfer.receive` | record | `PATCH /stock-transfer/receive` `{transfer_id, items:[{st_item_id, quantity_received, quantity_rejected}]}` | "Receive N units into {location}?" | — | P | invalidate inventory |
 | `transfer.delete` | record | `DELETE /stock-transfers/:id` | critical: "Delete this transfer?" | D | P | go to list |

@@ -29,7 +29,7 @@ list: {
 
 - Fields: totalSpent, tags, firstName, lastName, isDeleted, isActive, createdAt, updatedAt (`SegmentForm.tsx:319`); operators by field type (`:29`); comma-separated values split into lists (`:148`).
 - Edit reads the saved AND / OR (today it resets to AND).
-- `editor: { save: 'segment.save', create: { route: '/segments/new', command: 'segment.create' } }`
+- `editor: { save: 'segment.update', create: { route: '/segments/new', command: 'segment.create' } }`
 
 ## Customers in segment (`/segments/$id/customers`)
 
@@ -49,6 +49,6 @@ commands: {
 ```ts
 service:     'os-customer',
 nav:         { group: 'customers', parent: 'customer', position: 2 },
-permissions: { read: 'customers:read', write: 'customers:write' },
+permissions: { read: 'read_customers', write: 'write_customers' },
 assistant:   { description: 'Saved groups of customers by conditions.', readableFields: ['name', 'description', 'conditions', 'customerCount'] },
 ```

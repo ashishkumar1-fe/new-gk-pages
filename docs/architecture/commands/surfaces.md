@@ -65,10 +65,9 @@ Installed apps can add commands and call allowed ones.
 
 - **Adding.** An app registers commands for a target: `record` (a details page More menu) or `selection` (an index page bulk bar), with a should-render check per record. They appear like built-in commands and run inside the extension sandbox.
 - **Calling.** An app can call built-in commands exposed to extensions, through the same `runCommand`, with the app as the actor and the merchant's confirmation for anything not read-only.
-- Apps never receive session tokens or call write endpoints directly.
 
 ## Keyboard
 
 - Shortcuts are bound to command IDs, scoped to the screens where the command is visible.
-- `mod+k` opens the palette; `mod+s` saves the editor; `?` lists shortcuts for the current screen.
+- Bindings: [registry](registry.md#shortcuts).
 - Shortcuts never fire inside text inputs unless they use a modifier.

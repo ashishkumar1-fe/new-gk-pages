@@ -4,6 +4,8 @@
 
 Every resource in the admin. Nav groups follow the Ratio design sidebar.
 
+All routes live under `/store/$storeId` ([routing](../platform/routing.md)); paths here and in resource and command definitions are relative to it.
+
 | Resource | Service | Routes | Screen | Nav | Definition |
 |---|---|---|---|---|---|
 | Order | os-order | `/orders`, `/orders/$id`, `/orders/$id/edit` | list + detail view + edit route | Orders (badge: count) | [order](defs/order.md) |

@@ -29,17 +29,13 @@ Sent with each message so "refund these" works:
 - selected row ids,
 - open record id.
 
-## Tools
-
-- **Read tools** — list/get queries per resource (search orders, get product).
-- **Write tools** — generated from command input schemas. Same permissions, same confirm policy, same execution path.
-
 ## Rules
 
+Tools, topics, the proposal flow and approval rules: [commands › surfaces](../commands/surfaces.md#assistant).
+
 - LLM calls and API keys stay on the backend; the browser streams responses.
-- Writes always need user confirmation. No silent writes, no "auto-approve" in v1.
+- No "auto-approve" in v1.
 - Tool results are rendered as UI (tables, record cards), not only text.
-- Every proposed and executed action is logged for audit.
 
 ## Open
 

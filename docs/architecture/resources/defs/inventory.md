@@ -65,6 +65,6 @@ commands: {
 ```ts
 service:     'inventory',
 nav:         { group: 'products', parent: 'product', position: 3 },
-permissions: { read: 'inventory:read', write: 'inventory:write' },
+permissions: { read: 'read_inventory', write: 'write_inventory' },
 assistant:   { description: 'Stock per SKU and location.', readableFields: ['sku', 'title', 'locationId', 'available', 'committed', 'onHand', 'incoming'] },   // InventoryRow fields
 ```

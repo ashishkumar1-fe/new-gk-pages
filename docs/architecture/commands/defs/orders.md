@@ -1,8 +1,8 @@
 # Order commands
 
-[← Commands](../README.md) · Resources: [order](../../resources/defs/order.md), [draft order](../../resources/defs/draft-order.md) · Service: os-order. Paths are relative to `{ORDER}/api/v1/admin` unless they start with a token ([services](../../docs/platform.md#services)).
+[← Commands](../README.md) · Resources: [order](../../resources/defs/order.md), [draft order](../../resources/defs/draft-order.md) · Service: os-order. Paths are relative to `{ORDER}/api/v1/admin` unless they start with a token ([services](../../platform/api-client.md#services)).
 
-Permission: `orders:write`; refund commands `orders:refund` (enforcement off in v1).
+Permission: `write_orders`; refund commands `write_refunds` (enforcement off in v1).
 
 Effect: R read-only · D destructive · I idempotent · X external. Mode: P pessimistic · O optimistic. Every os-order write carries `staff_id`, `staff_name` (added by the API client).
 
@@ -62,7 +62,7 @@ select items ──calculate (debounce 300 ms)──▶ preview (note, restock, 
 | Command | Scope | Steps | Confirm | Effect | Mode | After |
 |---|---|---|---|---|---|---|
 | `draftOrder.create` | page | calculate; `POST /draft-orders` | — | — | P | toast "Draft order saved"; open draft |
-| `draftOrder.save` | record | calculate `POST /draft-orders/calculate`; `PUT /draft-orders` (id in body) | — | I | P | set detail |
+| `draftOrder.update` | record | calculate `POST /draft-orders/calculate`; `PUT /draft-orders` (id in body) | — | I | P | set detail |
 | `draftOrder.complete` | record | `POST /draft-orders/:id/complete` `{financial_intent: 'mark_as_paid' \| 'payment_pending', payment_method?, idempotency_key}` (rules below) | "Place order": Mark as paid / Payment pending | X | P | toast "Order created"; open the order |
 | `draftOrder.sendInvoice` | record | `POST /draft-orders/:id/send-invoice` `{notify?: {sms, whatsapp, email}, to_email?, to_phone?, subject?, message?}`; `notify: {}` = get link only | — | X | P | toast "Invoice sent"; status `invoice_sent` (not when link-only); invalidate draft |
 | `draftOrder.duplicate` | record | `POST /draft-orders/:id/duplicate` (server copy, catalog lines re-priced); blocked while unsaved | — | — | P | toast; open the copy |

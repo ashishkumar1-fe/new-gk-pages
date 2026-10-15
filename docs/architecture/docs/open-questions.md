@@ -4,7 +4,6 @@
 
 | # | Question | Owner | Notes |
 |---|---|---|---|
-| 1 | Reuse existing gk-pages code first (standalone lift-and-shift), or build fresh directly? | Product, Engineering | The standalone tracker assumes reuse; this doc assumes fresh. Middle path: lift-and-shift to unblock domain/auth, then rebuild domain by domain. |
 | 2 | Final product name and subdomain | Product | Must be a gokwik.in subdomain for the session cookie |
 | 3 | Gateway CORS for the new origin, with credentials | Backend / Platform | Blocks login and every API call |
 | 4 | Login/session endpoints callable from the new origin | Backend | Includes a reliable "who am I" check |
@@ -20,3 +19,12 @@
 | 15 | Staff activity log: where command audit events are stored and shown | Product, Backend | gk-pages already posts field-level change records to the Audit Service (`AUDIT_SERVICEURL`); v1 sends command events to PostHog only |
 | 16 | Fix the data-affecting defects in today's writes | Product, QA | List in [commands README](../commands/README.md#defects-in-todays-writes); product bulk edit price bug first |
 | 14 | Business-logic changes the design implies (GST rate, tax split, MRP label, marketplaces, inventory history, variant save, validations) | Product | Kept as today in v1; list and seams in [deferred.md](../schema/deferred.md#b-business-logic-keep-todays-behaviour-change-only-with-product-sign-off) |
+| 19 | Default cache policy: `fresh` (revalidate on every mount) or `balanced` (30 s lists, 60 s detail)? | Product, Engineering | Starts as `fresh`; switching is one line ([data access](../resources/data-access.md#cache-policy)) |
+
+## Decided
+
+| Was | Decision |
+|---|---|
+| #1 Convert gk-pages in place or new codebase | New codebase ([ADR 0002](../adr/0002-new-codebase.md)) |
+| #17 Response validation scope | Every response, one way ([ADR 0004](../adr/0004-validate-every-response.md)) |
+| #18 Where team docs live | This repo for now; can move later as a whole ([ADR 0002](../adr/0002-new-codebase.md#docs)) |

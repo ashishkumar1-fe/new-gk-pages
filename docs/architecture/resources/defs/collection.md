@@ -46,7 +46,7 @@ list: {
 - Type (manual / smart) is chosen only on create, as today.
 - Products child: paging is blocked while product changes are unsaved, as today. Changes are sent as `addProducts` / `removedProducts`.
 - Save enabled only when dirty (today it is always enabled).
-- `editor: { save: 'collection.save', create: { route: '/collections/new', command: 'collection.create' } }`
+- `editor: { save: 'collection.update', create: { route: '/collections/new', command: 'collection.create' } }`
 
 ### Validation
 
@@ -75,6 +75,6 @@ service:      'item',   // products in a collection come from the collection det
 search:       { enabled: true, limit: 4 },
 nav:          { group: 'products', parent: 'product', position: 2 },
 customFields: { ownerType: 'collection', placement: 'main' },
-permissions:  { read: 'products:read', write: 'products:write' },
+permissions:  { read: 'read_products', write: 'write_products' },
 assistant:    { description: 'Groups of products, manual or rule-based.', readableFields: ['title', 'kind', 'published', 'productsCount', 'rules'] },
 ```

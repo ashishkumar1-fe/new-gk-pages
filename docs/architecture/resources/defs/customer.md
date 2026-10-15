@@ -45,8 +45,8 @@ Search, as today: `contains` conditions OR-ed across email, firstName, lastName,
 | aside | Tags | | |
 | aside | Statistics | orders, amount spent, average order value | read-only |
 
-- `editor: { save: 'customer.save', create: { route: '/customers/new', command: 'customer.create' } }`
-- Save (`customer.save`): `PUT` customer only if fields or custom fields changed; addresses diffed (update changed, create new), as today.
+- `editor: { save: 'customer.update', create: { route: '/customers/new', command: 'customer.create' } }`
+- Save (`customer.update`): `PUT` customer only if fields or custom fields changed; addresses diffed (update changed, create new), as today.
 - Create: customer first, then addresses; then back to the list.
 
 ### Validation (`schemas/customerSchema.ts`)
@@ -77,6 +77,6 @@ relations:    { orders: { resource: 'order', kind: 'many', via: 'customer_id' } 
 search:       { enabled: true, limit: 4 },
 nav:          { group: 'customers', position: 1 },
 customFields: { ownerType: 'customer', placement: 'main' },
-permissions:  { read: 'customers:read', write: 'customers:write' },
+permissions:  { read: 'read_customers', write: 'write_customers' },
 assistant:    { description: 'People who bought or signed up.', readableFields: ['firstName', 'lastName', 'email', 'phone', 'tags', 'stats.ordersCount', 'stats.amountSpent', 'stats.lastOrderAt', 'marketing'] },
 ```

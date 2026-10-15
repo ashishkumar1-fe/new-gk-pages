@@ -16,8 +16,8 @@ Lists, records and single commands don't need one: the query cache and `runComma
 
 | Machine | States | Used by |
 |---|---|---|
-| Login | form → otp → loading; resend timer; Google | [platform](platform.md) |
-| App boot | checking session → login / loading user → picking merchant → checking entitlement → ready / no access | [platform](platform.md#boot-flow) |
+| Login | form → otp → loading; resend timer; Google | [auth-session](../platform/auth-session.md) |
+| App boot | checking session → login / loading user → picking merchant → checking entitlement → ready / no access | [auth-session](../platform/auth-session.md#boot-flow) |
 | Record editor | loading → pristine ⇄ dirty → saving → pristine; invalid; conflict; error; navigation guard | [resources/editor](../resources/editor.md#draft-lifecycle) |
 | Refund | select items ⇄ calculating → preview → submitting → polling → success / failed / still processing | [order commands](../commands/defs/orders.md#refund-flow) |
 | Order edit session | beginning → (waiting on stale collision) → active ⇄ staging → previewing → committing → committed; error; discard on leave | [order commands](../commands/defs/orders.md#order) |
@@ -27,15 +27,6 @@ Lists, records and single commands don't need one: the query cache and `runComma
 | Assistant | idle → thinking → proposed → confirming → executing → done / error | [assistant](assistant.md) |
 
 The machine drives the UI; writes inside it are still commands (`refund.create`, `order.edit`, `product.import`).
-
-## Assistant machine
-
-```
-idle ─▶ thinking ─▶ proposed ─▶ confirming ─▶ executing ─▶ done
-  ▲                     │            │              │
-  └──── reject ─────────┴────────────┘              ▼
-  └──────────────── retry / dismiss ──────────── error
-```
 
 ## File layout
 

@@ -16,7 +16,7 @@ interface ResourceDefinition<
   subtitle?: (r: T | TItem) => string;
 
   // ── Data ────────────────────────────────────────────────
-  service: 'item' | 'inventory' | 'os-order' | 'os-customer' | 'os-discount' | 'os-resources' | 'apps' | 'timeline' | 'bulk-ops';   // see docs/platform.md#services
+  service: 'item' | 'inventory' | 'os-order' | 'os-customer' | 'os-discount' | 'os-resources' | 'apps' | 'timeline' | 'bulk-ops';   // see platform/api-client.md#services
   schema: { detail: ZodType<T>; item: ZodType<TItem>; input?: ZodType<TInput> };
   data: DataProvider<T, TItem>;                  // data-access.md
   keys: QueryKeys;
@@ -91,7 +91,7 @@ interface DetailConfig<T> {
 ## Supporting types
 
 ```ts
-type Permission = `${string}:${string}`;            // "orders:write"; enforcement off in v1
+type Permission = `${'read' | 'write'}_${string}`;  // Shopify-style scope: "read_products", "write_orders", "write_refunds"; enforcement off in v1
 type IconName = string;                              // from the UI kit icon set
 type StatusSpec = { label: string; tone: 'success' | 'warning' | 'critical' | 'info' | 'neutral' };
 interface CreateContext {                            // prefill sources for create routes

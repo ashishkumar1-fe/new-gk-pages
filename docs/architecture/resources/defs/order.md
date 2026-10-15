@@ -101,7 +101,7 @@ search:       { enabled: true, limit: 4 },
 service:      'os-order',
 nav:          { group: 'orders', position: 1, badge: { params: {}, cap: 10000 } },   // total orders, shown as "10,000+" above the cap (design)
 customFields: { ownerType: 'order', placement: 'main', readOnly: true },
-permissions:  { read: 'orders:read', write: 'orders:write' },
+permissions:  { read: 'read_orders', write: 'write_orders' },
 assistant: {
   description: 'Customer orders with payment and fulfillment status.',
   readableFields: ['name', 'createdAt', 'financialStatus', 'fulfillmentStatus', 'status', 'totals.total', 'customer.firstName', 'customer.lastName', 'lineItems.title', 'lineItems.quantity', 'tags', 'payment.method'],

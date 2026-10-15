@@ -51,7 +51,7 @@ editor: {
     debounceMs: 500,
     skipWhen: (d) => d.lineItems.length === 0,   // totals reset to 0, "Please add at least one product"
   },
-  save: 'draftOrder.save',                        // POST new / PUT existing; disabled with no products or invalid quantity
+  save: 'draftOrder.update',                        // POST new / PUT existing; disabled with no products or invalid quantity
 }
 ```
 
@@ -89,6 +89,6 @@ service:      'os-order',
 relations:    { customer: { resource: 'customer', kind: 'one', via: 'customer.id' } },
 nav:          { group: 'orders', parent: 'order', position: 2 },
 customFields: { ownerType: 'draft_order', placement: 'aside' },
-permissions:  { read: 'orders:read', write: 'orders:write' },
+permissions:  { read: 'read_orders', write: 'write_orders' },
 assistant:    { description: 'Orders created by staff before payment.', readableFields: ['name', 'status', 'customer', 'lineItems.title', 'lineItems.quantity', 'totals.total'] },
 ```

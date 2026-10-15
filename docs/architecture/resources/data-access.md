@@ -24,7 +24,7 @@ Service-specific mapping lives here, for example:
 |---|---|
 | Product | `GET /products/?storeId&search&vendor&tags&productType&status&page&limit&show_variants=true` |
 | Collection | `GET /collections/?storeId&search&types&published&page&limit` |
-| Inventory | `GET /inventory/warehouse/:warehouseId?filter&…&page&limit`; search uses `GET /inventory/search` |
+| Inventory | `GET /v3/admin/inventory/levels?location_id&<range filters>&sort_by&sort_dir&page&limit`; search adds `search` |
 | Order | `GET /orders?page&limit&sort_field&sort_direction&search&<filters>` + `/orders/views`, `/orders/sortby` |
 | Customer | `POST /customers/filter { conditions, conditionLogic, page, limit, sortBy, sortOrder }` |
 | Discount | `POST {BASE}/dashboard/v2/discount/fetch { status, search, sort_by, sort_order, page, limit, pageSize }` |
@@ -33,7 +33,7 @@ Service-specific mapping lives here, for example:
 
 ```ts
 const keys = {
-  all:     [merchantId, 'product'] as const,
+  all:     ['product', storeId] as const,             // [domain, storeId, …] (d31)
   lists:   () => [...keys.all, 'list'] as const,
   list:    (p: ListParams) => [...keys.lists(), p] as const,
   details: () => [...keys.all, 'detail'] as const,
@@ -42,19 +42,31 @@ const keys = {
 };
 ```
 
-Merchant ID first, so switching store never shows another store's data.
+`storeId` is in every key, so one store's cache never shows in another ([API client](../platform/api-client.md#query-keys)).
 
 ## Cache policy
 
-Today's gk-pages has no cache: every navigation refetches. Proposed starting values, tuned after launch with real traffic:
+Today's gk-pages has no cache: every navigation refetches. Freshness is one setting, not per-screen code: every query takes its `staleTime` from a named class, and the classes come from one policy object in `platform/query/cachePolicy.ts`. Switching policy is a one-line change.
 
-| Data | Fresh for | Why |
+```ts
+type CacheClass = 'list' | 'detail' | 'lookup' | 'calc';
+
+const policies = {
+  fresh:    { list: 0,      detail: 0,      lookup: 10 * 60_000, calc: 0 },   // revalidate on every mount and focus (tracker: "never feel stale")
+  balanced: { list: 30_000, detail: 60_000, lookup: 10 * 60_000, calc: 0 },   // fewer refetches
+} satisfies Record<string, Record<CacheClass, number>>;
+
+export const ACTIVE_POLICY: keyof typeof policies = 'fresh';   // ← the switch
+```
+
+| Class | Used by | Why |
 |---|---|---|
-| Lists | 30 s, refetch on window focus | Orders arrive constantly |
-| Detail | 60 s | The editor keeps its own draft |
-| Lookups (vendors, types, tags, taxonomy, warehouses, suppliers, sort options, views) | 10 min | Rarely change |
-| Server calculations (`/calculate`) | 0 | Always current |
-| Refund status | Polled 5 s, up to 24 times | As today |
+| `list` | list screens | Orders arrive constantly; refetch on window focus in both policies |
+| `detail` | detail and editor reads | The editor keeps its own draft |
+| `lookup` | vendors, types, tags, taxonomy, locations, suppliers, sort options, views | Rarely change |
+| `calc` | server calculations (`/calculate`, edit-session preview) | Always current |
+
+Resource data providers declare a class, never a number; a per-resource override is allowed only with a comment saying why. Either policy renders cached data instantly while the background refetch runs. Polling stays per command (refund status: 5 s, up to 24 times, as today).
 
 ## Invalidation
 

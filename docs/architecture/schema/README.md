@@ -2,15 +2,7 @@
 
 [← Architecture](../README.md)
 
-The data model for the admin. Written in three passes:
-
-1. **Industry baseline**: the shape most commerce platforms converge on (Shopify Admin API, commercetools, Medusa), with Indian commerce needs (MRP, GST, HSN, COD). ✓
-2. **Backend check**: aligned with what the services return today, as used by gk-pages. ✓
-3. **Design check**: Ratio design features checked against schema and backend. ✓ Gaps in [deferred.md](deferred.md).
-
-Types are written in TypeScript for readability. The Zod schemas in code follow these shapes.
-
-**Status: v1 draft.** Shapes are inferred from gk-pages client code (interfaces, transformers, payload builders), not from backend specs. Before freezing, verify each entity against a real sandbox response; see [Verification](#verification).
+The data model for the admin: the common commerce shape (Shopify Admin API, commercetools, Medusa) plus Indian needs (MRP, GST, HSN, COD), aligned with what the services return to gk-pages today. Design gaps are in [deferred.md](deferred.md). Types are TypeScript for readability; the Zod schemas in code follow them.
 
 ## Entity map
 
@@ -61,8 +53,6 @@ erDiagram
 
 **Parity rule:** today's backend and gk-pages behaviour are the source of truth for business logic (tax, totals, discounts, pricing, inventory). The revamp may rearrange screens, rename fields in code and wrap existing calls; it does not change what is calculated or how. Any such change needs product sign-off. Deferred items: [deferred.md](deferred.md).
 
-The domain model is camelCase and consistent; each service's quirks (case, envelopes, units, sentinels) are fixed once in its API module transformer.
-
 ## Verification
 
-Freeze an entity only after its schema parses a real sandbox response (list and detail) without errors, and its write payload matches what today's gk-pages sends. Order of checks follows the build order: product, variant, collection, inventory, then orders.
+Status: v1 draft. Shapes are inferred from gk-pages client code (interfaces, transformers, payload builders), not backend specs. Freeze an entity only after its schema parses a real sandbox response (list and detail) without errors, and its write payload matches what today's gk-pages sends. Order of checks follows the build order: product, variant, collection, inventory, then orders.

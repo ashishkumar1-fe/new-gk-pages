@@ -34,7 +34,7 @@ Status tabs filter the current page client-side today (no API param); kept until
 | main | Products | lines (child) |
 | aside | Additional | referenceNumber, noteToSupplier, tags |
 
-Save: `editor: { save: 'purchaseOrder.save', create: { route: '/purchase-orders/new', command: 'purchaseOrder.create' } }`.
+Save: `editor: { save: 'purchaseOrder.update', create: { route: '/purchase-orders/new', command: 'purchaseOrder.create' } }`.
 
 Products child: columns Product, SKU, Quantity, Cost, Total. Picker searches inventory of the destination location (debounce 500 ms; destination required first); picked cost seeds the line.
 
@@ -76,6 +76,6 @@ Today's "Edit" toggle becomes editing in place. "Export PDF" has an endpoint but
 service:     'inventory',
 relations:   { supplier: { resource: 'supplier', kind: 'one', via: 'supplierId' }, destination: { resource: 'location', kind: 'one', via: 'destinationLocationId' } },
 nav:         { group: 'products', parent: 'product', position: 4 },
-permissions: { read: 'inventory:read', write: 'inventory:write' },
+permissions: { read: 'read_inventory', write: 'write_inventory' },
 assistant:   { description: 'Stock ordered from suppliers.', readableFields: ['referenceNumber', 'status', 'supplier.companyName', 'expectedAt', 'totalCost', 'lines.title', 'lines.quantityOrdered', 'lines.quantityReceived'] },
 ```

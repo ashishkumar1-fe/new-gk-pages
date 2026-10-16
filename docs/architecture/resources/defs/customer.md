@@ -17,7 +17,7 @@ list: {
   ],
   search: { param: 'conditions', placeholder: 'Search customers', debounceMs: 400 },   // today: 500 ms
   filters: [
-    { id: 'tags', label: 'Tags', type: 'multi_enum', options: tagsLookup, toParams: (v) => cond('tags', 'contains_any', v) },
+    { id: 'tags', label: 'Tags', type: 'multi_enum', options: tagsLookup, toQuery: (v) => ({ conditions: [cond('tags', 'contains_any', v)] }) },
   ],
   views: { source: 'static', items: [
     { id: 'all', label: 'All' },

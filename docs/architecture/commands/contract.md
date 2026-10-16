@@ -75,6 +75,11 @@ interface Step<TInput> {
   onFailure: 'abort' | 'continue-with-warning';  // abort → compensate earlier steps in reverse
 }
 
+interface CommandDeps {
+  api: ApiModules;                               // api/<service> modules, injected (tests swap them)
+  session: { staff: { id: Id; name: string }; storeId: Id };
+}
+
 interface CommandContext {
   storeId: Id;                                   // the merchant (backend m_id / merchant_id)
   staff: { id: Id; name: string; permissions: Permission[] };
@@ -107,5 +112,5 @@ type CommandResult<TResult> =
 - **`effect` sets defaults.** Destructive → critical confirm. External → confirm and audit. Non-idempotent → never retried automatically. The same flags become the assistant tool annotations (`readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`).
 - **`fromContext` + `form`.** If context gives complete input, the command runs (after confirm, if any). If not, its form opens. The assistant fills the same form; the user sees it before approving.
 - **Steps.** Most commands have one step. Multi-call writes (save with children, complete a draft) list their calls in order, with compensation where an undo exists. Where it doesn't (an order can't be un-created), the step is marked and the result reports what succeeded.
-- **Endpoints live only in steps.** Surfaces know IDs and inputs, never URLs.
+- **Endpoints live only in API modules.** Steps call their functions through `deps`; surfaces know IDs and inputs, never URLs. The endpoint and payload shown in each [defs](defs/) table document what that function sends.
 - **One result type** for every command, so every surface handles success, field errors, partial bulk results and failures the same way.

@@ -17,7 +17,7 @@ list: {
   ],
   search: { param: 'search', placeholder: 'Search collections', debounceMs: 400 },   // today: 500 ms
   filters: [
-    { id: 'type', label: 'Type', type: 'multi_enum', options: [manual, smart], toParams: (v) => ({ types: v }) },
+    { id: 'type', label: 'Type', type: 'multi_enum', options: [manual, smart], toQuery: (v) => ({ kinds: v }) },
   ],
   views: { source: 'static', items: [
     { id: 'all', label: 'All' },

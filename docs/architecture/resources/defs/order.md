@@ -25,14 +25,14 @@ list: {
     minLength: (q) => q.length >= 2 || /^#?\d+$/.test(q),
   },
   filters: [
-    { id: 'payment',     type: 'enum', options: ['paid', 'partially_paid', 'pending', 'refunded', 'voided'], toParams: (v) => ({ financial_status: v }) },
-    { id: 'fulfillment', type: 'enum', options: ['unfulfilled', 'pending', 'fulfilled', 'partially_fulfilled'], toParams: (v) => ({ fulfillment_status: v }) },
-    { id: 'created',     type: 'date_range',   toParams: ([a, b]) => ({ created_at_min: startOfDayIso(a), created_at_max: endOfDayIso(b) }) },
-    { id: 'total',       type: 'money_range',  toParams: ([a, b]) => ({ order_total_min: a * 100, order_total_max: b * 100 }) },
-    { id: 'items',       type: 'number_range', toParams: ([a, b]) => ({ item_count_min: a, item_count_max: b }) },
-    { id: 'discount',    type: 'text',         toParams: (v) => ({ discount_code: v }) },
-    { id: 'tagged',      type: 'text',         toParams: (v) => ({ tag_contains: v }) },
-    { id: 'notTagged',   type: 'text',         toParams: (v) => ({ tag_not_contains: v }) },
+    { id: 'payment',     type: 'enum', options: ['paid', 'partially_paid', 'pending', 'refunded', 'voided'], toQuery: (v) => ({ financialStatus: v }) },
+    { id: 'fulfillment', type: 'enum', options: ['unfulfilled', 'pending', 'fulfilled', 'partially_fulfilled'], toQuery: (v) => ({ fulfillmentStatus: v }) },
+    { id: 'created',     type: 'date_range',   toQuery: ([a, b]) => ({ createdAt: { from: a, to: b } }) },
+    { id: 'total',       type: 'money_range',  toQuery: ([a, b]) => ({ total: { min: a, max: b } }) },
+    { id: 'items',       type: 'number_range', toQuery: ([a, b]) => ({ itemCount: { min: a, max: b } }) },
+    { id: 'discount',    type: 'text',         toQuery: (v) => ({ discountCode: v }) },
+    { id: 'tagged',      type: 'text',         toQuery: (v) => ({ tagged: v }) },
+    { id: 'notTagged',   type: 'text',         toQuery: (v) => ({ notTagged: v }) },
   ],
   views: { source: 'server', default: 'is_default' },     // GET /orders/views
   sort:  { source: 'server', default: { field: 'created_at', direction: 'desc' } },   // GET /orders/sortby

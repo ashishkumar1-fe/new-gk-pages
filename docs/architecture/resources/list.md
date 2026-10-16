@@ -33,14 +33,14 @@ interface ListConfig<TItem> {
 type Filter = {
   id: string;
   label: string;
-  toParams: (value: unknown) => Record<string, unknown>;   // exact API mapping
+  toQuery: (value: unknown) => Partial<TQuery>;   // the list function's typed query, domain names
   mode?: 'server' | 'client';
 } & (
   | { type: 'enum' | 'multi_enum'; options: Option[] | (() => Promise<Option[]>) }
   | { type: 'text' }
   | { type: 'number_range' }
-  | { type: 'money_range' }                // entered in rupees, sent in paise
-  | { type: 'date_range' }                 // local day start/end, sent as ISO
+  | { type: 'money_range' }                // entered in rupees, becomes Money
+  | { type: 'date_range' }                 // local days, { from, to } DateOnly
   | { type: 'conditions'; fields: ConditionField[] }   // customers: condition list
 );
 
@@ -58,7 +58,7 @@ interface ConditionField { field: string; type: 'text' | 'number' | 'money' | 'd
 interface Option { value: string; label: string }
 ```
 
-`toParams` is required because each service encodes filters differently: comma-joined (products), repeated arrays (inventory), min/max pairs (orders), condition objects (customers).
+`toQuery` speaks domain names and units; the API module encodes them for its service (comma-joined, repeated arrays, min/max pairs, condition objects, paise, day bounds), as listed in [gateway](../gateway/README.md).
 
 ## URL state
 

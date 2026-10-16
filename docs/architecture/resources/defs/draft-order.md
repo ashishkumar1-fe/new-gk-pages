@@ -19,10 +19,10 @@ list: {
   views: { source: 'server', default: 'is_default' },   // /draft-orders/views
   sort:  { source: 'server', default: { field: 'created_at', direction: 'desc' } },   // /draft-orders/sortby; column click sets sort_field / sort_direction
   filters: [
-    { id: 'status',   type: 'enum', options: ['open', 'invoice_sent', 'completed'], toParams: (v) => ({ status: v }) },
-    { id: 'created',  type: 'date_range', toParams: ([a, b]) => ({ created_from: ymd(a), created_to: ymd(b) }) },   // inclusive both ends
-    { id: 'customer', type: 'text', toParams: (v) => ({ customer_id: v }) },
-    { id: 'tags',     type: 'text', toParams: (v) => ({ tags: v }) },   // comma-separated, OR
+    { id: 'status',   type: 'enum', options: ['open', 'invoice_sent', 'completed'], toQuery: (v) => ({ status: v }) },
+    { id: 'created',  type: 'date_range', toQuery: ([a, b]) => ({ createdAt: { from: a, to: b } }) },   // inclusive both ends
+    { id: 'customer', type: 'text', toQuery: (v) => ({ customerId: v }) },
+    { id: 'tags',     type: 'text', toQuery: (v) => ({ tags: v }) },   // comma-separated, OR
   ],
   pageSize: 50,
   selection: { enabled: true },
@@ -47,7 +47,7 @@ Draft filters are server-side query params, as today.
 editor: {
   readOnlyWhen: (d) => d.status === 'completed',
   calculate: {
-    query: (d) => draftOrdersApi.calculate({ line_items: d.lineItems, discount_code: d.discountCode }),
+    query: (d) => api.osOrder.calculateDraft({ lineItems: d.lineItems, discountCode: d.discountCode }),
     debounceMs: 500,
     skipWhen: (d) => d.lineItems.length === 0,   // totals reset to 0, "Please add at least one product"
   },

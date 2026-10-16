@@ -11,7 +11,7 @@ src/
   machines/        <flow>/machine.ts, actors.ts, actions.ts, types.ts           5 orchestration
   resources/       <resource>.ts  (defineResource: data provider, keys, list, editor)   4 contracts
   commands/        <resource>.ts  (defineCommand: steps call api/)
-  api/             <service>/client.ts, wire.ts, transformer.ts  (one per backend service)   3 service API
+  api/             <service>/client.ts, wire.ts, transformer.ts, errors.ts, fixtures/   3 service API
   domain/          <entity>/schema.ts, rules.ts, format.ts  (Zod schemas, pure rules)   2 domain
   platform/        http client, session, merchant (storeId), permissions, query client, telemetry, config   1 platform core
   ui/              tokens, primitives, patterns, shell components               side: UI kit

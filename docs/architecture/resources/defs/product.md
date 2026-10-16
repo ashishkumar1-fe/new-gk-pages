@@ -19,9 +19,9 @@ list: {
   ],
   search: { param: 'search', placeholder: 'Search and filter', debounceMs: 500 },
   filters: [
-    { id: 'vendor', label: 'Vendor', type: 'multi_enum', options: lookups.filters.vendors, toParams: (v) => ({ vendor: v.join(',') }) },
-    { id: 'tags',   label: 'Tags',   type: 'multi_enum', options: lookups.filters.tags,    toParams: (v) => ({ tags: v.join(',') }) },
-    { id: 'type',   label: 'Type',   type: 'enum',       options: lookups.productTypes,    toParams: (v) => ({ productType: v }) },
+    { id: 'vendor', label: 'Vendor', type: 'multi_enum', options: lookups.filters.vendors, toQuery: (v) => ({ vendors: v }) },
+    { id: 'tags',   label: 'Tags',   type: 'multi_enum', options: lookups.filters.tags,    toQuery: (v) => ({ tags: v }) },
+    { id: 'type',   label: 'Type',   type: 'enum',       options: lookups.productTypes,    toQuery: (v) => ({ productType: v }) },
   ],
   views: { source: 'static', items: [
     { id: 'all', label: 'All' },

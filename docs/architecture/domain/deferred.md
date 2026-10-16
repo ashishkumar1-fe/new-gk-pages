@@ -51,7 +51,7 @@ Seams used throughout:
 | 19 | Free shipping discounts | Discounts | V2 already has SHIPPING `cross_domain_effects` (editor hidden in gk-pages, value round-tripped); turning it on is one editor section + a capability flag |
 | 20 | Product insights (sell-through, days of inventory, ABC) | Products list | List `insights` slot, capability off |
 | 21 | Return window, COD and package per product | Product editor, Shipping | Shipping section fields behind a capability |
-| 22 | Server-side status and filter params for POs, transfers, segment search | Lists | Filters declared with `toParams`; moving off client-side is a provider change |
+| 22 | Server-side status and filter params for POs, transfers, segment search | Lists | Filters declared with `toQuery`; moving off client-side is an API-module change |
 | 23 | Server sort for products and collections; sort UI for customers and segments (their APIs already take `sortBy` / `sortOrder`) | Lists | `sort` config per resource; add options when the API sorts |
 
 Group C screens ship only when their backend exists; until then they are hidden, not faked.

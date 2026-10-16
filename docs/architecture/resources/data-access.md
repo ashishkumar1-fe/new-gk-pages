@@ -20,7 +20,7 @@ interface DataProvider<T, TItem> {
 interface ListParams {
   view?: string;                         // active tab
   search?: string;
-  filters?: Record<string, unknown>;     // filter id → value; mapped by each filter's toParams
+  filters?: Record<string, unknown>;     // filter id → value; turned into the typed query by each filter's toQuery
   scope?: Record<string, string>;        // required scope (location) or relation scope (customer_id)
   sort?: { field: string; direction: 'asc' | 'desc' };
   page?: number;                         // 1-based
@@ -28,7 +28,11 @@ interface ListParams {
 }
 ```
 
-Inside a provider: map `ListParams` to the service's params → call → unwrap the envelope → transform each row → parse with the schema → return `Page<TItem>`.
+A provider only builds the typed query and calls the API module, which parses, transforms and returns `Page<TItem>` ([service API](../service-api/README.md#module-contract)):
+
+```ts
+getList: (p) => api.osOrder.listOrders(toQuery(p), { signal })
+```
 
 Service-specific mapping lives here, for example:
 

@@ -40,7 +40,7 @@ interface FieldSpec<TInput> {
 ## Saving
 
 - Dirty and valid come from the form; Save is enabled only when both hold. Validation is the input schema plus runtime custom-field schemas, always run before save.
-- The save itself runs the [record save machine](../docs/machines.md#page-machines); one save bar with Discard / Save (design).
+- The save itself runs the [record save machine](../docs/machines.md#record-save); one save bar with Discard / Save (design).
 - Every editor has the [leave guard](../docs/machines.md#other-orchestration).
 - With `calculate`, totals shown come from the server response, never computed locally (today's tax fallback is the one exception, kept as is). A response older than the latest request is dropped.
 

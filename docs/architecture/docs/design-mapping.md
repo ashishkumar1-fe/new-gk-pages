@@ -34,7 +34,7 @@ How the Ratio design (Login, Home, Products, Product detail, Settings, top bar, 
 | A destructive colour; elevation for menus and dialogs; Dialog and form components; error and toast states | Destructive commands, confirms and errors need them |
 | A motion rule | Home animates beyond the 120 ms rule |
 | Page loader without invented Sales / AOV / Conversion numbers | Deferred data is hidden, never faked |
-| Variant prices and per-location stock shown as saving on their own | They save separately (`variant.update`, immediate `inventory.adjust`), not with the product |
+| Variant prices and per-location stock shown as saving on their own | They save separately (`product.updateVariant`, immediate `inventory.adjust`), not with the product |
 | A Commands group in ⌘K, with disabled rows showing their reason | The palette runs commands |
 | A jobs indicator in the top bar | Job results can't go to the bell while notifications are off |
 | Login screens for unverified email and forced password change; drop "Forgot password" or add a flow | The Login machine has those branches; the gateway has no reset endpoint |

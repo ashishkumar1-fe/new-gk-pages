@@ -4,7 +4,7 @@
 
 | # | Decision |
 |---|---|
-| d09 | URLs are `/store/:storeId/…`. The `/gk-pages` prefix only existed for single-spa mounting and is dropped. |
+| d09 | URLs are `/store/$storeId/…`. The `/gk-pages` prefix only existed for single-spa mounting and is dropped. |
 | d10 | Old dashboard URLs redirect at cutover. |
 
 ## Structure
@@ -31,7 +31,7 @@ All resource routes ([resources registry](../resources/registry.md)) live under 
 ## Old URLs
 
 ```
-dashboard.gokwik.in/gk-pages/store/7/products  ──301──▶  <ratio>.gokwik.in/store/7/products
+dashboard.gokwik.in/gk-pages/store/195qow8rsryx/products  ──▶  <ratio>.gokwik.in/store/195qow8rsryx/products
 ```
 
-A rule at the dashboard host's edge (a real 301) maps `/gk-pages/*` to the same path on the new domain, keeping query and hash. It stays for a few months after cutover, then is removed.
+A rule at the dashboard host's edge (302, then 301 once cutover holds: [delivery](../operations/delivery.md#cutover)) maps `/gk-pages/*` to the same path on the new domain, keeping query and hash. It stays for a few months after cutover, then is removed.

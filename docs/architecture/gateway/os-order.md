@@ -2,11 +2,11 @@
 
 [← Gateway](README.md)
 
-Base `{ORDER}` (`REACT_APP_ORDER_BASE_URL`); paths relative to `/api/v1/admin`. Case: orders, fulfilment, edit session, refund requests snake_case; drafts, refund responses, tag bodies, settings camelCase. Money: paise everywhere (decimal strings like `"600000.00"` on orders and drafts, numbers in refunds and edit preview) except `shippingLine.price` and commit `refund_amount` (rupees). List envelope: `{ orders | draft_orders: T[], pagination: { total, pages, current_page, limit } }`.
+Base `{ORDER}` (`REACT_APP_ORDER_BASE_URL`); paths relative to `/api/v1/admin`. Case: orders, fulfillment, edit session, refund requests snake_case; drafts, refund responses, tag bodies, settings camelCase. Money: paise everywhere (decimal strings like `"600000.00"` on orders and drafts, numbers in refunds and edit preview) except `shippingLine.price` and commit `refund_amount` (rupees). List envelope: `{ orders | draft_orders: T[], pagination: { total, pages, current_page, limit } }`.
 
 - `{ORDER}` already ends in `/api`, so real URLs are `…/api/api/v1/admin/…`. Do not collapse: the single-`/api` path lands on dashboard-backend and 404s.
 - Staff attribution: `staff_id`, `staff_name` in the body on order writes (cancel, PATCH, bulk, tags, holds, refunds). `gk-user-*` headers are not sent (CORS preflight).
-- Errors: `{ code, message, … }`, `message` may be `string[]` (Nest 400). Fulfilment also reads `error_code`, or `error` when it looks like a code.
+- Errors: `{ code, message, … }`, `message` may be `string[]` (Nest 400). Fulfillment also reads `error_code`, or `error` when it looks like a code.
 
 ## Orders
 
@@ -191,7 +191,7 @@ interface TrackingInfo { company?: string; number?: string; url?: string; number
 
 | code | meaning |
 |---|---|
-| `FULFILLMENT_HELD` (or any 409) | create fulfilment: units are held |
+| `FULFILLMENT_HELD` (or any 409) | create fulfillment: units are held |
 | `FULFILLMENT_HELD`, `NOTHING_TO_FULFILL`, `ORDER_CANCELLED`, `ORDER_NOT_FOUND`, `NO_SHIPPING_ADDRESS` | bulk `failed[].error`: final skip |
 | other `failed[].error`, or an id missing from both lists | failed or not attempted, can retry |
 | `BULK_LIMIT_EXCEEDED`, `UNKNOWN_CARRIER_CODE` | bulk 4xx: nothing changed. A 5xx/timeout may be partial: refresh the list, then resubmit (safe) |

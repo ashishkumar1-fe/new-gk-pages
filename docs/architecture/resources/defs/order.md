@@ -49,7 +49,7 @@ Scoped list: `customer_id` (from customer page "View all orders").
 | Column | Section | Content |
 |---|---|---|
 | main | Items | line items; removed items (current quantity 0) listed separately |
-| main | Fulfillment | unfulfilled / fulfilled cards per location, tracking, holds (`GET /orders/:id/fulfillments`); fulfil, hold, release and tracking on the card (`order.fulfill`, `order.hold`, `order.releaseHold`, `order.updateTracking`) |
+| main | Fulfillment | unfulfilled / fulfilled cards per location, tracking, holds (`GET /orders/:id/fulfillments`); fulfill, hold, release and tracking on the card (`order.fulfill`, `order.hold`, `order.releaseHold`, `order.updateTracking`) |
 | main | Payment | server totals (`current_*` values) |
 | main | Info tabs | Payment, Checkout, UTM, Refunds (`GET /orders/:id/refunds`) |
 | main | Custom fields | read-only |
@@ -67,7 +67,7 @@ detail: {
 
 ## Edit order (`/orders/$id/edit`)
 
-Runs the order edit session machine ([machines](../../docs/machines.md#page-machines)); queries `orderEdit.preview` (`…/edit/:sid/preview`, cache `calc`) and `orderEdit.session` (`GET …/edit/:sid`); line rules `canIncreaseQuantities`, `editAmountLabel`, `paid` ([domain](../../domain/orders.md#rules)); saved by `order.update` ([commands](../../commands/defs/orders.md#order)).
+Runs the order edit session machine ([machines](../../docs/machines.md#order-edit-session)); queries `orderEdit.preview` (`…/edit/:sid/preview`, cache `calc`) and `orderEdit.session` (`GET …/edit/:sid`); line rules `canIncreaseQuantities`, `editAmountLabel`, `paid` ([domain](../../domain/orders.md#rules)); saved by `order.update` ([commands](../../commands/defs/orders.md#order)).
 
 ## Commands
 
@@ -80,7 +80,7 @@ commands: {
 }
 ```
 
-Visibility and enablement come from the [order rules](../../domain/orders.md#rules): `canCancel`, `refundBlockReason`, `statusUrl` for the status page, `fulfillmentView` for fulfil / hold, active holds for release, `shouldOfferBulkFulfil` for bulk fulfil.
+Visibility and enablement come from the [order rules](../../domain/orders.md#rules): `canCancel`, `refundBlockReason`, `statusUrl` for the status page, `fulfillmentView` for fulfill / hold, active holds for release, `shouldOfferBulkFulfil` for bulk fulfill.
 
 ## Other
 

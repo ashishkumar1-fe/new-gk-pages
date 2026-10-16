@@ -16,30 +16,32 @@
 flowchart LR
   subgraph pr["Pull request"]
     direction LR
-    PR([PR]) --> Gates["lint · tsc --noEmit · tests<br/>initial-bundle budget · audit high/critical<br/>(all blocking)"]
+    PR([PR]) --> Gates["lint · tsc --noEmit · unit + integration<br/>Playwright on MSW fixtures · axe<br/>initial-bundle budget · audit (prod deps)<br/>(all blocking)"]
     Gates --> Prev["Preview deploy<br/>QA backend · non-prod badge"]
   end
   subgraph rel["Merge to main"]
     direction LR
     MG([merge]) --> Build["Build<br/>contenthash"] --> S3[(S3)] --> CDN["CDN: invalidate index.html"]
-    CDN --> Smoke["Playwright smoke on staging<br/>login → pick merchant → products list → one save<br/>(deploy gate)"] --> Rel([Release])
+    CDN --> Smoke["Playwright smoke on staging<br/>login → pick merchant → products list → one save<br/>(deploy gate)"] --> Rel(["Release: tag → prod with approval"])
   end
 ```
 
 | Concern | Rule |
 |---|---|
 | Versioning | Git tag is the source of truth; stamped into the bundle (`__APP_VERSION__`), Sentry release, GitHub release |
-| Cache | Hashed assets cached for a year; `index.html` never cached; CDN invalidation on deploy. Nobody is asked to hard-refresh |
+| Cache | Hashed assets cached for a year and kept for the previous releases; `index.html` never cached; CDN invalidation on deploy. A failed chunk load or a newer version prompts a reload; nobody is asked to hard-refresh |
 | Rollback | Repoint to the previous version |
-| Env | Baked at build time per environment; previews always use the QA backend |
+| Env | Build-time or runtime config: [open question 8](../docs/open-questions.md); public keys only, by allowlist ([security](quality.md#security-v1)); previews use the QA backend |
 | Branches | `main` protected; changes through pull requests |
+| SPA fallback | Only extensionless paths fall back to `index.html`; a missing `.js` stays a 404 |
+| Audit | Prod dependencies; an advisory without a fix can be ignored with an expiry date |
 
 ## Cutover
 
 | Step | Rollback |
 |---|---|
 | 1. Ratio live on its domain; smoke test | Take the domain down |
-| 2. Dashboard sidebar link and `/gk-pages/*` redirect to Ratio ([routing](../surfaces/routing.md#old-urls)) | Remove the redirect |
+| 2. Dashboard sidebar link and `/gk-pages/*` redirect to Ratio ([routing](../surfaces/routing.md#old-urls)): 302 until step 3 has held, then 301 | Remove the redirect |
 | 3. Remove the `@gokwik/gk-pages` import-map entry | Restore the entry |
 
-Both stay deployable until step 3 has held. Phased rollout (d03) can use a PostHog flag on the redirect.
+Both stay deployable until step 3 has held. Phased rollout (d03): [open question 24](../docs/open-questions.md).

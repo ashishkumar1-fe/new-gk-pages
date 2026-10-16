@@ -6,7 +6,7 @@ All v1 commands by resource. Definitions in [defs/](defs).
 
 | Resource | Commands | File |
 |---|---|---|
-| Product | `create`, `update`, `variant.update`, `delete`, `bulkDelete`, `setStatus`, `bulkEdit`, `duplicate`, `copyLink`, `import`, `importPreview`, `export`, `exportPreview`, `generateContent` | [catalog](defs/catalog.md#product) |
+| Product | `create`, `update`, `updateVariant`, `delete`, `bulkDelete`, `setStatus`, `bulkEdit`, `duplicate`, `copyLink`, `import`, `importPreview`, `export`, `exportPreview`, `generateContent` | [catalog](defs/catalog.md#product) |
 | Collection | `create`, `update`, `delete`, `bulkDelete`, `setPublished`, `bulkEdit`, `copyLink` | [catalog](defs/catalog.md#collection) |
 | Price schedule | `create`, `cancel` | [catalog](defs/catalog.md#price-schedule-flash-sale) |
 | Field definition | `create`, `update`, `delete` | [catalog](defs/catalog.md#custom-field-definitions) |
@@ -15,7 +15,7 @@ All v1 commands by resource. Definitions in [defs/](defs).
 | Transfer | `create`, `update`, `markPending`, `openReceive`, `receive`, `delete`, `createFromSelection` | [inventory](defs/inventory.md#transfer) |
 | Order | `updateNote`, `comment`, `addTags`, `removeTag`, `bulkTags`, `updateContact`, `update`, `cancel`, `bulkCancel`, `archive`, `unarchive`, `duplicate`, `openStatusPage`, `fulfill`, `updateTracking`, `hold`, `releaseHold`, `bulkFulfill`, `import`, `importPreview`, `export`, `exportPreview` | [orders](defs/orders.md#order) |
 | Refund | `create` | [orders](defs/orders.md#refund-flow) |
-| Order edit (`orderEdit`, internal: machine only, not exposed) | `begin`, `stage`, `discard` | [orders](defs/orders.md#order) |
+| Order edit (`orderEdit`, internal: machine only, not exposed) | `begin`, `stage`, `discard` | [orders](defs/orders.md#order-edit-session-internal) |
 | Draft order | `create`, `update`, `complete`, `sendInvoice`, `duplicate`, `delete`, `bulkDelete`, `bulkTags`, `export`, `createForCustomer` | [orders](defs/orders.md#draft-order) |
 | Customer | `create`, `update`, `deleteAddress`, `setBlocked`, `delete`, `comment`, `export` | [customers](defs/customers.md#customer) |
 | Segment | `create`, `update`, `delete` | [customers](defs/customers.md#segment) |

@@ -25,7 +25,7 @@ Seams used throughout:
 | 1 | GST per product | `taxable` + `hs_code`; server calculates | GST rate picker | Tax is its own editor section and its own schema block (`ProductTax`); adding `gstRate` is one field + one input |
 | 2 | Tax lines | Generic lines from server; 18% display fallback | CGST/SGST/IGST split | UI renders `taxLines[]` as a list, never assumes one line; fallback lives in one function (`displayTax`) |
 | 3 | Compare-at price | `compare_at_price` | Labelled MRP | Label from the copy dictionary |
-| 4 | Sales channels | online, pos | Marketplaces | Modelled as channel rows now (`channels: { channelId, published }[]`); marketplaces are more rows |
+| 4 | Sales channels | online, pos | Marketplaces | `channels` is a list ([catalog](catalog.md)); marketplaces are more values |
 | 5 | Inventory edits | v3 set / adjust with a reason; adjustment history page per variant | Reasons and history across the list | All stock writes go through `inventory.adjust` and `inventory.bulkEdit` (v3); the endpoint stays inside the command. Stock model already has named states |
 | 6 | Variant save | Full replace | Diff-based save | Replace vs diff decided inside `product.update` only |
 | 7 | Validations, discount %, margin | As in gk-pages | Ported as is | One rules module per entity with characterization tests |

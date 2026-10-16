@@ -16,7 +16,7 @@ Effect: R read-only · D destructive · I idempotent · X external. Mode: P pess
 | `order.removeTag` | record | `DELETE /orders/:id/tags/:tagId` | — | I | O | invalidate order |
 | `order.bulkTags` | selection | `POST /orders/bulk/tags/add` or `/remove` `{orderIds, tagIds}` (native) | — | I | P | partial results per order |
 | `order.updateContact` | record | `PUT {KWIKPASS_CUSTOMER}/v1/admin/customers/:cid?merchantId=` then `PATCH /orders/:id` (contact, shipping address, or customer removed) | — | — | P | toast "Customer contact details updated" |
-| `order.update` | record | `POST /orders/:id/edit/:sid/commit` (session from the [order edit machine](../../docs/machines.md#page-machines)); metadata `PATCH /orders/:id` (no `line_items`) | when refund ≠ 0 or unknown: "Confirm order edit" / "Save changes" | X | P | toast "Order updated" (+ refund initiated); go to detail; invalidate order, timeline, inventory, refunds |
+| `order.update` | record | `POST /orders/:id/edit/:sid/commit` (session from the [order edit machine](../../docs/machines.md#order-edit-session)); metadata `PATCH /orders/:id` (no `line_items`) | when refund ≠ 0 or unknown: "Confirm order edit" / "Save changes" | X | P | toast "Order updated" (+ refund initiated); go to detail; invalidate order, timeline, inventory, refunds |
 | `order.cancel` | record | `PATCH /orders/:id/cancel` | critical: "Cancel order {name}?" / "Keep order" | D X | P | toast "Order {name} has been cancelled"; invalidate order, timeline, inventory, refunds |
 | `order.bulkCancel` | selection | `POST /orders/bulk-cancel` `{order_ids, …}` (native) | critical: "Cancel N orders?" | D X | P | partial results |
 | `order.archive` | record, selection | `POST /orders/bulk-archive` `{orderIds, idempotencyKey}` | selection: "Archive N order(s)?" | I | P | warnings for `ALREADY_ARCHIVED` |
@@ -40,6 +40,16 @@ Effect: R read-only · D destructive · I idempotent · X external. Mode: P pess
 - **`order.archive` / `unarchive`**: single orders use the bulk endpoint with one ID, as today; no confirm for a single record.
 - **`order.update`**: commits the edit session's line ops; customer, addresses, metafields and edit reason go in the metadata PATCH. Session writes (begin, stage, discard) are internal commands `orderEdit.*`; preview and the session read are queries ([order](../../resources/defs/order.md)). Error codes: [gateway](../../gateway/os-order.md).
 - **`order.duplicate`** copies line items, customer, email, phone, addresses, note, tags, custom fields; not discounts, freebies or shipping.
+
+### Order edit session (internal)
+
+Run only by the [order edit machine](../../docs/machines.md#order-edit-session); not exposed.
+
+| Command | Call |
+|---|---|
+| `orderEdit.begin` | `POST /orders/:id/edit/begin` `{reason?}` |
+| `orderEdit.stage` | `POST /orders/:id/edit/:sid/stage` (one op per call) |
+| `orderEdit.discard` | `POST /orders/:id/edit/:sid/discard`; on page close a `keepalive` fetch |
 
 ### Refund flow
 

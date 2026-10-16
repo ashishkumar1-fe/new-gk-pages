@@ -2,7 +2,7 @@
 
 [← ADRs](README.md)
 
-Status: accepted (draft architecture) · 2026-10-14
+Status: accepted · 2026-10-14
 
 ## Context
 

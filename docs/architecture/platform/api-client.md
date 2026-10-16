@@ -24,6 +24,8 @@ Read only in `platform/config`. What each service serves: [gateway](../gateway/R
 | `{RESOURCES}` | `REACT_APP_OS_RESOURCE_API_URL` |
 | `{APPS}` | `REACT_APP_MERCHANT_APP_STORE_API_URL` |
 
+Names as in gk-pages; Ratio reads them with Vite's `VITE_` prefix, and only allowlisted keys reach the bundle ([quality](../operations/quality.md#security-v1)).
+
 URL = base + path, joined verbatim. Some bases already end in `/api`, so real paths can read `…/api/api/v1/…` (os-order); that is correct, and the client never collapses it. Each service module owns its path prefix.
 
 ## What the client does
@@ -33,9 +35,9 @@ URL = base + path, joined verbatim. Some bases already end in `/api`, so real pa
 | Credentials | `credentials: 'include'` on every call (cookie session) |
 | Merchant | `merchant-mid` and `gk-merchant-id` = current `storeId` |
 | Other headers | None, except an idempotency header a service needs; anything else fails the gateway CORS preflight ([access](../gateway/access.md#cors-change-platform-team)) |
-| Idempotency | `newIdempotencyKey()` (UUID v4, one per attempt); the service module puts it where its service wants it ([commands](../commands/execution.md#idempotency-and-retry)) |
+| Idempotency | `newIdempotencyKey()` (UUID v4, one per attempt); the service module shapes it and puts it where its service wants it (refunds: `refund-<orderId>-<uuid>`, ≤ 64 chars) ([commands](../commands/execution.md#idempotency-and-retry)) |
 | Response | Returns status and body as-is; envelopes differ per service, so unwrapping is the service module's job |
-| Errors | Non-2xx → `ApiError` (below). `401` also emits `session-expired`, which sends the boot flow to login |
+| Errors | Non-2xx → `ApiError` (below). `401` also emits `session-expired`, which sends the Session machine to login |
 | Uploads | Presigned storage PUTs bypass the client (no cookie, no merchant headers) |
 
 ```ts

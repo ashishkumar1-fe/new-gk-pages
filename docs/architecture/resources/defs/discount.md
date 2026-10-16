@@ -30,7 +30,7 @@ list: {
 - **Create**: one route, `/discounts/new`, a 5-step wizard: offer type · offer & code · eligibility · usage & stacking · review.
 - **Edit**: `/discounts/$id` opens the same wizard at step 2, kind and mode locked.
 - **Code check**: the `codeUnique` query (`POST /check-code`), not a command.
-- **Finish** (create and edit): "Publish this discount?" with Publish now / Save as draft / Cancel; the choice sets the status, then back to the list. Runs as the discount wizard machine; the finish dialog is the confirm ([machines](../../docs/machines.md#page-machines)).
+- **Finish** (create and edit): "Publish this discount?" with Publish now / Save as draft / Cancel; the choice sets the status, then back to the list. Runs as the discount wizard machine; the finish dialog is the confirm ([machines](../../docs/machines.md#discount-wizard)).
 
 `editor: { save: 'discount.update', create: { route: '/discounts/new', command: 'discount.create' } }`
 

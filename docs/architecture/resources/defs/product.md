@@ -79,7 +79,7 @@ children: {
 
 - Options and combinations: `optionPresets`, `generateVariants`, `matchExistingVariants` ([domain](../../domain/catalog.md#rules)).
 - New (unsaved) variants show a NEW badge and edit in a modal.
-- The variant page keeps its own save, `variant.update`, as today (tracking, policy, price, SKU, weight, custom fields); per-location stock there is immediate (`inventory.adjust`).
+- The variant page keeps its own save, `product.updateVariant`, as today (tracking, policy, price, SKU, weight, custom fields); per-location stock there is immediate (`inventory.adjust`).
 
 ### Save
 

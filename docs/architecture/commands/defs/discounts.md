@@ -16,7 +16,7 @@ Payload encoding (paise, unlimited, no end date): domain rules `unlimited`, `noE
 | `discount.moveToDraft` | record | `PUT /bulk/update {…, status: 'draft'}` | — | I | P | toast |
 | `discount.markInactive` | record | `PUT /bulk/update {…, status: 'inactive'}` | "Deactivate {code}?" | I X | P | toast |
 | `discount.createWithAssistant` | page | session flow below | — | — | P | opens the legacy form filled; saves with v1 `POST {DISCOUNT}/api/v1/admin/os-discount/create` |
-| `discount.aiConfirm` | page | `POST /sessions/:id/confirm {action_token}` | the proposal card | X | P | open `/discounts/:id` |
+| `discount.aiConfirm` | page | `POST /sessions/:id/confirm {action_token}` | the proposal card | X | P | open `/discounts/$id` |
 | `discountSet.create` | page | `POST /create-discount-set` (base keys + `number_of_random_coupons, prefix, suffix, length, email`) | "Generate N codes?" | X | P | toast "Discount set created" |
 | `discountSet.update` | record | `PUT /update/:id` (keeps `rules[0].rule_id`, `is_deleted: false`) | — | I | P | toast |
 | `discountSet.downloadCodes` | record | `POST {BASE}/api/v1/admin/os-discount/bulk-discount/presigned-url {url, operation_type: 'FETCH'}` → fetch zip → CSV | — | R | P | download `discount-codes-{campaignId}.csv` |
@@ -47,7 +47,7 @@ sequenceDiagram
   F->>F: user saves with v1 os-discount /create (not V2 discount.create)
   opt action proposed (publish, modify_live, bulk_action)
     A->>S: POST /sessions/:id/confirm {action_token} (discount.aiConfirm)
-    Note over A,S: 410 → "That confirmation expired. Ask again." · then opens /discounts/:id
+    Note over A,S: 410 → "That confirmation expired. Ask again." · then opens /discounts/$id
   end
 ```
 

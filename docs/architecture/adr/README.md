@@ -2,7 +2,7 @@
 
 [← Architecture](../README.md)
 
-One file per settled decision: `NNNN-short-title.md` with Context, Decision, Consequences. Never edit after acceptance; supersede instead.
+One file per settled decision: `NNNN-short-title.md` with Status, Context, Decision (options considered) and Consequences. After team review, never edit; supersede instead.
 
 | ADR | Decision |
 |---|---|
@@ -11,6 +11,16 @@ One file per settled decision: `NNNN-short-title.md` with Context, Decision, Con
 | [0003](0003-naming-and-data-flow.md) | One name per concept (Shopify vocabulary, `storeId`); transform once at the boundary, never mutate |
 | [0004](0004-validate-every-response.md) | Every response parsed with its schema, the same way |
 | [0005](0005-cache-policy-switch.md) | Cache freshness is one switch (`fresh` / `balanced`) |
+
+Decided in the docs, no ADR of its own:
+
+| Decision | Where |
+|---|---|
+| Logic leads; the design is asked to change | [design mapping](../docs/design-mapping.md#asks-to-design) |
+| Permissions declared on every command, enforcement off in v1 | [identity and access](../platform/identity-access.md#permissions) |
+| Flow review step, a command's own form or an approved proposal is the confirm | [execution](../commands/execution.md#confirmation-policy) |
+| List, editor and detail routes generated from the registry; mobile shell, desktop-first pages | [pages](../surfaces/pages.md) |
+| Store in the URL, one store per tab | [routing](../surfaces/routing.md) |
 
 ## Tracker decisions d01–d42
 
@@ -32,4 +42,4 @@ From the standalone decision tracker (all closed); each page lists the ones it c
 | d41 | registry scope: [resources](../resources/README.md#rules), palette [chrome](../surfaces/chrome.md) |
 | d42 | fresh codebase [ADR 0002](0002-new-codebase.md); freshness [ADR 0005](0005-cache-policy-switch.md); docs stay in this repo (ADR 0002 over d42's Confluence) |
 
-Still open: exact subdomain (d02, [open questions](../docs/open-questions.md) #2), phased rollout (d03, at cutover), detailed deploy process (d19, near launch).
+Still open: subdomain (d02), deploy process (d19), phased rollout (d03): [open questions](../docs/open-questions.md) #2, #8, #24.

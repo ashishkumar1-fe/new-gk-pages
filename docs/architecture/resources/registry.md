@@ -14,12 +14,12 @@ All routes live under `/store/$storeId` ([routing](../surfaces/routing.md)); pat
 | Collection | item | `/collections`, `/collections/$id`, `/collections/new` | list + editor | Products › Collections | [collection](defs/collection.md) |
 | Inventory | inventory | `/inventory?location=` | list with cell edit | Products › Inventory | [inventory](defs/inventory.md) |
 | Location | inventory | `/inventory/locations` | list (name + Default badge, address, status) + form; row menu edit, activate / deactivate / delete by status | — ("Manage locations" on the inventory page; the sidebar has two levels) | [location commands](../commands/defs/inventory.md#inventory) |
-| Purchase order | inventory | `/purchase-orders`, `/$id`, `/new`, `/$id/receive` | list + editor + receive | Products › Purchase orders | [purchase-order](defs/purchase-order.md) |
-| Transfer | inventory | `/transfers`, `/$id`, `/new`, `/$id/receive` | list + editor + receive | Products › Transfers | [transfer](defs/transfer.md) |
+| Purchase order | inventory | `/purchase-orders`, `/purchase-orders/$id`, `/purchase-orders/new`, `/purchase-orders/$id/receive` | list + editor + receive | Products › Purchase orders | [purchase-order](defs/purchase-order.md) |
+| Transfer | inventory | `/transfers`, `/transfers/$id`, `/transfers/new`, `/transfers/$id/receive` | list + editor + receive | Products › Transfers | [transfer](defs/transfer.md) |
 | Customer | os-customer | `/customers`, `/customers/$id`, `/customers/new` | list + editor | Customers | [customer](defs/customer.md) |
 | Segment | os-customer | `/segments`, `/segments/$id`, `/segments/new`, `/segments/$id/customers` | list + editor | Customers › Segments | [segment](defs/segment.md) |
-| Discount | Discount Service V2 (gateway) | `/discounts`, `/discounts/$id`, `/discounts/new` | list + editor | Discounts | [discount](defs/discount.md) |
-| Discount set | os-discount | `/discount-sets`, `/$id`, `/new/$kind` | list + editor | Discounts › Bulk codes | [discount](defs/discount.md#discount-set) |
+| Discount | discount (V2) | `/discounts`, `/discounts/$id`, `/discounts/new` | list + editor | Discounts | [discount](defs/discount.md) |
+| Discount set | discount (os-discount) | `/discount-sets`, `/discount-sets/$id`, `/discount-sets/new/$kind` | list + editor | Discounts › Bulk codes | [discount](defs/discount.md#discount-set) |
 
 ## Supporting resources (lookups and settings)
 
@@ -33,12 +33,12 @@ No list screen of their own in v1; used by pickers, filters and the settings she
 | Field definition | inventory | Settings › Custom fields; editors (runtime fields) |
 | Metaobject | inventory | Settings › Custom fields; reference fields |
 | Price schedule | item | Products › Flash sale (page action) |
-| App | apps | Settings › Apps |
-| Media asset | os-resources | Media pickers; Content |
-| Timeline event | timeline | Order and customer detail |
+| App | media-apps | Settings › Apps |
+| Media asset | media-apps | Media pickers; Content |
+| Timeline event | os-order (timeline) | Order and customer detail |
 | Order tag | os-order | Order tags section and bulk tags |
 | Job | bulk-ops | Jobs indicator, import / export history, `bulkOps.cancel` |
 
 ## Design-only (capability off until backend exists)
 
-Gift cards, shipping zones, domains, checkout settings, admin notifications. See [deferred](../domain/deferred.md).
+See [deferred](../domain/deferred.md).

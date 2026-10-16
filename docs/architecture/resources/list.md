@@ -83,7 +83,7 @@ Changing search, filters, sort, view or scope resets `page`.
 - **Server views** (orders, drafts): loaded from `/views`; a view's query (`["k=v"]`) becomes URL params. Default is the view marked default, else the first.
 - **Server sort options** (orders, drafts): loaded from `/sortby`.
 - **Column sort** (discounts, orders, drafts): clicking a sortable column sets `sort`; the API module encodes it per service.
-- **No sort** (products, collections, customers fixed to newest first): no sort UI, because the API doesn't sort.
+- **No sort** (products, collections fixed to newest first): no sort UI, because the API doesn't sort. Customers: the API sorts, the UI is deferred ([deferred](../domain/deferred.md)).
 
 ## Selection and bulk
 

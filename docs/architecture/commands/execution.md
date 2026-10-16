@@ -38,7 +38,7 @@ The server remains the final authority; a passed client check is a UX hint, not 
 | `effect.external` (customer-facing, money, other systems) | Yes |
 | Bulk above 25 items (proposed) | Yes, with the count in the label |
 | Surface is `assistant` and `effect.readOnly` is false | The approved proposal card is the confirm |
-| Run from a flow's review step (refund review, wizard finish) | That step is the confirm ([machines](../docs/machines.md#rules)) |
+| Run from a flow's review step or the command's own form (refund review, wizard finish, send invoice, tracking, order edit save) | That step or form is the confirm ([machines](../docs/machines.md#rules)) |
 | Everything else | No |
 
 Confirm labels state the action and count ("Archive 12 orders"), never "OK".

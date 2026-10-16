@@ -4,7 +4,7 @@
 
 Permission: `write_products` for every command unless noted (enforcement off in v1).
 
-Columns: **Effect** R read-only · D destructive · I idempotent · X external. **Mode** P pessimistic · O optimistic · U undoable. Payload shapes are built by the service transformer from the domain input; only behaviour that matters is noted.
+Columns: **Effect** R read-only · D destructive · I idempotent · X external. **Mode** P pessimistic · O optimistic. Payload shapes are built by the service transformer from the domain input; only behaviour that matters is noted.
 
 ## Product
 
@@ -22,7 +22,7 @@ Columns: **Effect** R read-only · D destructive · I idempotent · X external. 
 | `product.import` | page | bulk-ops ([bulk-ops.md](bulk-ops.md)) | the preview step: "Import N rows? Existing products may be updated." | X | P (job) | job indicator |
 | `product.exportPreview` | page | bulk-ops ([bulk-ops.md](bulk-ops.md)) | — | R | P | shows estimate; enables export |
 | `product.export` | page | bulk-ops job ([bulk-ops.md](bulk-ops.md)) | — | R | P (job) | file emailed; job indicator |
-| `variant.update` | record | `PUT /variants/:id` | — | I | P | toast; set detail |
+| `product.updateVariant` | record | `PUT /variants/:id` | — | I | P | toast; set detail |
 | `product.generateContent` | record | `POST /content/title-and-description`; apply with `PATCH /content/:requestId/smart` | — | — | P | fills title and description in the draft; does not save |
 
 Notes:

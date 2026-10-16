@@ -39,6 +39,4 @@ Tools, topics, the proposal flow and approval rules: [commands › surfaces](../
 
 ## Open
 
-- Is Arya part of the core product or an installed app? The design lists it under Settings → Apps.
-- Which backend hosts the assistant endpoint (see [open-questions.md](open-questions.md)).
-- Model and cost limits per merchant.
+Core feature or installed app, backend, model and cost limits: [open questions](open-questions.md) #5, #10.

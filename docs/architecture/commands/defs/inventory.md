@@ -22,7 +22,7 @@ Effect: R read-only · D destructive · I idempotent · X external. Mode: P pess
 
 Notes:
 - Bulk edit and set on hand are absolute targets; `compare_quantity` makes a stale available write fail with `COMPARE_AND_SET_CONFLICT`. Every write carries a reason and is logged (adjustments). Rules: [domain](../../domain/inventory.md#rules).
-- The single endpoint behind all stock writes stays inside these commands, so moving to adjustments later is local ([deferred #5](../../domain/deferred.md)).
+- Stock-write endpoints stay inside these commands, so a change to them is local ([deferred #5](../../domain/deferred.md)).
 
 ## Purchase order
 
@@ -35,7 +35,7 @@ Notes:
 | `purchaseOrder.reopen` | record | same PATCH with status `Draft` | — | — | P | — |
 | `purchaseOrder.receive` | record | receive lines (`receiveCaps`, `receivePayload`) | "Receive N units into {location}?" | — | P | toast; back to detail; invalidate inventory |
 | `purchaseOrder.delete` | record | `DELETE /purchase-orders/:id/?store_id=` | critical: "Delete {number}?" | D | P | go to list |
-| `purchaseOrder.openReceive` | record | navigate to `/purchase-orders/:id/receive` | — | R | — | — |
+| `purchaseOrder.openReceive` | record | navigate to `/purchase-orders/$id/receive` | — | R | — | — |
 | `purchaseOrder.createFromSelection` | selection | navigate to create with selected inventory rows (quantity 1, cost 0); no gk-pages entry point on main | — | R | — | — |
 
 Notes:
@@ -50,7 +50,7 @@ Notes:
 | `transfer.markPending` | record | same PATCH with status `Pending` (button "Mark as Pending") | — | — | P | toast "Transfer marked as pending successfully"; invalidate inventory (incoming) |
 | `transfer.receive` | record | receive lines (`receiveCaps`, `receivePayload`) | "Receive N units into {location}?" | — | P | invalidate inventory |
 | `transfer.delete` | record | `DELETE /stock-transfers/:id` | critical: "Delete this transfer?" | D | P | go to list |
-| `transfer.openReceive` | record | navigate to `/transfers/:id/receive` | — | R | — | — |
+| `transfer.openReceive` | record | navigate to `/transfers/$id/receive` | — | R | — | — |
 | `transfer.createFromSelection` | selection | navigate to create with selected rows (quantity 1); no gk-pages entry point on main | — | R | — | — |
 
 Notes:
@@ -66,4 +66,4 @@ Notes:
 | receive, close, reopen | ✓ | — | — |
 | delete, import | ✓ | — | — |
 
-Stock-changing commands are not exposed to the assistant in v1.
+Commands that change on-hand stock are not exposed to the assistant in v1.

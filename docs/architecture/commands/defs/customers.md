@@ -4,7 +4,7 @@
 
 Permission: `write_customers` for every command (enforcement off in v1).
 
-Effect: R read-only · D destructive · I idempotent · X external. Mode: P pessimistic · O optimistic. Writes carry `staffId`, `staffName` (camelCase for this service; os-customer rejects unknown fields).
+Effect: R read-only · D destructive · I idempotent · X external. Mode: P pessimistic · O optimistic.
 
 ## Customer
 
@@ -12,7 +12,7 @@ Effect: R read-only · D destructive · I idempotent · X external. Mode: P pess
 |---|---|---|---|---|---|---|
 | `customer.create` | page | 1 `POST /customers`; 2 `POST /addresses` default first, then others | — | — | P | toast "Customer created"; open detail (today: list) |
 | `customer.update` | record | 1 `PUT /customers/:id` (if fields or custom fields changed); 2 per changed address `PUT /addresses/:id` or `POST /addresses` | — | — | P | toast "Customer updated"; set detail |
-| `customer.deleteAddress` | record | `DELETE /addresses/:id` | "Delete this address?" | D | P | invalidate addresses |
+| `customer.deleteAddress` | record | `DELETE /addresses/:id` | critical: "Delete this address?" | D | P | invalidate addresses |
 | `customer.setBlocked` | record | `PATCH /customers/:id/status` `{isBlocked}` | "Disable this customer account?" / "Are you sure you want to enable this account?" | I | P | toast "Customer account disabled / enabled" |
 | `customer.delete` | record | `DELETE /customers/:id` | critical: "Delete this customer? This can't be undone." (list row only) | D | P | toast; invalidate list |
 | `customer.comment` | record | `POST {KWIKPASS_CUSTOMER}/v1/admin/customers/:id/comment` `{message, visibility}` | — | — | P | invalidate timeline |

@@ -24,7 +24,7 @@ GET /api/dashboard/user/details
 | `false` | Every route blocked; "You don't have access. Talk to sales." screen |
 
 - Today the flag only shows the sidebar item (`dashboard-ui` `sideNav/index.tsx:1476`, `SideNavMerger.tsx:667`); gk-pages still mounts by URL.
-- Ratio's guard makes it real: it runs in the boot flow ([machines](../docs/machines.md#session)), before any route renders.
+- Ratio's guard makes it real: it runs in the Session machine ([machines](../docs/machines.md#session)), before any route renders.
 
 ## Permissions
 

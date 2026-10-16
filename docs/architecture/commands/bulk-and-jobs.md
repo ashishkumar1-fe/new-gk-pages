@@ -24,8 +24,7 @@ interface BulkSpec<TInput> {
 
 ### Selection rules
 
-- Bulk input is the selected IDs on the current page. No filter-based "all matching" unless the API accepts a filter.
-- Conditional bulk commands check the whole selection (Unarchive only if all selected are archived).
+- Bulk input is the selection ([list](../resources/list.md#selection-and-bulk)).
 - After the command, the selection clears on success and keeps failed items on partial.
 
 ## Background jobs

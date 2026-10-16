@@ -39,7 +39,7 @@ Search: `customerSearch` ([domain](../../domain/customers.md#rules)); the module
 | main | Overview | firstName, lastName, language, email, phone (+91), email and SMS consent | consent toggles disabled until email / phone entered |
 | main | Addresses | addresses (child) | modal with address schema; delete runs `customer.deleteAddress` immediately |
 | main | Custom fields | runtime fields | edit only |
-| main | Orders | latest order, "Create order", "View all orders (n)" | edit only; links to orders scoped by `customerId` |
+| main | Orders | latest order, "Create order" (`draftOrder.createForCustomer`), "View all orders (n)" | edit only; links to orders scoped by `customerId` |
 | main | Timeline | events and comments (`customer.comment`) | edit only |
 | aside | Notes | ≤ 5000 chars | |
 | aside | Tags | | |

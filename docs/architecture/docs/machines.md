@@ -18,7 +18,7 @@ Lists, records and single commands don't need one: the query cache and `runComma
 - **One state per distinct outcome.** A state exists only if it allows different events, exits or UI; failures with the same exits share a state.
 - **Every async state has a way out:** a timeout (`after`) or a limit, an error state, and RETRY or CLOSE.
 - **Ids, not copies.** Context holds ids and flow choices; server data stays in the query cache, form values in the form.
-- **Actors call contracts only:** `runCommand` and resource queries, with the actor's `signal`. The idempotency key is created on entering the submit state and reused for its retries; changed input gets a new key.
+- **Actors call contracts only:** `runCommand` and resource queries, with the actor's `signal`; Session and Login also call platform session. The idempotency key is created on entering the submit state and reused for its retries; changed input gets a new key.
 - **Flow-owned confirm.** A review state (refund review, wizard finish, assistant proposal) is the confirm: the machine runs the command with `confirmed: true` ([execution](../commands/execution.md#confirmation-policy)).
 - **UI reads tags.** One hook per machine returns plain values and senders; components never import XState.
 - **Lifetime.** Page machines start with their route, drawer or dialog and stop when it closes, aborting their actors. App-wide machines live at the root with a `systemId`. A store switch stops everything merchant-scoped.
@@ -53,7 +53,7 @@ stateDiagram-v2
 ```
 
 - `GET /user/details` is both the session check and the user load ([auth](../platform/auth-session.md#cookie-session)). Routes render only in Ready.
-- Logout and login reach other tabs; the store stays per tab (#21).
+- Logout and login reach other tabs; the store stays per tab (pending [open question 21](open-questions.md)).
 
 ### Jobs
 

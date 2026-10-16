@@ -42,7 +42,7 @@ The domain sees one shape; every row below is fixed in the service's transformer
 
 | Concern | Wire today |
 |---|---|
-| Case | snake_case: dashboard, os-order orders / fulfilment / edit / refund requests, item reads, inventory, discounts. camelCase: os-customer, media, apps, bulk-ops, os-order drafts / refund responses / tags, item collections. PascalCase keys in bulk-ops import preview |
+| Case | snake_case: dashboard, os-order orders / fulfillment / edit / refund requests, item reads, inventory, discounts. camelCase: os-customer, media, apps, bulk-ops, os-order drafts / refund responses / tags, item collections. PascalCase keys in bulk-ops import preview |
 | Envelope | dashboard `{ status_code, data }`; os-customer, discount, media `{ success, …, data }`; inventory v3 `{ data, errors, api_version, request_id }`; os-order `{ orders \| draft_orders, pagination }`; others per endpoint (bare arrays, `{ data, meta }`, `{ assets, pagination }`) |
 | Pagination | Mostly page + limit; v3 levels by offset; totals as `total`, `total_pages`, `pages` / `current_page` or `hasNextPage` |
 | Money | Paise as integers or decimal strings (`"600000.00"`). Rupees: customer amounts, draft `shippingLine.price`, edit-commit `refund_amount`, PO line tax |

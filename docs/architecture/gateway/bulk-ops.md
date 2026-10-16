@@ -2,7 +2,7 @@
 
 [← Gateway](README.md)
 
-Base `{BULK_OPS}` (`REACT_APP_BULK_OPS_API_URL`); paths relative to `/api/v1/admin/bulk-ops`. Case: camelCase (import preview also has PascalCase keys). Money: none. Store scoping: previews take query `store-id` (= merchant `m_id` from `sessionStorage`, not the store id); history takes `storeId`. Envelope: bare body, usually with `success` at top level.
+Base `{BULK_OPS}` (`REACT_APP_BULK_OPS_API_URL`); paths relative to `/api/v1/admin/bulk-ops`. Case: camelCase (import preview also has PascalCase keys). Money: none. Store scoping: previews take query `store-id` (= merchant `m_id` from `sessionStorage`); history takes `storeId` (the route's, the same `m_id`). Envelope: bare body, usually with `success` at top level.
 
 Client: `makeApiCall` wrapper (merchant headers) everywhere except import preview: raw `fetch` with `merchant-mid`, `gk-merchant-id`, `credentials: 'include'`.
 

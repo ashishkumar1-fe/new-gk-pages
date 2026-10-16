@@ -222,7 +222,7 @@ As today; strings quoted are the user-facing messages. Source paths are in gk-pa
 | `removedLines` | currentQuantity 0 and originalQuantity > 0 | `OrderDetails.tsx:155` |
 | `lineGroups` | unfulfilled = fulfillable; fulfilled = quantity − fulfillable; removed band | `modules/order/lineItemGroups.ts:24` |
 | `rowPricing` | discounted unit = unit − allocations ÷ current quantity | `lineItemGroups.ts:80` |
-| `fulfillmentView` | merge held and fulfillable lines; an order hold covers all; can fulfil / hold = open and unheld remaining > 0 | `modules/fulfillment/transformer.ts:86` |
+| `fulfillmentView` | merge held and fulfillable lines; an order hold covers all; can fulfill / hold = open and unheld remaining > 0 | `modules/fulfillment/transformer.ts:86` |
 | `summarizeRefunds` | success → refunded; pending / processing → in progress; failed → neither | `modules/refunds/utils.ts:24` |
 | `hasLiveInvoice` | `invoiceUrl` set (status alone isn't enough) | `modules/draft-order/` |
 | `draftValidation` | custom item: name, price > 0, quantity; quantity ≤ 1,000,000; new customer: names, email, phone 10–15 digits, address1, city, state, PIN 6 digits; address: letters-only names and city, PIN 6, phone 10 | `components/orders/DraftOrder.tsx:1127`, `ProductSection.tsx:1003`, `CreateCustomerModal.tsx:73`, `EditShippingAddressModal.tsx:113` |

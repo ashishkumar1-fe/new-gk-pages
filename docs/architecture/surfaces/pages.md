@@ -11,7 +11,7 @@ Pages are built from contracts, not written per resource. A resource's config pi
 | List | [`ListConfig`](../resources/list.md) | Header (title, page commands) · view tabs · search and filter · table · bulk bar on selection · pagination |
 | Editor | [`EditorConfig`](../resources/editor.md) | Header · main 65 / aside 35 sections · save bar |
 | Detail | [`DetailConfig`](../resources/contract.md) | Header with previous / next · read sections · record commands (orders) |
-| Flow | a [machine](../docs/machines.md) hook | Its own route (wizard, order edit), a drawer (refund) or a dialog (import, export) |
+| Flow | a [machine](../docs/machines.md) hook | A dialog for a short decision (import, export), a drawer for a task beside the page (refund), its own route for anything longer or a create (wizard, order edit) |
 
 - List, editor and detail routes are generated from the [resources registry](../resources/registry.md); flow and settings routes are written by hand.
 - A section or cell given as a `ComponentId` is resolved in `features/components.ts`, the one map from id to React component. Extension targets render there too ([extensions](../docs/extensions.md)).

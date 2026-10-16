@@ -40,3 +40,6 @@ How the Ratio design (Login, Home, Products, Product detail, Settings, top bar, 
 | Login screens for unverified email and forced password change; drop "Forgot password" or add a flow | The Login machine has those branches; the gateway has no reset endpoint |
 | A leave-guard dialog | Every editor asks before discarding |
 | Status tabs Active / Draft / Archived on the product list | The list has those views |
+| Critical button; info and neutral badge tones; overlay, focus-ring and page-background tokens; skeleton fill; AI-filled field highlight | Confirms, statuses (Draft, Archived), sheets and dialogs, keyboard focus, assistant |
+| Contrast to AA: warning text (2.4:1), blue on tint (4.2:1), inactive tab (3.7:1) | WCAG 2.2 AA (d29) |
+| Date picker, rich text, stepper, timeline, banner, drawer, dropdown, toast, filters, sort, column picker, bulk bar, proposal card | Used by v1 screens, not yet designed |

@@ -29,7 +29,7 @@ Same layers as the [README](../README.md#layers). A layer imports only from laye
 | 3 Service API | `api/<service>/` (client, wire schema, transformer) | domain (schemas), platform core (HTTP client, config) | React; every layer above |
 | 2 Domain | `domain/` | other domain modules | anything else in the app; React; network |
 | 1 Platform core | `platform/` | nothing in the app | every layer above |
-| Side: UI kit | `ui/` | nothing in the app | domain types, contracts |
+| Side: UI kit | `ui/` | nothing in the app | everything in the app |
 
 - Machines import `runCommand` and resource queries directly; async work stays in `actors.ts` so tests can replace it.
 - Every write endpoint is called from exactly one command ([ADR 0001](../adr/0001-resources-and-commands.md)). Exception: login, OTP, logout and store switch are platform session calls.

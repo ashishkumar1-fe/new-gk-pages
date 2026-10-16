@@ -70,7 +70,7 @@ State is not a layer: server data sits in the query cache (client in platform co
 | 3 · Service API | [service-api/](service-api/README.md): data flow, wire schema → transformer, what transformers normalise |
 | 4 · Contracts | [resources/](resources/README.md) reads · [commands/](commands/README.md) writes |
 | 5 · Orchestration | [machines.md](docs/machines.md): session, jobs, assistant, refund, order edit, import, export… |
-| 6 · Surfaces | [surfaces/](surfaces/README.md) routing, chrome · [assistant.md](docs/assistant.md) · [extensions.md](docs/extensions.md) · [ui-kit.md](docs/ui-kit.md) |
+| 6 · Surfaces | [surfaces/](surfaces/README.md) pages, routing, chrome · [assistant.md](docs/assistant.md) · [extensions.md](docs/extensions.md) · [ui-kit.md](docs/ui-kit.md) |
 
 | Cross-cutting | Docs |
 |---|---|

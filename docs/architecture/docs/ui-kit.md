@@ -12,13 +12,14 @@ Source of truth for tokens and visuals: the **Ratio design system** (colors, typ
 |---|---|
 | **Tokens** | color, type, spacing, radius, shadow (CSS variables) |
 | **Primitives** | Button, Input, Select, Checkbox, Dialog, Popover, Tooltip, Tabs, Toast |
-| **Patterns** | DataTable, FilterBar, BulkBar, Save bar, Form sections, Settings sheet, Empty/Error/Loading states, Page header |
+| **Patterns** | DataTable, FilterBar, BulkBar, Save bar, Form sections, Settings sheet, Empty/Error/Loading states (page and table skeletons), Page header (back, title, status, actions, previous / next), Resource picker (products, collections, customers) |
 | **Shell** | Sidebar, Top bar, Command palette, Assistant panel, Jobs indicator, Proposal card |
 
 ## Rules
 
 - Feature code uses patterns and primitives, never raw Radix.
-- Every component has loading, empty, error and disabled states.
+- Every pattern has loading, empty, error and disabled states.
+- A dialog for a short decision, a drawer for a task beside the page (refund), a page for anything longer or a create.
 - Keyboard and screen-reader support are part of "done".
 - Docs: a `/playground` route, built only into non-prod, shows every component, variant and a snippet.
 

@@ -21,7 +21,7 @@ Lists, records and single commands don't need one: the query cache and `runComma
 - **Actors call contracts only:** `runCommand` and resource queries, with the actor's `signal`. The idempotency key is created on entering the submit state and reused for its retries; changed input gets a new key.
 - **Flow-owned confirm.** A review state (refund review, wizard finish, assistant proposal) is the confirm: the machine runs the command with `confirmed: true` ([execution](../commands/execution.md#confirmation-policy)).
 - **UI reads tags.** One hook per machine returns plain values and senders; components never import XState.
-- **Lifetime.** Page machines start with their route and stop on leave, aborting their actors. App-wide machines live at the root with a `systemId`. A store switch stops everything merchant-scoped.
+- **Lifetime.** Page machines start with their route, drawer or dialog and stop when it closes, aborting their actors. App-wide machines live at the root with a `systemId`. A store switch stops everything merchant-scoped.
 - **Tests:** `createActor(machine.provide({ actors }))` with fake timers, one test per transition. Entering a failure state or abandoning a flow is a PostHog event.
 
 ## App-wide machines
@@ -103,7 +103,7 @@ stateDiagram-v2
 
 ## Page machines
 
-Start with their route, stop on leave.
+Start with their route, drawer or dialog; stop when it closes. Where each appears: [pages](../surfaces/pages.md#machines-on-screen).
 
 | Machine | Calls | Timers |
 |---|---|---|

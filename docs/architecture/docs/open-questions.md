@@ -9,7 +9,7 @@
 | 4 | Login/session endpoints callable from the new origin | Backend | Includes a reliable "who am I" check |
 | 5 | Where the assistant backend lives, model, cost limits | Engineering, Backend | |
 | 6 | Permission list for commands | Backend | Keys declared on commands; enforcement off in v1 (gk-pages checks only the two Ratio Reports permissions today); staff UI out of scope |
-| 7 | Design: navigation, tokens, components | Design, Product | Two-level nav, global search in v1. Logic leads, the design adapts. Asks: a destructive colour (destructive commands, confirms), elevation for menus and dialogs, Dialog and form components, error and toast states, a motion rule (Home animates beyond the 120 ms rule) |
+| 7 | Design: navigation, tokens, components | Design, Product | Two-level nav, global search in v1. Logic leads, the design adapts: [asks to design](design-mapping.md#asks-to-design) |
 | 8 | Hosting and CI (S3/CloudFront, previews) | Platform | |
 | 9 | Do any APIs bypass the gateway today (uploads, direct hosts)? | Ashish, Backend | Need a list before step 1 |
 | 10 | Arya: core feature or installed app? | Product | Changes where it is built and how it gets permissions |

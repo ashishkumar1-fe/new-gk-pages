@@ -11,15 +11,22 @@
 
 ```
 /login
-/store/:storeId                         home
-/store/:storeId/products                list
-/store/:storeId/products/:id            editor
-/store/:storeId/products/new
-/store/:storeId/orders/:id/edit
-…
+/pick-store                            store picker (Session machine)
+/no-access
+/store/$storeId                        home
+/store/$storeId/products               list      ┐ generated from the
+/store/$storeId/products/$id           editor    │ resources registry
+/store/$storeId/products/new                     ┘
+/store/$storeId/orders/$id/edit        flow (hand-written)
+/store/$storeId/apps/$handle/*         embedded app
+/store/$storeId/…?settings=<tab>       settings sheet over any page
+*                                      404
 ```
 
-All resource routes ([resources registry](../resources/registry.md)) live under `/store/:storeId`. Keeping the store in the URL keeps deep links, shared links and one-store-per-tab working.
+All resource routes ([resources registry](../resources/registry.md)) live under `/store/$storeId`. Keeping the store in the URL keeps deep links, shared links and one-store-per-tab working. Templates and page states: [pages](pages.md).
+
+- Document title: `{record} · {page} · {store}`.
+- Page views go to PostHog by route template (`/store/$storeId/orders/$id`), never with raw ids.
 
 ## Old URLs
 
@@ -27,4 +34,4 @@ All resource routes ([resources registry](../resources/registry.md)) live under 
 dashboard.gokwik.in/gk-pages/store/7/products  ──301──▶  <ratio>.gokwik.in/store/7/products
 ```
 
-A redirect stub in the dashboard maps `/gk-pages/*` to the same path on the new domain. It stays for a few months after cutover, then is removed.
+A rule at the dashboard host's edge (a real 301) maps `/gk-pages/*` to the same path on the new domain, keeping query and hash. It stays for a few months after cutover, then is removed.

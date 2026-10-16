@@ -13,7 +13,7 @@ All routes live under `/store/$storeId` ([routing](../surfaces/routing.md)); pat
 | Product | item | `/products`, `/products/$id`, `/products/new`, `/products/$id/variants` | list + editor | Products | [product](defs/product.md) |
 | Collection | item | `/collections`, `/collections/$id`, `/collections/new` | list + editor | Products › Collections | [collection](defs/collection.md) |
 | Inventory | inventory | `/inventory?location=` | list with cell edit | Products › Inventory | [inventory](defs/inventory.md) |
-| Location | inventory | `/inventory/locations` | list (name + Default badge, address, status) + form; row menu edit, activate / deactivate / delete by status | Inventory › Manage locations | [location commands](../commands/defs/inventory.md#inventory) |
+| Location | inventory | `/inventory/locations` | list (name + Default badge, address, status) + form; row menu edit, activate / deactivate / delete by status | — ("Manage locations" on the inventory page; the sidebar has two levels) | [location commands](../commands/defs/inventory.md#inventory) |
 | Purchase order | inventory | `/purchase-orders`, `/$id`, `/new`, `/$id/receive` | list + editor + receive | Products › Purchase orders | [purchase-order](defs/purchase-order.md) |
 | Transfer | inventory | `/transfers`, `/$id`, `/new`, `/$id/receive` | list + editor + receive | Products › Transfers | [transfer](defs/transfer.md) |
 | Customer | os-customer | `/customers`, `/customers/$id`, `/customers/new` | list + editor | Customers | [customer](defs/customer.md) |

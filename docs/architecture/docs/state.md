@@ -7,7 +7,7 @@ State has three homes. It is not a layer of its own; where each home sits in the
 | Kind | Home | Examples |
 |---|---|---|
 | **Server data** | TanStack Query cache | product list, order detail, user details |
-| **View state** | URL search params | `?view=unfulfilled&q=rahul&financial_status=paid&sort=created_at:desc&page=2` |
+| **View state** | URL search params | `?view=unfulfilled&q=rahul&financial_status=paid&sort=created_at:desc&page=2`, `?settings=apps` |
 | **UI state** | Component state, or a small Zustand store when global | modal open, assistant panel open, row selection |
 
 Flow state (multi-step processes) lives in a state machine; see [machines.md](machines.md). URL format and list params: [../resources/list.md](../resources/list.md#url-state).

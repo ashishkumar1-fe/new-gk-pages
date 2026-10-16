@@ -2,7 +2,7 @@
 
 [← Architecture](../README.md)
 
-XState v5 for flows that have steps. Not for every screen.
+XState v5 for flows that have steps. Not for every screen. Two or three people author machines; everyone else uses their hooks (d41).
 
 ## Use a machine when
 

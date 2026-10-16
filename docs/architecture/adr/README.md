@@ -12,7 +12,7 @@ One file per settled decision: `NNNN-short-title.md` with Context, Decision, Con
 | [0004](0004-validate-every-response.md) | Every response parsed with its schema, the same way |
 | [0005](0005-cache-policy-switch.md) | Cache freshness is one switch (`fresh` / `balanced`) |
 
-## Tracker decisions d01–d36
+## Tracker decisions d01–d42
 
 From the standalone decision tracker (all closed); each page lists the ones it carries.
 
@@ -26,5 +26,10 @@ From the standalone decision tracker (all closed); each page lists the ones it c
 | d17, d18 | [gateway › access](../gateway/access.md) |
 | d19–d21, d32, d34 | [operations › delivery](../operations/delivery.md) |
 | d22–d30, d33, d35 | [operations › quality](../operations/quality.md) |
+| d37, d39 | [operations › contribution](../operations/contribution.md) |
+| d38 | [UI kit › governance](../docs/ui-kit.md#governance-d38) |
+| d40 | [stack](../docs/stack.md) (adopted after review) |
+| d41 | registry scope: [resources](../resources/README.md#rules), palette [chrome](../surfaces/chrome.md), machine owners [machines](../docs/machines.md) |
+| d42 | fresh codebase [ADR 0002](0002-new-codebase.md); freshness [ADR 0005](0005-cache-policy-switch.md); docs stay in this repo (ADR 0002 over d42's Confluence) |
 
 Still open: exact subdomain (d02, [open questions](../docs/open-questions.md) #2), phased rollout (d03, at cutover), detailed deploy process (d19, near launch).

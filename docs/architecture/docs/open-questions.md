@@ -19,10 +19,10 @@
 | 15 | Staff activity log: where command audit events are stored and shown | Product, Backend | gk-pages already posts field-level change records to the Audit Service (`AUDIT_SERVICEURL`); v1 sends command events to PostHog only |
 | 16 | Fix the data-affecting defects in today's writes | Product, QA | List in [commands README](../commands/README.md#defects-in-todays-writes); product bulk edit price bug first |
 | 14 | Business-logic changes the design implies (GST rate, tax split, MRP label, marketplaces, inventory history, variant save, validations) | Product | Kept as today in v1; list and seams in [deferred.md](../domain/deferred.md#b-business-logic-keep-todays-behaviour-change-only-with-product-sign-off) |
-| 19 | Default cache policy: `fresh` (revalidate on every mount) or `balanced` (30 s lists, 60 s detail)? | Product, Engineering | Starts as `fresh`; switching is one line ([data access](../resources/data-access.md#cache-policy)) |
 | 20 | OpenAPI specs for os-order, item, inventory, os-customer, discount V2, bulk-ops? | Backend | Upgrades the [gateway API docs](../gateway/README.md) from inferred to confirmed; otherwise sandbox HAR captures |
 | 21 | Does the server need `POST /team/switch-merchant` when every call already carries `merchant-mid`? Does it break two tabs on different stores? | Backend | Decides whether store switching is per tab ([merchant context](../platform/auth-session.md#merchant-context)) |
 | 22 | What does `@gokwik/utilities` `makeAPICall` do exactly: headers added, envelope unwrapped, errors swallowed? | Dashboard team | The new client must match it; the package isn't in either repo |
+| 23 | Tracker defaults never ratified: PR ≤ 400 lines, component ~150 lines, kit change SLA 1–2 days, uptime check per minute, MSW and no snapshot tests | Engineering | Promote or drop; listed in the tracker's decision log §4 |
 
 ## Decided
 
@@ -30,4 +30,5 @@
 |---|---|
 | #1 Convert gk-pages in place or new codebase | New codebase ([ADR 0002](../adr/0002-new-codebase.md)) |
 | #17 Response validation scope | Every response, one way ([ADR 0004](../adr/0004-validate-every-response.md)) |
+| #19 Default cache policy | `balanced`, 30 s / 60 s, behind the switch ([ADR 0005](../adr/0005-cache-policy-switch.md)) |
 | #18 Where team docs live | This repo for now; can move later as a whole ([ADR 0002](../adr/0002-new-codebase.md#docs)) |

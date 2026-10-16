@@ -20,4 +20,12 @@ Source of truth for tokens and visuals: the **Ratio design system** (colors, typ
 - Feature code uses patterns and primitives, never raw Radix.
 - Every component has loading, empty, error and disabled states.
 - Keyboard and screen-reader support are part of "done".
-- A Storybook-lite route documents each shared component.
+- Docs: a `/playground` route, built only into non-prod, shows every component, variant and a snippet.
+
+## Governance (d38)
+
+- `src/ui/` is read-only for feature work; CODEOWNERS (`@kit-owners`) must approve any change.
+- Closed APIs: a fixed list of variants and no `className` / `style` passthrough, so a new look can only come from a kit change. Raw hex outside the kit fails lint.
+- Lint bans raw `<button>` / `<input>` / `<select>`, kit-internal imports and look-alike components in features.
+- Need a variant? Open a "UI kit change request" issue; approved changes appear in the playground.
+- Stays an in-repo folder until a second app needs it or bypasses keep recurring.

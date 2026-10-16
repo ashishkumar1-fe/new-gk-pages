@@ -68,21 +68,22 @@ Today's gk-pages has no cache: every navigation refetches. In Ratio, freshness i
 type CacheClass = 'list' | 'detail' | 'lookup' | 'calc';
 
 const policies = {
-  fresh:    { list: 0,      detail: 0,      lookup: 10 * 60_000, calc: 0 },   // revalidate on every mount and focus (tracker: "never feel stale")
-  balanced: { list: 30_000, detail: 60_000, lookup: 10 * 60_000, calc: 0 },   // fewer refetches
+  balanced: { list: 30_000, detail: 60_000, lookup: 10 * 60_000, calc: 0 },   // default (d42)
+  fresh:    { list: 0,      detail: 0,      lookup: 10 * 60_000, calc: 0 },   // revalidate on every mount
 } satisfies Record<string, Record<CacheClass, number>>;
 
-export const ACTIVE_POLICY: keyof typeof policies = 'fresh';   // ← the switch
+export const ACTIVE_POLICY: keyof typeof policies = 'balanced';   // ← the switch
 ```
 
 | Class | Used by | Why |
 |---|---|---|
-| `list` | list screens | Orders arrive constantly; refetch on window focus in both policies |
+| `list` | list screens | Orders arrive constantly |
 | `detail` | detail and editor reads | The editor keeps its own draft |
 | `lookup` | vendors, types, tags, taxonomy, locations, suppliers, sort options, views | Rarely change |
 | `calc` | server calculations (`/calculate`, edit-session preview) | Always current |
 
-- Data providers declare a class, never a number; a per-resource override needs a comment saying why.
+- Data providers declare a class, never a number; the `new:resource` scaffolder won't generate one without it. A resource that must always be fresh overrides with `0` and a comment.
+- `refetchOnWindowFocus: true` globally, in every policy: returning to the tab always revalidates.
 - Either policy renders cached data instantly while the background refetch runs.
 - Polling stays per command (refund status: 5 s, up to 24 times, as today).
 

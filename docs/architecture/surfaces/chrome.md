@@ -15,7 +15,7 @@
 |---|---|
 | Sidebar | Two levels, groups from resource `nav` ([resources registry](../resources/registry.md)); Orders count badge |
 | Top bar | Search, store switcher, profile menu (store settings, account, shortcuts, logout), assistant button |
-| Search (⌘K) | Pages, commands, and records from products, collections, orders, customers; recent items |
+| Search (⌘K) | Pages and commands from the registries; records via the list APIs' search params, 2–3 resources in parallel (no backend search, d41); recent items |
 | Store switcher | Lists merchants from user details; switching clears merchant-scoped state ([auth-session](../platform/auth-session.md#merchant-context)) |
 | Jobs indicator | Running import / export jobs |
 | Settings sheet | Opens over any page; tab in the URL |

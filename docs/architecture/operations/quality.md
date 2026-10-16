@@ -20,7 +20,7 @@
 
 - Sentry (already in the org), new project. Route boundaries call `captureException`.
 - Source maps: built hidden, uploaded by CI, removed from the deployed bundle.
-- Tags: release, merchant ID. No PII.
+- Tags: release (`ratio@<version>`), merchant ID, route. No PII.
 - Alerts only for new errors and spikes, through the existing Sentry → OpsGuard pipe.
 - Session replay in one tool only.
 
@@ -45,7 +45,7 @@ One CloudFront response-headers policy:
 | `Referrer-Policy` | `strict-origin-when-cross-origin` |
 | `Permissions-Policy` | camera, microphone, geolocation off |
 
-Plus: no secrets in the bundle, no public source maps, login rate limit confirmed with backend. Full CSP rolls out in report-only mode after launch, then enforced.
+Plus: no secrets in the bundle (public-env allowlist in the build config), no public source maps; login rate limit to confirm with backend. Full CSP rolls out in report-only mode after launch, then enforced.
 
 Embedded apps run in iframes inside Ratio; `frame-ancestors 'none'` applies to Ratio itself being framed, not to the apps it frames.
 

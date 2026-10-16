@@ -75,7 +75,7 @@ State is not a layer: server data sits in the query cache (client in platform co
 | Cross-cutting | Docs |
 |---|---|
 | State | [state.md](docs/state.md): where data lives |
-| Operations | [operations/](operations/README.md): delivery, quality |
+| Operations | [operations/](operations/README.md): delivery, quality, contribution |
 | Code | [structure.md](docs/structure.md) folders and imports · [stack.md](docs/stack.md) libraries |
 | Planning | [context.md](docs/context.md) · [design-mapping.md](docs/design-mapping.md) · [build-order.md](docs/build-order.md) · [open-questions.md](docs/open-questions.md) · [adr/](adr/README.md) |
 

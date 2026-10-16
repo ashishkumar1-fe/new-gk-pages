@@ -58,7 +58,7 @@ State is not a layer: server data sits in the query cache (client in platform co
 4. **One schema per shape.** Zod schemas validate API responses, drive forms and become AI tool inputs.
 5. **Machines for flows, hooks for rendering.** If it needs 3+ booleans or an effect chain, it is a state machine.
 6. **Spec first, confirmed by real screens.** Resource and command definitions are the target spec; products and orders are built first and the contracts adjusted where real code disagrees.
-7. **Parity now, change later in one place.** Business logic behaves exactly as in today's gk-pages. Known future changes (tax, channels, inventory history, new settings) are prepared as local seams: a schema field, a transformer, a command, a registered section. See [schema/deferred.md](schema/deferred.md).
+7. **Parity now, change later in one place.** Business logic behaves exactly as in today's gk-pages. Known future changes (tax, channels, inventory history, new settings) are prepared as local seams: a schema field, a transformer, a command, a registered section. See [schema/deferred.md](domain/deferred.md).
 
 ## Docs
 
@@ -66,8 +66,8 @@ State is not a layer: server data sits in the query cache (client in platform co
 |---|---|
 | Gateway (backend) | [gateway/](gateway/README.md): every endpoint gk-pages uses, CORS and bypass audit |
 | 1 · Platform core | [platform/](platform/README.md): HTTP client, session, merchant, permissions, config |
-| 2 · Domain | [schema/](schema/README.md) entities and conventions · [domain.md](docs/domain.md) rules and formatters |
-| 3 · Service API | [data flow](schema/conventions.md#data-flow-transform-once-never-mutate): wire schema → transformer (per-service pages to come) |
+| 2 · Domain | [domain/](domain/README.md): entities, business rules, formatters |
+| 3 · Service API | [service-api/](service-api/README.md): data flow, wire schema → transformer, what transformers normalise |
 | 4 · Contracts | [resources/](resources/README.md) reads · [commands/](commands/README.md) writes |
 | 5 · Orchestration | [machines.md](docs/machines.md): boot, login, refund, editor, import… |
 | 6 · Surfaces | [surfaces/](surfaces/README.md) routing, chrome · [assistant.md](docs/assistant.md) · [extensions.md](docs/extensions.md) · [ui-kit.md](docs/ui-kit.md) |

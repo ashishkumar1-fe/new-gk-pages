@@ -84,6 +84,10 @@ Confirm labels state the action and count ("Archive 12 orders"), never "OK".
 
 ## Audit and analytics
 
+```ts
+interface Actor { type: 'staff' | 'app' | 'assistant' | 'system'; id?: Id; name?: string }
+```
+
 - Each run emits one PostHog event: command ID, resource, target IDs (not full input), actor (`Actor`: staff, app or assistant), surface, result status, duration.
 - Assistant runs also record the conversation ID and the approved proposal.
 - A staff-visible activity log can use the Audit Service gk-pages already writes field-level changes to (`AUDIT_SERVICEURL`; [open question 15](../docs/open-questions.md)).

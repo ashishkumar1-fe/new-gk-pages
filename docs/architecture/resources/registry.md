@@ -41,4 +41,4 @@ No list screen of their own in v1; used by pickers, filters and the settings she
 
 ## Design-only (capability off until backend exists)
 
-Gift cards, shipping zones, domains, checkout settings, admin notifications. See [../schema/deferred.md](../schema/deferred.md).
+Gift cards, shipping zones, domains, checkout settings, admin notifications. See [../schema/deferred.md](../domain/deferred.md).

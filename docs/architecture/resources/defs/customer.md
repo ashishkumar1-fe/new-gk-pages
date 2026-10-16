@@ -1,6 +1,6 @@
 # Customer
 
-[← Resources](../README.md) · Schema: [customers.md](../../schema/customers.md) · Today: `pages/customers/CustomerHome.tsx`, `components/customers/CreateCustomerForm.tsx`, `EditCustomer.tsx`
+[← Resources](../README.md) · Schema: [customers.md](../../domain/customers.md) · Today: `pages/customers/CustomerHome.tsx`, `components/customers/CreateCustomerForm.tsx`, `EditCustomer.tsx`
 
 ## List
 

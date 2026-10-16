@@ -1,6 +1,6 @@
 # Segment
 
-[← Resources](../README.md) · Schema: [customers.md](../../schema/customers.md#segment) · Today: `pages/customers/CustomerSegments.tsx`, `components/customers/SegmentForm.tsx`, `CustomersInSegment.tsx`
+[← Resources](../README.md) · Schema: [customers.md](../../domain/customers.md#segment) · Today: `pages/customers/CustomerSegments.tsx`, `components/customers/SegmentForm.tsx`, `CustomersInSegment.tsx`
 
 ## List
 

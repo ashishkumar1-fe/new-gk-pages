@@ -1,6 +1,6 @@
 # Purchase order
 
-[← Resources](../README.md) · Schema: [inventory.md](../../schema/inventory.md#purchase-order) · Today: `pages/purchase-orders/*`, `components/purchase-orders/PurchaseOrderDetails.tsx`
+[← Resources](../README.md) · Schema: [inventory.md](../../domain/inventory.md#purchase-order) · Today: `pages/purchase-orders/*`, `components/purchase-orders/PurchaseOrderDetails.tsx`
 
 ## List
 

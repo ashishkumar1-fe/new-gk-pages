@@ -4,7 +4,7 @@
 
 A **resource** is one entity as the admin presents it: how it is fetched, listed, edited and found. Each is defined once; list screens, editors, ⌘K search, the assistant and extensions read the same definition.
 
-Built on the [schema](../schema/README.md) → [data access](data-access.md) → definition → generic screens ([list](list.md), [editor](editor.md)).
+Built on the [schema](../domain/README.md) → [data access](data-access.md) → definition → generic screens ([list](list.md), [editor](editor.md)).
 
 ## Files
 
@@ -21,7 +21,7 @@ Built on the [schema](../schema/README.md) → [data access](data-access.md) →
 
 1. **Reads only.** Writes are commands, referenced by ID.
 2. **Declarative first, escape hatch always.** Any column, filter, field or section can be a custom component; any route can use its own page.
-3. **Behaviour as today** ([parity rule](../schema/README.md#five-rules-that-shape-everything)): filters map to today's API params; validations and derived values cite their gk-pages source lines.
+3. **Behaviour as today** ([parity rule](../domain/README.md#five-rules-that-shape-everything)): filters map to today's API params; validations and derived values cite their gk-pages source lines.
 
 ## Today's UI issues and how the new admin treats them
 
@@ -29,7 +29,7 @@ Built on the [schema](../schema/README.md) → [data access](data-access.md) →
 |---|---|
 | List state lost on navigation; held in Redux/session/local storage | Fixed: URL |
 | Column sort on current page only (products, POs, transfers, customers; orders and drafts sort on the server since 2026-08) | Dropped: sort only where the API sorts |
-| Filters/tabs applied to current page only (PO and transfer tabs, segment search) | Kept as today until the API has the param; listed in [deferred.md](../schema/deferred.md) |
+| Filters/tabs applied to current page only (PO and transfer tabs, segment search) | Kept as today until the API has the param; listed in [deferred.md](../domain/deferred.md) |
 | Edit saves that skip validation (PO, transfer) | Fixed: validation always runs |
 | No unsaved-changes guard on any editor | Added (design has a save bar) |
 | Stub bulk actions (PO, transfer), stub duplicate (transfer), dead shipping-line modal (draft) | Not carried over |

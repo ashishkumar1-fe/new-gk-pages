@@ -27,7 +27,7 @@ Defined per resource as `[domain, storeId, …]`; see [../resources/data-access.
 
 ## Rules
 
-- Never copy query data into a store or `useState`, and never mutate it; derive display values at render ([data flow](../schema/conventions.md#data-flow-transform-once-never-mutate)).
+- Never copy query data into a store or `useState`, and never mutate it; derive display values at render ([data flow](../service-api/README.md#data-flow-transform-once-never-mutate)).
 - Never fetch in `useEffect`.
 - Writes go through commands; how each updates the UI (pessimistic, optimistic, undoable) is set per command ([../commands/execution.md](../commands/execution.md#modes)).
 - Row selection is UI state; it clears when the URL changes.

@@ -22,7 +22,7 @@ Effect: R read-only · D destructive · I idempotent · X external. Mode: P pess
 
 Notes:
 - Bulk edit and set on hand are absolute targets; `compare_quantity` makes a stale available write fail with `COMPARE_AND_SET_CONFLICT`. Every write carries a reason and is logged (adjustments). Derived on hand / available follow [the inventory rules](../../resources/defs/inventory.md#derived-values).
-- The single endpoint behind all stock writes stays inside these commands, so moving to adjustments later is local ([deferred #5](../../schema/deferred.md)).
+- The single endpoint behind all stock writes stays inside these commands, so moving to adjustments later is local ([deferred #5](../../domain/deferred.md)).
 
 ## Purchase order
 

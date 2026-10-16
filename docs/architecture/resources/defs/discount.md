@@ -1,6 +1,6 @@
 # Discount
 
-[← Resources](../README.md) · Schema: [discounts.md](../../schema/discounts.md) · Today: `pages/discounts/DiscountsHome.tsx`, `pages/discounts/CreateDiscountWizard.tsx`, `components/discounts/wizard/*`, `schemas/discountWizard.ts`; `components/discounts/*Form.tsx` (discount sets, AI create), `pages/discount-set`
+[← Resources](../README.md) · Schema: [discounts.md](../../domain/discounts.md) · Today: `pages/discounts/DiscountsHome.tsx`, `pages/discounts/CreateDiscountWizard.tsx`, `components/discounts/wizard/*`, `schemas/discountWizard.ts`; `components/discounts/*Form.tsx` (discount sets, AI create), `pages/discount-set`
 
 ## List
 
@@ -40,7 +40,7 @@ Hidden in today's wizard, round-tripped on save: `stacking`, `payment` flags, `c
 |---|---|
 | Offer type | cart · buy X get Y · bundle · dynamic tier · free gift |
 | Offer & code | mode (code / automatic), title, code, display name, offer (per kind), gift top-up |
-| Eligibility | minimum (none / amount / quantity, on subtotal or to-pay), customers (all / new / returning / specific phones, include or exclude), active dates, devices, visibility, description |
+| Eligibility | minimum (none / amount / quantity, on subtotal or to-pay), customers (all / new / returning / specific customers, include or exclude), active dates, devices, visibility, description |
 | Usage & stacking | total uses, per customer, per order, terms |
 | Review | summary |
 

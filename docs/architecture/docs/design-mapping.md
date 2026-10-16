@@ -24,4 +24,4 @@ How the Ratio design (Login, Home, Products, Product detail, Settings) maps onto
 | Quick add | `product.create` via quick create |
 | Import / export | bulk-ops jobs |
 | ⌘K, nav counts, store switcher, assistant panel | [chrome](../surfaces/chrome.md) |
-| Insights strip, gift cards, checkout, shipping zones, domains, bank account, notification feed, onboarding checklist | Capability off; no backend ([deferred](../schema/deferred.md)) |
+| Insights strip, gift cards, checkout, shipping zones, domains, bank account, notification feed, onboarding checklist | Capability off; no backend ([deferred](../domain/deferred.md)) |

@@ -1,8 +1,8 @@
 # Inventory
 
-[← Resources](../README.md) · Schema: [inventory.md](../../schema/inventory.md) · Today: `pages/inventory/InventoryHome.tsx`, `components/inventory/InventoryTable.tsx`
+[← Resources](../README.md) · Schema: [inventory.md](../../domain/inventory.md) · Today: `pages/inventory/InventoryHome.tsx`, `components/inventory/InventoryTable.tsx`
 
-A list with per-cell adjust popovers (each save is immediate); no record editor. Row type: [`InventoryRow`](../../schema/inventory.md#inventory-row).
+A list with per-cell adjust popovers (each save is immediate); no record editor. Row type: [`InventoryRow`](../../domain/inventory.md#inventory-item-and-level).
 
 ## List
 

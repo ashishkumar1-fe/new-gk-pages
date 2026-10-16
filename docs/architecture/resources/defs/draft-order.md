@@ -1,6 +1,6 @@
 # Draft order
 
-[← Resources](../README.md) · Schema: [orders.md](../../schema/orders.md#draft-order) · Today: `pages/draft-orders/DraftOrdersHome.tsx`, `components/orders/DraftOrder.tsx`
+[← Resources](../README.md) · Schema: [orders.md](../../domain/orders.md#draft-order) · Today: `pages/draft-orders/DraftOrdersHome.tsx`, `components/orders/DraftOrder.tsx`
 
 ## List
 

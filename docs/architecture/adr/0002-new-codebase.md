@@ -11,7 +11,7 @@ The standalone tracker chose to convert gk-pages in place (approach A): keep `ma
 ## Decision
 
 - Ratio is built in this repo (`new-gk-pages`) as a new codebase on the [architecture](../README.md).
-- gk-pages is the behaviour reference, not the code base: business rules, payloads and validations are ported with tests that pin today's behaviour ([schema parity rule](../schema/README.md)).
+- gk-pages is the behaviour reference, not the code base: business rules, payloads and validations are ported with tests that pin today's behaviour ([schema parity rule](../domain/README.md)).
 - The tracker's platform decisions (d01–d36) carry over unchanged, except where they assumed in-place conversion: the API client keeps no `makeAPICall` signature (d11), and response validation covers every response ([ADR 0004](0004-validate-every-response.md)).
 
 ## Docs

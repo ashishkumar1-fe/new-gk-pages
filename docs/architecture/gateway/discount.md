@@ -2,7 +2,7 @@
 
 [← Gateway](README.md)
 
-Two services. Discount V2 base `{BASE}/dashboard/v2/discount` (`REACT_APP_BASE_URL`, dashboard gateway). os-discount base `{DISCOUNT}` (`REACT_APP_KWIKPASS_DISCOUNT_API_URL`); paths relative to `/api/v1/admin/os-discount`, joined with `joinApiUrl` (collapses a duplicate `/api` when the base already ends in it). Case: snake_case. Money: V2 in **paise** (×100: `amount` unless `method: 'PERCENT_OFF'`, `max_discount`, `min_value`, `max_value`); os-discount v1 sends form values unconverted. Envelope: `{ success, status_code, message, data }`; Response column shows it as `{ data: … }` (V2 and AI wrappers unwrap with `data.data ?? data`).
+Two services. Discount V2 base `{BASE}/dashboard/v2/discount` (`REACT_APP_BASE_URL`, dashboard gateway). os-discount base `{DISCOUNT}` (`REACT_APP_KWIKPASS_DISCOUNT_API_URL`); paths relative to `/api/v1/admin/os-discount`, joined with `joinApiUrl` (collapses a duplicate `/api` when the base already ends in it). Case: snake_case. Money: V2 in **paise** (×100: `amount` unless `method: 'PERCENT_OFF'`, `max_discount`, `min_value`, `max_value`); os-discount v1 also in paise (the legacy transformer multiplies form values by 100). Envelope: `{ success, status_code, message, data }`; Response column shows it as `{ data: … }` (V2 and AI wrappers unwrap with `data.data ?? data`).
 
 - Headers: `merchant-mid` + `gk-merchant-id` only. No custom headers (gateway CORS allowlist rejects them; preflight fails as "CORS error").
 - Scoping: merchant in body `merchant_id` (V2, sets) or query `?merchant_id=` (V2 get); V2 merchant-config takes it from headers.

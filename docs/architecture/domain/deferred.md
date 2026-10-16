@@ -1,21 +1,8 @@
 # Deferred changes
 
-[← Schema](README.md)
+[← Domain](README.md)
 
-What v1 deliberately does not change or build, and how each item is prepared so it can land later as a local change. The parity rule is in the [schema README](README.md).
-
-Three groups:
-
-## A. Presentation: we handle, no logic change
-
-| Item | How |
-|---|---|
-| Mixed case, envelopes, pagination names, status casing, sentinels | Transformers per service, lossless, no recalculation |
-| Money units (customer `totalSpent` in rupees, PO decimal strings) | Unit conversion at the boundary only |
-| ⌘K search across resources | Calls existing per-resource search endpoints |
-| Nav counts | Existing list `total` |
-| Draft order completion | Same single call (`POST /draft-orders/:id/complete`), wrapped in one command |
-| Discount transformer quirks (v1 buy X get Y quantity in legacy forms; V2 free gift as `CART` + `FREE_GIFT`, unlimited omitted) | Written exactly as today |
+What v1 deliberately does not change or build, and how each item is prepared so it can land later as a local change. The parity rule is in the [domain README](README.md#five-rules-that-shape-everything). Wire normalisation is not deferred work; it is in [service API](../service-api/README.md#what-transformers-normalise).
 
 ## Designing for the change
 
@@ -59,16 +46,12 @@ Seams used throughout:
 | 14 | Custom field groups | Product editor | Editor groups fields through one `groupFields()`; today it returns pinned / others |
 | 15 | Gift cards | Products nav | New resource + nav entry from the registry |
 | 16 | Returns, exchanges | Orders | Returns exist on gk-pages qa/sandbox only (`/returns`, `/orders/:id/returnable-items`, approve / decline / process), not on main. Order page sections are pluggable; refund trigger `return` already modelled; new commands slot in |
-| 17 | Payment transactions, mark COD paid | Orders | `Payment` is one object today; becomes a list behind the same accessor |
+| 17 | Payment transactions, mark an existing COD order paid | Orders | `Payment` is one object today; becomes a list behind the same accessor. Drafts can already complete as paid |
 | 18 | WhatsApp marketing consent | Customers | Consent is a map by channel (`marketing.email`, `.sms`, `.push`); WhatsApp is one more key |
 | 19 | Free shipping discounts | Discounts | V2 already has SHIPPING `cross_domain_effects` (editor hidden in gk-pages, value round-tripped); turning it on is one editor section + a capability flag |
 | 20 | Product insights (sell-through, days of inventory, ABC) | Products list | List `insights` slot, capability off |
 | 21 | Return window, COD and package per product | Product editor, Shipping | Shipping section fields behind a capability |
 | 22 | Server-side status and filter params for POs, transfers, segment search | Lists | Filters declared with `toParams`; moving off client-side is a provider change |
-| 23 | Server sort for products, collections, customers | Lists | `sort` config per resource; add options when the API sorts |
+| 23 | Server sort for products and collections; sort UI for customers and segments (their APIs already take `sortBy` / `sortOrder`) | Lists | `sort` config per resource; add options when the API sorts |
 
 Group C screens ship only when their backend exists; until then they are hidden, not faked.
-
-## Backend consistency
-
-When a service normalizes its case, envelopes or units, only that service's transformer changes. The domain model and screens don't.

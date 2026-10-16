@@ -47,4 +47,4 @@ interface ApiError {
 }
 ```
 
-**Not the client's job** (layer 3, `api/<service>/`): envelopes, `success: false` in a 2xx body, scoping params (`?storeId=`, `merchant_id`, `?merchantId=`), staff fields in write bodies, case conversion, schema validation ([data flow](../schema/conventions.md#data-flow-transform-once-never-mutate)).
+**Not the client's job** (layer 3, `api/<service>/`): envelopes, `success: false` in a 2xx body, scoping params (`?storeId=`, `merchant_id`, `?merchantId=`), staff fields in write bodies, case conversion, schema validation ([data flow](../service-api/README.md#data-flow-transform-once-never-mutate)).

@@ -1,6 +1,6 @@
 # Order
 
-[← Resources](../README.md) · Schema: [orders.md](../../schema/orders.md) · Today: `pages/orders/OrdersHome.tsx`, `components/orders/OrderDetails.tsx`, `EditOrder.tsx`, `hooks/useOrderEditSession.ts`, `components/orders/FulfillmentCards.tsx`, `components/refunds/RefundDrawer.tsx`
+[← Resources](../README.md) · Schema: [orders.md](../../domain/orders.md) · Today: `pages/orders/OrdersHome.tsx`, `components/orders/OrderDetails.tsx`, `EditOrder.tsx`, `hooks/useOrderEditSession.ts`, `components/orders/FulfillmentCards.tsx`, `components/refunds/RefundDrawer.tsx`
 
 Not yet in the Ratio design; definition follows today's behaviour.
 
@@ -61,7 +61,7 @@ Scoped list: `customer_id` (from customer page "View all orders").
 ```ts
 detail: {
   pager: (o) => o.neighbors,               // previous / next from the detail response; J/K keys
-  editRoute: (o) => editBlockReason(o) ? undefined : `/orders/${o.id}/edit`,   // cancelled, fully fulfilled or edit-blocking discount: disabled with reason; Shopify-sourced: blocked with a message
+  editRoute: (o) => editBlockReason(o) ? undefined : `/orders/${o.id}/edit`,   // disabled with the reason; isShopifySourced: blocked with a message
 }
 ```
 
@@ -81,14 +81,13 @@ Editor driven by an os-order edit session (one lock per order):
 commands: {
   page: ['order.export', 'order.import', 'draftOrder.create'],          // "Create order" opens a new draft
   bulk: ['order.bulkCancel', 'order.bulkTags', 'order.archive', 'order.unarchive', 'order.bulkFulfil'],   // unarchive only if all selected are archived; bulkCancel only if all are cancellable
-  more: (o) => ['order.openStatusPage', 'order.duplicate', o.closedAt ? 'order.unarchive' : 'order.archive', ...(anyFulfilled(o) ? [] : ['order.cancel'])],
+  more: (o) => ['order.openStatusPage', 'order.duplicate', o.closedAt ? 'order.unarchive' : 'order.archive', 'refund.create', 'order.cancel'],   // visibility from domain rules
   row:  ['order.fulfil', 'order.hold', 'order.releaseHold', 'order.updateTracking'],   // on the Fulfillment card
-  primary: (o) => canRefund(o) ? 'refund.create' : undefined,
 }
 ```
 
-- `order.cancel`: hidden once any item is fulfilled (fulfilled, partially fulfilled, shipped, delivered). Reasons (6 fixed), staff note, restock (default on), notify (always on, as today), auto-refund when amount > 0, not COD and not already refunded.
-- `refund.create`: hidden if cancelled; blocked for COD, refunded, partially refunded and refund pending. Flow: select items → preview (note, restock, include shipping) → confirm with idempotency key → poll status (machine).
+- `order.cancel`: visible when `canCancel` ([order rules](../../domain/orders.md#rules)). Reasons (6 fixed), staff note, restock (default on), notify (always on, as today), auto-refund when amount > 0, not COD and not already refunded.
+- `refund.create`: hidden if cancelled; disabled with `refundBlockReason`. Flow: select items → preview (note, restock, include shipping) → confirm with idempotency key → poll status (machine).
 - `order.duplicate`: builds a draft from the order and opens it.
 - Export and import: bulk-ops jobs ([commands](../../commands/defs/bulk-ops.md)); the export file is emailed.
 - Archive / unarchive responses `ALREADY_ARCHIVED` / `ALREADY_OPEN` are warnings, not errors.

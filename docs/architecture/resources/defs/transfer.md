@@ -1,6 +1,6 @@
 # Transfer
 
-[← Resources](../README.md) · Schema: [inventory.md](../../schema/inventory.md#transfer) · Today: `pages/transfers/*`, `components/transfers/TransferDetailsForm.tsx`
+[← Resources](../README.md) · Schema: [inventory.md](../../domain/inventory.md#transfer) · Today: `pages/transfers/*`, `components/transfers/TransferDetailsForm.tsx`
 
 ## List
 

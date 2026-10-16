@@ -16,6 +16,18 @@ interface DataProvider<T, TItem> {
 }
 ```
 
+```ts
+interface ListParams {
+  view?: string;                         // active tab
+  search?: string;
+  filters?: Record<string, unknown>;     // filter id → value; mapped by each filter's toParams
+  scope?: Record<string, string>;        // required scope (location) or relation scope (customer_id)
+  sort?: { field: string; direction: 'asc' | 'desc' };
+  page?: number;                         // 1-based
+  limit?: number;                        // 50
+}
+```
+
 Inside a provider: map `ListParams` to the service's params → call → unwrap the envelope → transform each row → parse with the schema → return `Page<TItem>`.
 
 Service-specific mapping lives here, for example:

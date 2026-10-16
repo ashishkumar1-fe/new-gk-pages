@@ -38,9 +38,9 @@ Effect: R read-only · D destructive · I idempotent · X external. Mode: P pess
 - **`order.cancel`** input: `{ reason, staffNote?, restock (default true), notify (always true, as today), autoRefund }`. Reasons sent as today's strings: "Customer changed or canceled order", "Payment declined", "Fraudulent order", "Items unavailable", "Staff error", "Other". `autoRefund` only when amount > 0, not COD, not refunded or refund pending.
 - **`order.bulkCancel`** uses the same input per order. Today it does not apply the auto-refund rule per order (see [defects](../README.md#defects-in-todays-writes)).
 - **`order.archive` / `unarchive`**: single orders use the bulk endpoint with one ID, as today. Visibility: archive when not archived; unarchive when archived (all selected for bulk).
-- **`order.edit`**: line changes are session ops (`set_qty` absolute, `remove_line`, `apply_line_item_discount`); no adding items; increases only on unfulfilled, unpaid COD orders. The metadata PATCH sends `note_attributes: [{ name: 'reason_for_edit' }]`, customer, addresses, metafields; `source_name: 'Draft Order'`; no `line_items`. Disabled with reason when cancelled, fully fulfilled or carrying an edit-blocking discount; Shopify-sourced orders show "This order can't be edited here". Commit errors: `PREVIEW_OUT_OF_DATE` re-previews; `SESSION_REAPED_DURING_COMMIT` counts as applied; a dropped commit is re-read before retry.
+- **`order.edit`**: line changes are session ops (`set_qty` absolute, `remove_line`, `apply_line_item_discount`); no adding items; increases only on unfulfilled, unpaid COD orders. The metadata PATCH sends `note_attributes: [{ name: 'reason_for_edit' }]`, customer, addresses, metafields; `source_name: 'Draft Order'`; no `line_items`. Disabled with reason when cancelled, fully fulfilled or carrying an edit-blocking discount; Shopify-sourced orders show "This order cannot be edited by this app." ([rules](../../domain/orders.md#rules)). Commit errors: `PREVIEW_OUT_OF_DATE` re-previews; `SESSION_REAPED_DURING_COMMIT` counts as applied; a dropped commit is re-read before retry.
 - **`order.cancel`** is hidden once any item is fulfilled; **`order.bulkCancel`** is offered only when every selected order is cancellable.
-- **Fulfilment** writes carry `staff_id`, `staff_name` in the body. Hold reasons are 8 fixed values ([schema](../../schema/orders.md#fulfillment)). Bulk fulfil skips held, fulfilled and cancelled orders and reports each.
+- **Fulfilment** writes carry `staff_id`, `staff_name` in the body. Hold reasons are 8 fixed values ([schema](../../domain/orders.md#fulfillment)). Bulk fulfil skips held, fulfilled and cancelled orders and reports each.
 - **`order.duplicate`** copies line items, customer, email, phone, addresses, note, tags, custom fields; not discounts, freebies or shipping.
 - **`order.updateContact`**: removing a customer sends `{customer: null}`.
 
@@ -62,7 +62,7 @@ stateDiagram-v2
 
 - The refund machine drives the drawer. Calculate is a query (`POST /refunds/calculate {order_id, line_items:[{line_item_id, quantity}], include_shipping}`), not a command.
 - `refund.create` is one step plus `poll: { intervalMs: 5000, maxAttempts: 24, done: status ∈ success | failed }`. Input adds `{note?, restock_type: 'NO_RESTOCK' | 'CANCEL'}`.
-- Enabled: not cancelled; disabled with reason for COD ("COD orders can't be refunded"), refunded, partially refunded, refund pending.
+- Visible when not cancelled; disabled with `refundBlockReason` ([rules](../../domain/orders.md#rules)).
 - Runs as the refund machine ([../../docs/machines.md](../../docs/machines.md)).
 
 ## Draft order

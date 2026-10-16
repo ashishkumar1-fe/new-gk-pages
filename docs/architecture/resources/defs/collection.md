@@ -1,6 +1,6 @@
 # Collection
 
-[← Resources](../README.md) · Schema: [catalog.md](../../schema/catalog.md#collection) · Today: `pages/collections/CollectionsHome.tsx`, `components/collections/CollectionsForm.tsx`
+[← Resources](../README.md) · Schema: [catalog.md](../../domain/catalog.md#collection) · Today: `pages/collections/CollectionsHome.tsx`, `components/collections/CollectionsForm.tsx`
 
 ## List
 
@@ -35,7 +35,7 @@ list: {
 | Column | Section | Fields | Notes |
 |---|---|---|---|
 | main | Details | title, description | |
-| main | Conditions | match all/any, rules | smart only; fields and operators as in [schema](../../schema/catalog.md#collection); custom field rules equals only |
+| main | Conditions | match all/any, rules | smart only; fields and operators as in [schema](../../domain/catalog.md#collection); custom field rules equals only |
 | main | Products | product list | child, server-paged 50; add-products picker paged 10 with search |
 | main | Custom fields | runtime fields | only if definitions exist |
 | main | Search engine listing | seo.title, seo.description, handle | |

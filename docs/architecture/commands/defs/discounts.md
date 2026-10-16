@@ -28,7 +28,7 @@ Payloads come from the transformer per API, exactly as today:
 
 Notes:
 - **Result handling**: `discount.create` and `discount.update` check the API's success flag; a failure is shown as an error (today the wizard shows success unless the call throws, and `makeAPICall` returns soft failures; see [defects](../README.md#defects-in-todays-writes)).
-- **Status commands** visible by current status: draft → publish; published → move to draft, mark inactive; inactive → publish.
+- **Status commands**: each of publish, move to draft and mark inactive, except the current status ([domain rule](../../domain/discounts.md#rules)).
 - **Delete**: `PUT /bulk/update {status: 'deleted'}` (the gateway has no delete route), but the menu item is disabled in gk-pages; not in v1.
 - **Bulk status**: `PUT /bulk/update {merchant_id, discount_ids, status?, visibility?, updated_by}`; no bulk UI today; not in v1.
 - **Global discount settings** (`/discounts/global-settings`: `GET /merchant-config`, `PUT /config/merchant/upsert`) exist in gk-pages; the entry button is hidden; not in v1.

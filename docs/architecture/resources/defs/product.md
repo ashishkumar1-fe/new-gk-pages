@@ -1,6 +1,6 @@
 # Product
 
-[← Resources](../README.md) · Schema: [catalog.md](../../schema/catalog.md) · Today: `pages/products/ProductsHome.tsx`, `components/products/ProductForm.tsx`
+[← Resources](../README.md) · Schema: [catalog.md](../../domain/catalog.md) · Today: `pages/products/ProductsHome.tsx`, `components/products/ProductForm.tsx`
 
 ## List
 
@@ -50,8 +50,8 @@ Layout 65/35, single save, as today. Sections in today's order, with the design'
 | main | Variants | options editor, variants list | child, see below |
 | main | Pricing | price, compareAtPrice, costPerItem; profit and margin read-only | only when no variants; cost block collapsed |
 | main | Inventory | variants[0].inventoryTracked, variants[0].inventoryPolicy, stock per location | only when no variants; per-location stock is a v3 section (immediate adjust, edit locations, history link), not part of the draft; create takes no starting stock |
-| main | Shipping | variants[0].weight (value + unit), variants[0].requiresShipping, countryOfOrigin | design; return window, COD and package are capability off ([deferred #21](../../schema/deferred.md)) |
-| main | Tax | tax.taxable, tax.hsnCode | own section so a GST rate can be added later ([deferred #1](../../schema/deferred.md)) |
+| main | Shipping | variants[0].weight (value + unit), variants[0].requiresShipping, countryOfOrigin | design; return window, COD and package are capability off ([deferred #21](../../domain/deferred.md)) |
+| main | Tax | tax.taxable, tax.hsnCode | own section so a GST rate can be added later ([deferred #1](../../domain/deferred.md)) |
 | main | Custom fields | runtime fields | errors block save |
 | main | Search engine listing | seo.title, seo.description, handle | collapsed preview + edit |
 | main | Extension slot | `admin.product-details.block.render` | |

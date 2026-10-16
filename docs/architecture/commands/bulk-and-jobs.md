@@ -4,24 +4,17 @@
 
 ## Bulk
 
-A bulk command acts on a selection. Three strategies, chosen by what the API offers:
+A bulk command acts on a selection with one API call carrying all IDs (native). Long work is a page-level job, below.
 
 ```ts
 interface BulkSpec<TInput> {
-  strategy:
-    | { kind: 'native' }                         // one API call with all IDs; API returns per-item results
-    | { kind: 'fan-out'; concurrency: number }   // one call per item, client-side
-    | { kind: 'job' };                           // API creates a background job
   maxItems?: number;                             // hard cap with a clear message
   toItems: (input: TInput) => Id[];
 }
 ```
 
-| Strategy | When | Result |
-|---|---|---|
-| Native | API takes a list (bulk cancel, bulk tags, bulk delete) | Per-item outcome from the response |
-| Fan-out | No bulk endpoint; small selections only | Per-item outcome collected client-side; concurrency limited. Reserved: no v1 command uses it |
-| Job | Large or slow operations (import, export, price updates) | Job ID, then progress |
+- Per-item outcome when the API returns one (bulk cancel, tags, archive, fulfill, draft delete).
+- Count-only APIs (product bulk delete / update) succeed or fail as a whole.
 
 ### Partial failure
 
@@ -57,7 +50,7 @@ type JobStatus<TResult> =
 
 - A job runs in the background; the user can leave the page. Progress shows in a jobs indicator in the top bar and in a notification when finished.
 - Import jobs have a preview step (validate file, show row errors) before the import runs, as a two-command flow: `*.importPreview` then `*.import`.
-- Export results are a download link when ready; small exports may return the file directly.
+- Export results: emailed for bulk-ops jobs; downloaded for inventory and customer exports.
 - Job history (who ran what, when, result) is a read-only resource.
 
 ## Polling a single operation
@@ -65,7 +58,7 @@ type JobStatus<TResult> =
 Some single commands finish asynchronously (a refund is accepted, then processed):
 
 - The command returns once accepted.
-- A status query polls until a terminal state; interval and limit are defined on the command.
+- The command declares the status query, interval and limit; the flow's machine (refund, job tracker) runs the polling.
 - The UI shows initiated → completed / failed.
 - Transient poll errors are ignored until the limit.
 

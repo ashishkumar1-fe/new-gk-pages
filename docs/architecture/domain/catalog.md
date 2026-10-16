@@ -116,7 +116,7 @@ As today. Source paths are in gk-pages `src/`.
 | `optionPresets` | Size, Color, Material, Style, Weight, with preset values | `VariantsCard/constants.ts:2` |
 | `profit` / `margin` | profit = price − cost; margin = price ≤ 0 → 0, else profit ÷ price × 100; both 2 dp; computed on the client, sent on write | `utils/calculationFunctions.ts:2` |
 | `deriveHandle` | trimmed SEO handle, else title lowercased, spaces → "-" | `modules/products/transformers/products.request.transformer.ts:177` |
-| `productValidation` | title required; each option ≥ 1 value; variant price required; image source required; SKU optional | `ProductForm.tsx:90`, `:125`, `:140`, `:149`, `:213` |
+| `productValidation` | title required; each option ≥ 1 value; variant price required; image source required; tags ≤ 50 chars; SKU optional | `ProductForm.tsx:90`, `:125`, `:140`, `:149`, `:213` |
 | `normalizeWeightUnit` | grams, lbs… → kg, g, lb, oz | `modules/products/constants.ts` |
 | `productDefaults` | status active, charge tax off, country of origin `US`, weight unit kg | `ProductForm.tsx:94` |
 | `tagsJoin` | tags joined and split on ", " | `products.request.transformer.ts:93` |

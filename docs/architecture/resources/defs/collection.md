@@ -15,7 +15,7 @@ list: {
     { id: 'createdAt',  header: 'Created at', cell: date, hidden: true },
     { id: 'updatedAt',  header: 'Updated at', cell: date, hidden: true },
   ],
-  search: { param: 'search', placeholder: 'Search collections', debounceMs: 400 },   // today: 500 ms
+  search: { placeholder: 'Search collections', debounceMs: 500 },   // as today
   filters: [
     { id: 'type', label: 'Type', type: 'multi_enum', options: [manual, smart], toQuery: (v) => ({ kinds: v }) },
   ],

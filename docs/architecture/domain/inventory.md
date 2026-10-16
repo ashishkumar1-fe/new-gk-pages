@@ -74,7 +74,7 @@ interface InventoryRow extends InventoryLevel {   // inventory list row
 }
 
 type QuantityName = 'available' | 'committed' | 'incoming' | 'reserved' | 'damaged' | 'safetyStock' | 'qualityControl';
-type MutableQuantityName = Exclude<QuantityName, 'committed' | 'incoming'> | 'onHand';   // what the adjust popover can set
+type MutableQuantityName = Exclude<QuantityName, 'committed'> | 'onHand';   // what the adjust popover can set
 
 type AdjustReason = 'correction' | 'received' | 'damaged' | 'safetyStockSet' | 'import' | 'other';   // admin writes; history also shows order, return, QC and sync reasons
 
@@ -108,7 +108,7 @@ interface Supplier extends Entity {
 type PurchaseOrderStatus = 'draft' | 'ordered' | 'partially_received' | 'received' | 'closed';
 
 interface PurchaseOrder extends Entity {
-  referenceNumber: string;
+  referenceNumber?: string;          // empty → auto PO-… number
   supplier: { id: Id; companyName: string };   // wire: string or object
   destinationLocationId: LocationId;
   status: PurchaseOrderStatus;
@@ -187,10 +187,10 @@ As today. Source paths are in gk-pages `src/`.
 | `receivePayload` | PO sends this session's deltas; transfer sends cumulative totals | `ReceiveInventory.tsx:139`, `pages/transfers/ReceiveTransferInventory.tsx:145` |
 | `poLineTotal` / `poTotals` | quantity × cost; total = Σ line totals; tax excluded | `components/purchase-orders/PurchaseOrderDetails.tsx:167` |
 | `poStatus` | `Draft`, `Ordered`, `Partially_Received`, `Received`, `Closed`; unknown → draft | `store/purchase-orders/index.ts:154` |
-| `poActions` | draft: primary Mark as ordered, more delete; ordered / partial / received: primary Receive, more close; closed: more reopen (→ draft) | `PurchaseOrderDetails.tsx:687`, `:804` |
+| `poActions` | draft: primary Mark as ordered, more edit, delete; ordered / partial: primary Receive, more close; received: primary Receive, more falls back to the draft menu (a gk-pages bug; v1 offers close, needs sign-off); closed: more reopen (→ draft) | `PurchaseOrderDetails.tsx:687`, `:804` |
 | `transferStatus` | `Partial` / `Partially_Received` → partially received; `Received` / `Completed` → received | `interfaces/transfers.ts:6` |
 | `transferActions` | draft: primary Mark as pending; pending / partial: primary Receive; delete unless received | `components/transfers/TransferDetailsForm.tsx:328`, `:522` |
-| `poValidate` | reference, supplier, destination required; ≥ 1 line; quantity ≥ 1; cost ≥ 0 | `purchase-order-form-components/ValidationSchemas.ts` |
+| `poValidate` | supplier, destination required; reference optional (auto number `PO-…` used when empty); ≥ 1 line; quantity ≥ 1; cost ≥ 0 | `purchase-order-form-components/ValidationSchemas.ts` |
 | `transferValidate` | origin ≠ destination; ≥ 1 line; quantity ≥ 1 | `TransferForm/ValidationSchemas.ts:22` |
 
-Known defect, kept as today: PO update, close and reopen send `totalCost` in rupees while create sends paise ([defects](../commands/README.md#defects-in-todays-writes)).
+Known defects, kept as today ([defects](../commands/README.md#defects-in-todays-writes)): PO update sends the header `totalCost` in rupees; close and reopen convert already-paise line costs again (×100). Create and mark as ordered are correct.

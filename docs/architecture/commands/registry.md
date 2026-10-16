@@ -6,27 +6,24 @@ All v1 commands by resource. Definitions in [defs/](defs).
 
 | Resource | Commands | File |
 |---|---|---|
-| Product | `create`, `update`, `delete`, `bulkDelete`, `setStatus`, `bulkEdit`, `duplicate`, `copyLink`, `import`, `importPreview`, `export`, `generateContent` | [catalog](defs/catalog.md#product) |
+| Product | `create`, `update`, `variant.update`, `delete`, `bulkDelete`, `setStatus`, `bulkEdit`, `duplicate`, `copyLink`, `import`, `importPreview`, `export`, `generateContent` | [catalog](defs/catalog.md#product) |
 | Collection | `create`, `update`, `delete`, `bulkDelete`, `setPublished`, `bulkEdit`, `copyLink` | [catalog](defs/catalog.md#collection) |
 | Price schedule | `create`, `cancel` | [catalog](defs/catalog.md#price-schedule-flash-sale) |
 | Field definition | `create`, `update`, `delete` | [catalog](defs/catalog.md#custom-field-definitions) |
 | Inventory | `adjust`, `bulkEdit`, `import`, `export` | [inventory](defs/inventory.md#inventory) |
 | Purchase order | `create`, `update`, `markOrdered`, `close`, `reopen`, `openReceive`, `receive`, `delete`, `createFromSelection` | [inventory](defs/inventory.md#purchase-order) |
 | Transfer | `create`, `update`, `markPending`, `openReceive`, `receive`, `delete`, `createFromSelection` | [inventory](defs/inventory.md#transfer) |
-| Order | `updateNote`, `comment`, `addTags`, `removeTag`, `bulkTags`, `updateContact`, `edit`, `cancel`, `bulkCancel`, `archive`, `unarchive`, `duplicate`, `openStatusPage`, `fulfil`, `updateTracking`, `hold`, `releaseHold`, `bulkFulfil`, `import`, `importPreview`, `export` | [orders](defs/orders.md#order) |
+| Order | `updateNote`, `comment`, `addTags`, `removeTag`, `bulkTags`, `updateContact`, `update`, `cancel`, `bulkCancel`, `archive`, `unarchive`, `duplicate`, `openStatusPage`, `fulfill`, `updateTracking`, `hold`, `releaseHold`, `bulkFulfill`, `import`, `importPreview`, `export` | [orders](defs/orders.md#order) |
 | Refund | `create` | [orders](defs/orders.md#refund-flow) |
+| Order edit (`orderEdit`, internal: machine only, not exposed) | `begin`, `stage`, `preview`, `discard` | [orders](defs/orders.md#order) |
 | Draft order | `create`, `update`, `complete`, `sendInvoice`, `duplicate`, `delete`, `bulkDelete`, `bulkTags`, `export`, `createForCustomer` | [orders](defs/orders.md#draft-order) |
 | Customer | `create`, `update`, `deleteAddress`, `setBlocked`, `delete`, `comment`, `export` | [customers](defs/customers.md#customer) |
 | Segment | `create`, `update`, `delete` | [customers](defs/customers.md#segment) |
-| Discount | `create`, `update`, `checkCode`, `publish`, `moveToDraft`, `markInactive`, `createWithAssistant` | [discounts](defs/discounts.md) |
+| Discount | `create`, `update`, `publish`, `moveToDraft`, `markInactive`, `createWithAssistant`, `aiConfirm` | [discounts](defs/discounts.md) |
 | Discount set | `create`, `update`, `downloadCodes` | [discounts](defs/discounts.md) |
 | Location | `create`, `update`, `activate`, `deactivate`, `delete` | [inventory](defs/inventory.md#inventory) |
 | Inventory level (`inventoryLevel`) | `connect`, `disconnect` | [inventory](defs/inventory.md#inventory) |
-| Bulk-ops job (`bulkOps`) | `cancel` | [bulk-ops](defs/bulk-ops.md#job-tracking) |
-
-## Assistant topics (v1)
-
-Topics: catalog, inventory, orders, customers, discounts. What each command exposes to the palette, assistant and extensions is in the Exposure table of its [defs](defs) file. Every proposal still needs the person's approval.
+| Bulk-ops job (`bulkOps`) | `start`, `cancel` | [bulk-ops](defs/bulk-ops.md#job-tracking) |
 
 ## Permissions
 

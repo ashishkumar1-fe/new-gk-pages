@@ -21,7 +21,7 @@ list: {
     { id: 'updatedAt',   header: 'Updated At',         cell: date, hidden: true },
   ],
   search: {
-    param: 'search', placeholder: 'Search orders, customers, or products', debounceMs: 400,
+    placeholder: 'Search orders, customers, or products', debounceMs: 400,
     minLength: (q) => q.length >= 2 || /^#?\d+$/.test(q),
   },
   filters: [
@@ -49,7 +49,7 @@ Scoped list: `customer_id` (from customer page "View all orders").
 | Column | Section | Content |
 |---|---|---|
 | main | Items | line items; removed items (current quantity 0) listed separately |
-| main | Fulfillment | unfulfilled / fulfilled cards per location, tracking, holds (`GET /orders/:id/fulfillments`); fulfil, hold, release and tracking on the card (`order.fulfil`, `order.hold`, `order.releaseHold`, `order.updateTracking`) |
+| main | Fulfillment | unfulfilled / fulfilled cards per location, tracking, holds (`GET /orders/:id/fulfillments`); fulfil, hold, release and tracking on the card (`order.fulfill`, `order.hold`, `order.releaseHold`, `order.updateTracking`) |
 | main | Payment | server totals (`current_*` values) |
 | main | Info tabs | Payment, Checkout, UTM, Refunds (`GET /orders/:id/refunds`) |
 | main | Custom fields | read-only |
@@ -61,36 +61,26 @@ Scoped list: `customer_id` (from customer page "View all orders").
 ```ts
 detail: {
   pager: (o) => o.neighbors,               // previous / next from the detail response; J/K keys
-  editRoute: (o) => editBlockReason(o) ? undefined : `/orders/${o.id}/edit`,   // disabled with the reason; isShopifySourced: blocked with a message
+  editRoute: (o) => `/orders/${o.id}/edit`,   // Edit stays visible, disabled with editBlockReason; isShopifySourced → "Unable to edit order" modal
 }
 ```
 
 ## Edit order (`/orders/$id/edit`)
 
-Editor driven by an os-order edit session (one lock per order):
-
-- Session: `POST /orders/:id/edit/begin` on open (`ACTIVE_SESSION_EXISTS`: offer take-over; `STALE_SESSION_COLLISION`: retry every 15 s, ≤ 6 min); discard on leave (`POST …/edit/:sid/discard`, keepalive on unload).
-- Changes: debounced 500 ms, staged as ops (`set_qty` absolute, `remove_line`, `apply_line_item_discount` fixed per unit or %), then `POST …/preview`. No adding items. Increases only on unfulfilled, unpaid COD orders; fulfilled quantities are a floor.
-- Summary: updated total from the preview; paid = total − outstanding; "Refund owed", "Additional collection required" or "No amount due" by the sign of the preview's refund amount.
-- `editor: { save: 'order.edit', preview: { session: 'orderEditSession', debounceMs: 500 } }` on this route.
-- Save enabled when changed, quantities valid and (with line changes) the preview is current. Line changes commit the session; customer, address, metafield and reason changes go through `PATCH /orders/:id` without `line_items`.
+Runs the order edit session machine ([machines](../../docs/machines.md#v1-machines)); line rules `canIncreaseQuantities`, `editAmountLabel`, `paid` ([domain](../../domain/orders.md#rules)); saved by `order.update` ([commands](../../commands/defs/orders.md#order)).
 
 ## Commands
 
 ```ts
 commands: {
   page: ['order.export', 'order.import', 'draftOrder.create'],          // "Create order" opens a new draft
-  bulk: ['order.bulkCancel', 'order.bulkTags', 'order.archive', 'order.unarchive', 'order.bulkFulfil'],   // unarchive only if all selected are archived; bulkCancel only if all are cancellable
+  bulk: ['order.bulkCancel', 'order.bulkTags', 'order.archive', 'order.unarchive', 'order.bulkFulfill'],   // unarchive only if all selected are archived; bulkCancel only if all are cancellable
   more: (o) => ['order.openStatusPage', 'order.duplicate', o.closedAt ? 'order.unarchive' : 'order.archive', 'refund.create', 'order.cancel'],   // visibility from domain rules
-  row:  ['order.fulfil', 'order.hold', 'order.releaseHold', 'order.updateTracking'],   // on the Fulfillment card
+  row:  ['order.fulfill', 'order.hold', 'order.releaseHold', 'order.updateTracking'],   // on the Fulfillment card
 }
 ```
 
-- `order.cancel`: visible when `canCancel` ([order rules](../../domain/orders.md#rules)). Reasons (6 fixed), staff note, restock (default on), notify (always on, as today), auto-refund when amount > 0, not COD and not already refunded.
-- `refund.create`: hidden if cancelled; disabled with `refundBlockReason`. Flow: select items → preview (note, restock, include shipping) → confirm with idempotency key → poll status (machine).
-- `order.duplicate`: builds a draft from the order and opens it.
-- Export and import: bulk-ops jobs ([commands](../../commands/defs/bulk-ops.md)); the export file is emailed.
-- Archive / unarchive responses `ALREADY_ARCHIVED` / `ALREADY_OPEN` are warnings, not errors.
+Visibility and enablement come from the [order rules](../../domain/orders.md#rules): `canCancel`, `refundBlockReason`, `statusUrl` for the status page, `fulfillmentView` for fulfil / hold, active holds for release, `shouldOfferBulkFulfil` for bulk fulfil.
 
 ## Other
 

@@ -60,9 +60,8 @@ Confirm labels state the action and count ("Archive 12 orders"), never "OK".
 
 ## Idempotency and retry
 
-- `per-attempt` key: generated when the dialog opens and reused for retries of that attempt (prevents double refunds on a double click or flaky network).
-- `per-input` key: derived from input, for APIs that dedupe by key (order bulk archive / unarchive, draft completion, v3 inventory set / adjust today; bulk-ops does not).
-- Automatic retry only for idempotent commands, on network errors and 5xx, 2 attempts with backoff (proposed; same as reads).
+- Key: generated per attempt (when the dialog opens, or per user action) and reused for that attempt's retries; prevents double refunds on a double click or flaky network. As today: refunds, bulk archive, draft completion, v3 inventory writes; bulk-ops takes none.
+- Automatic retry only for idempotent commands, on network errors and 5xx, 2 retries with backoff, as for reads.
 - The same command for the same target can't run twice at once; a second call while the first is running is ignored.
 
 ## Cache
@@ -100,7 +99,8 @@ API modules map `ApiError` ([client](../platform/api-client.md#what-the-client-d
 |---|---|
 | Validation error with field | `invalid` with field paths in domain names |
 | 403 | `denied` |
-| 409 / version mismatch | `error` with "changed elsewhere", editor offers reload |
+| 409 with a version or `COMPARE_AND_SET_CONFLICT` | `error` with "changed elsewhere", editor offers reload |
+| Other 409 (business rule, e.g. location has stock) | `error` with the server message |
 | Known business code (`ALREADY_ARCHIVED`) | `success` with a warning, when harmless |
 | 2xx body with `success: false` | `error` (never shown as success) |
 | 401 | session expired; boot sends the user to login |

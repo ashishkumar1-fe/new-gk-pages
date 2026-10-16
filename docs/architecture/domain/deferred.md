@@ -31,7 +31,6 @@ Seams used throughout:
 | 7 | Validations, discount %, margin | As in gk-pages | Ported as is | One rules module per entity with characterization tests |
 | 7a | Product status names | Active / Draft / Archived | Active / Draft / Hidden | Status labels from the copy dictionary |
 | 7b | Pricing with variants | Pricing section hidden when variants exist | Pricing shown with the variants table | Pricing is its own section with `visibleWhen`; one predicate changes |
-| 7c | Receive with only rejected quantity | Line dropped (not sent) | Send it | One line in `purchaseOrder.receive` / `transfer.receive` |
 
 ## C. New features: no backend today, out of v1 unless product prioritises
 

@@ -35,11 +35,12 @@ interface CommandDefinition<TInput, TResult> {
     external: boolean;                           // reaches customers, money or other systems (refund, notify)
   };
   confirm: 'never' | 'always' | ((input: TInput, ctx: CommandContext) => ConfirmSpec | false);
+  preview?: (input: TInput, deps: CommandDeps) => Promise<unknown>;   // server dry run shown in confirm and proposal card (refund calculate, order-edit preview)
 
   // ── Execution ───────────────────────────────────────────
   mode?: 'pessimistic' | 'optimistic' | 'undoable';   // required unless effect.readOnly (navigate, copy, download)
   steps: Step<TInput>[];                         // one step for most commands; navigate commands have a navigate step
-  idempotencyKey?: 'per-attempt' | 'per-input';  // header when the API supports it
+  idempotencyKey?: boolean;                      // a fresh key per attempt, placed by the API module (header or body)
   timeoutMs?: number;
 
   // ── After ───────────────────────────────────────────────
@@ -60,7 +61,6 @@ interface CommandDefinition<TInput, TResult> {
   // ── Exposure ────────────────────────────────────────────
   expose: {
     palette: boolean;
-    shortcut: boolean;
     assistant: false | { topic: string; instructions?: string };   // grouped like Agentforce topics
     extensions: false | { targets: ('record' | 'selection')[] };
   };
@@ -75,14 +75,19 @@ interface Step<TInput> {
   onFailure: 'abort' | 'continue-with-warning';  // abort → compensate earlier steps in reverse
 }
 
+// From the libraries or other layers: QueryKey, CacheUpdate (TanStack Query); ApiModules (the api/ index); StepResults = Record<stepId, unknown>; InputFormSpec = editor FieldSpec[].
+
 interface CommandDeps {
   api: ApiModules;                               // api/<service> modules, injected (tests swap them)
   session: { staff: { id: Id; name: string }; storeId: Id };
+  signal: AbortSignal;                           // from timeoutMs and cancel
+  idempotencyKey?: string;                       // this attempt's key
 }
 
 interface CommandContext {
   storeId: Id;                                   // the merchant (backend m_id / merchant_id)
-  staff: { id: Id; name: string; permissions: Permission[] };
+  staff: { id: Id; name: string };
+  can: (scope: Permission) => boolean;           // platform permissions; unmapped scopes pass while enforcement is off
   route: string;
   record?: unknown;
   selection?: { resource: string; ids: Id[]; rows: unknown[] };
@@ -94,7 +99,6 @@ interface ConfirmSpec {
   body?: string;
   confirmLabel: string;                          // the verb: "Cancel order", "Delete 12 products"
   tone: 'default' | 'critical';
-  typeToConfirm?: string;                        // reserved: no v1 command uses it
 }
 
 type CommandResult<TResult> =

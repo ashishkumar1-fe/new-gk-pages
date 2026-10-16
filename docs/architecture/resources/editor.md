@@ -15,7 +15,7 @@ interface EditorConfig<T, TInput> {
   save: CommandId;
   create?: { route: string; initial: (ctx: CreateContext) => TInput; command: CommandId };
   calculate?: {                              // server-side totals
-    query: (d: TInput) => Promise<unknown>;  // /draft-orders/calculate; order edit uses the os-order edit session (stage → preview)
+    query: (d: TInput) => Promise<unknown>;  // draft calculate. Order edit is not an EditorConfig: its route runs the order edit session machine
     debounceMs: number;                      // 500 as today
     skipWhen?: (d: TInput) => boolean;       // no line items
   };
@@ -24,7 +24,7 @@ interface EditorConfig<T, TInput> {
 
 type Section<TInput> =
   | { id: string; title: string; fields: FieldSpec<TInput>[]; visibleWhen?: (d: TInput) => boolean; collapsible?: boolean }
-  | { id: string; title?: string; component: ComponentType<SectionProps<TInput>>; visibleWhen?: (d: TInput) => boolean };
+  | { id: string; title?: string; component: ComponentId; visibleWhen?: (d: TInput) => boolean };   // resolved by surfaces
 
 interface FieldSpec<TInput> {
   path: Path<TInput>;

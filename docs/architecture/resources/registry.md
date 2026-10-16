@@ -12,7 +12,8 @@ All routes live under `/store/$storeId` ([routing](../surfaces/routing.md)); pat
 | Draft order | os-order | `/draft-orders`, `/draft-orders/$id`, `/draft-orders/new` | list + editor | Orders › Drafts | [draft-order](defs/draft-order.md) |
 | Product | item | `/products`, `/products/$id`, `/products/new`, `/products/$id/variants` | list + editor | Products | [product](defs/product.md) |
 | Collection | item | `/collections`, `/collections/$id`, `/collections/new` | list + editor | Products › Collections | [collection](defs/collection.md) |
-| Inventory | inventory | `/inventory?location=` | list with inline edit | Products › Inventory | [inventory](defs/inventory.md) |
+| Inventory | inventory | `/inventory?location=` | list with cell edit | Products › Inventory | [inventory](defs/inventory.md) |
+| Location | inventory | `/inventory/locations` | list (name + Default badge, address, status) + form; row menu edit, activate / deactivate / delete by status | Inventory › Manage locations | [location commands](../commands/defs/inventory.md#inventory) |
 | Purchase order | inventory | `/purchase-orders`, `/$id`, `/new`, `/$id/receive` | list + editor + receive | Products › Purchase orders | [purchase-order](defs/purchase-order.md) |
 | Transfer | inventory | `/transfers`, `/$id`, `/new`, `/$id/receive` | list + editor + receive | Products › Transfers | [transfer](defs/transfer.md) |
 | Customer | os-customer | `/customers`, `/customers/$id`, `/customers/new` | list + editor | Customers | [customer](defs/customer.md) |
@@ -26,7 +27,6 @@ No list screen of their own in v1; used by pickers, filters and the settings she
 
 | Resource | Service | Used by |
 |---|---|---|
-| Location (warehouse) | inventory | Inventory scope, PO destination, transfer origin/destination |
 | Supplier | inventory | PO supplier picker |
 | Vendor, product type, tags | item | Product filters and organization fields |
 | Taxonomy | item | Product category |
@@ -41,4 +41,4 @@ No list screen of their own in v1; used by pickers, filters and the settings she
 
 ## Design-only (capability off until backend exists)
 
-Gift cards, shipping zones, domains, checkout settings, admin notifications. See [../schema/deferred.md](../domain/deferred.md).
+Gift cards, shipping zones, domains, checkout settings, admin notifications. See [deferred](../domain/deferred.md).

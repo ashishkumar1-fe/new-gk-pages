@@ -104,11 +104,11 @@ As today. Source paths are in gk-pages `src/`.
 
 | Rule | What | gk-pages source |
 |---|---|---|
-| `statusTargets` | offer published, draft and inactive, minus the current `effectiveStatus ?? status`; delete = status `deleted` | `components/discounts/DiscountsTable.tsx:13`, `:166` |
+| `statusTargets` | offer published, draft and inactive, minus the current `effectiveStatus ?? status`; none when scheduled or expired; delete = status `deleted` | `components/discounts/DiscountsTable.tsx:13`, `:166` |
 | `displayStatus` | `effectiveStatus ?? status` | `DiscountsTable.tsx:66` |
 | `wizardValidation` | title required; code ≥ 3 chars (also automatic mode); cart and tier amounts > 0; "specific" scope needs ≥ 1 product or collection; BXGY ≥ 1 buy rule, get quantity ≥ 1, amount unless free; bundle ≥ 1 tier, size and price > 0; free gift needs a product (inline) or get rule and quantity (catalogue); end after start; description required when visible; minimum value required when a minimum is set; usage limits integers ≥ 1 or empty; ≥ 1 device | `schemas/discountWizard.ts` |
 | `draftValidation` | a draft needs only kind and title | `discountWizard.ts:175` |
-| `codeUnique` | checked on leaving step 2; skipped on edit | `pages/discounts/CreateDiscountWizard.tsx:156` |
+| `codeUnique` | checked on leaving step 2 when the code differs from the loaded one; a failed check does not block | `pages/discounts/CreateDiscountWizard.tsx:156` |
 | `modeFixed` | mode can't change after create | `components/discounts/wizard/StepDetails.tsx:45` |
 | `legacyValidation` | code 3–20 chars `^[A-Z0-9-]+$`; title ≥ 3; percent 0–100; end not before start; BXGY quantities 1–1000, ≤ 100 items | `components/discounts/DiscountForm.tsx:251`, `:300`, `:485`, `:1088`; `BuyXGetYDiscountForm.tsx:256` |
 | `discountSetValidation` | codes 1–1,000,000; prefix and suffix ≤ 20 `^[A-Z0-9-]+$`; length 1–100; prefix + length + suffix ≥ 10 | `components/discounts/OrderDisountForm.tsx:265`, `:286`, `:333` |

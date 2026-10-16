@@ -76,7 +76,7 @@ interface Step<TInput> {
 }
 
 interface CommandContext {
-  merchantId: Id;
+  storeId: Id;                                   // the merchant (backend m_id / merchant_id)
   staff: { id: Id; name: string; permissions: Permission[] };
   route: string;
   record?: unknown;

@@ -62,7 +62,12 @@ type JobStatus<TResult> =
 
 ## Polling a single operation
 
-Some single commands finish asynchronously (a refund is accepted, then processed). The command returns once accepted; a status query polls until a terminal state, with interval and limit defined on the command. The UI shows initiated → completed / failed, and transient poll errors are ignored until the limit.
+Some single commands finish asynchronously (a refund is accepted, then processed):
+
+- The command returns once accepted.
+- A status query polls until a terminal state; interval and limit are defined on the command.
+- The UI shows initiated → completed / failed.
+- Transient poll errors are ignored until the limit.
 
 ## Concurrency
 

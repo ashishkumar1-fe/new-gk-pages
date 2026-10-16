@@ -23,9 +23,5 @@ How the Ratio design (Login, Home, Products, Product detail, Settings) maps onto
 | Inline "Create definition" | `fieldDefinition.create` |
 | Quick add | `product.create` via quick create |
 | Import / export | bulk-ops jobs |
-| ⌘K, nav counts, store switcher, assistant panel | [platform](platform.md) |
-| Insights strip, gift cards, checkout, shipping zones, domains, bank account, notification feed, onboarding checklist | Capability off; no backend ([deferred](../schema/deferred.md)) |
-
-## Domain rules
-
-Ported from gk-pages as they are. Design-only rules (GST picker, MRP check, volumetric weight) need product sign-off; see [../schema/deferred.md](../schema/deferred.md).
+| ⌘K, nav counts, store switcher, assistant panel | [chrome](../surfaces/chrome.md) |
+| Insights strip, gift cards, checkout, shipping zones, domains, bank account, notification feed, onboarding checklist | Capability off; no backend ([deferred](../domain/deferred.md)) |

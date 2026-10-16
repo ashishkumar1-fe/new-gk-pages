@@ -15,7 +15,7 @@ interface EditorConfig<T, TInput> {
   save: CommandId;
   create?: { route: string; initial: (ctx: CreateContext) => TInput; command: CommandId };
   calculate?: {                              // server-side totals
-    query: (d: TInput) => Promise<unknown>;  // /draft-orders/calculate, /orders/:id/calculate
+    query: (d: TInput) => Promise<unknown>;  // /draft-orders/calculate; order edit uses the os-order edit session (stage → preview)
     debounceMs: number;                      // 500 as today
     skipWhen?: (d: TInput) => boolean;       // no line items
   };
@@ -41,11 +41,21 @@ interface FieldSpec<TInput> {
 
 Driven by the record editor machine ([../docs/machines.md](../docs/machines.md)):
 
-```
-loading → pristine ⇄ dirty → saving → pristine
-                         ↘ invalid (inline errors, save blocked)
-          saving → conflict (changed elsewhere) → reload / keep mine
-          saving → error (draft kept, retry)
+```mermaid
+stateDiagram-v2
+  [*] --> Loading
+  Loading --> Pristine
+  Pristine --> Dirty: edit
+  Dirty --> Pristine: discard
+  Dirty --> Invalid: validation fails
+  Invalid --> Dirty: fix
+  Dirty --> Saving: save
+  Saving --> Pristine: saved
+  Saving --> Conflict: changed elsewhere
+  Conflict --> Loading: reload
+  Conflict --> Dirty: keep mine
+  Saving --> Error: request fails
+  Error --> Saving: retry (draft kept)
 ```
 
 - Save is enabled only when dirty and valid. Validation is the input schema plus runtime custom-field schemas, always run before save.
@@ -66,7 +76,7 @@ interface ChildConfig {
 }
 ```
 
-When a child is saved through its own endpoint (customer addresses, variant stock per warehouse), the save command orchestrates the calls in today's order. The UI never calls child endpoints directly.
+When a child is saved through its own endpoint (customer addresses), the save command orchestrates the calls in today's order. The UI never calls child endpoints directly.
 
 ## Create
 

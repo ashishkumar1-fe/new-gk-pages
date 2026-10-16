@@ -2,27 +2,22 @@
 
 [← Architecture](../README.md)
 
-A **command** is every action that changes data or has an effect outside the page: save a product, cancel an order, export customers. Each is defined once. Buttons, menus, the bulk bar, ⌘K, shortcuts, the assistant and extensions all run the same definition through one execution path.
+A **command** is every action that changes data or has an effect outside the page: update a product, cancel an order, export customers.
 
-Resources read; commands write. Nothing else calls a write endpoint.
-
-Written in passes:
-
-1. **Industry baseline**: the contract mature tools converge on. ✓
-2. **Production definitions**: every command the resources use, with real endpoints, confirmations and results from gk-pages. ✓ See [registry.md](registry.md) and [defs/](defs/).
+- Each is defined once.
+- Buttons, menus, the bulk bar, ⌘K, shortcuts, the assistant and extensions all run the same definition through one execution path.
 
 Background on the model and the products it draws from: [ADR 0001](../adr/0001-resources-and-commands.md).
 
 ## Layers
 
-```
-surfaces        buttons · menus · bulk bar · ⌘K · shortcuts · assistant · extensions     surfaces.md
-   ▼
-registry        resolve ID → definition, check visibility, enablement, permission
-   ▼
-execution       validate → confirm → run steps → update cache → notify → audit           execution.md
-   ▼
-API modules     the service calls (same modules resources read through)
+```mermaid
+flowchart TB
+  S["<b>Surfaces</b> — buttons · menus · bulk bar · ⌘K · shortcuts · assistant · extensions<br/><i>surfaces.md</i>"]
+  R["<b>Registry</b> — resolve ID → definition; check visibility, enablement, permission"]
+  E["<b>Execution</b> — validate → confirm → run steps → update cache → notify → audit<br/><i>execution.md</i>"]
+  A["<b>API modules</b> — the service calls (same modules resources read through)"]
+  S --> R --> E --> A
 ```
 
 ## Files
@@ -55,11 +50,9 @@ Found while mapping gk-pages. Plumbing defects are fixed in the commands. Defect
 
 | Defect in gk-pages | Data impact | Treatment |
 |---|---|---|
-| Manual discount create always shows success (soft failures ignored) | No | Fixed: result checks the API success flag |
+| Discount wizard create and edit always show success (`makeAPICall` soft failures not checked) | No | Fixed: result checks the API success flag |
 | Discount delete toast says "draft"; no confirm | No | Delete not in v1 (menu disabled today) |
 | Single product and collection delete without confirmation | No | Fixed: critical confirm |
-| Inventory "Update quantities" always shows success; sends `cost: NaN` | Yes (cost) | Fixed result handling; omit cost: needs sign-off |
-| Inventory bulk edit can't set a location to 0 (only > 0 sent) | Yes | Needs sign-off |
 | Product bulk edit converts product-level prices to paise twice | Yes (prices ×100) | Needs sign-off; high priority |
 | PO "Mark as ordered" sends costs not converted to paise (close/reopen do) | Yes (costs) | Needs sign-off |
 | Bulk cancel sends auto-refund without the single-cancel eligibility rule | Yes (refunds) | Needs sign-off |

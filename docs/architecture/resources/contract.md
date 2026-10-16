@@ -16,7 +16,7 @@ interface ResourceDefinition<
   subtitle?: (r: T | TItem) => string;
 
   // ── Data ────────────────────────────────────────────────
-  service: 'item' | 'inventory' | 'os-order' | 'os-customer' | 'os-discount' | 'os-resources' | 'apps' | 'timeline' | 'bulk-ops';   // see docs/platform.md#services
+  service: 'item' | 'inventory' | 'os-order' | 'os-customer' | 'os-discount' | 'os-resources' | 'apps' | 'timeline' | 'bulk-ops';   // see gateway/README.md#services
   schema: { detail: ZodType<T>; item: ZodType<TItem>; input?: ZodType<TInput> };
   data: DataProvider<T, TItem>;                  // data-access.md
   keys: QueryKeys;
@@ -81,7 +81,7 @@ interface DetailConfig<T> {
 
 ## Notes
 
-- **Detail vs editor.** Most resources edit in place (editor). Orders are a read view with actions plus a separate edit route, because editing an order goes through server recalculation.
+- **Detail vs editor.** Most resources edit in place (editor). Orders are a read view with actions plus a separate edit route, because editing an order goes through an os-order edit session (begin → stage → preview → commit).
 - **Status-driven actions.** POs and transfers change their main button and menu by status; `primary` and `more` express that instead of hard-coded buttons.
 - **Scoped lists.** A relation `via` a list param (`customer_id`) gives "View all orders" from the customer page with no extra code.
 - **Commands are IDs.** The registry resolves them, checks permission and `enabled`, and asks for confirmation.
@@ -91,7 +91,7 @@ interface DetailConfig<T> {
 ## Supporting types
 
 ```ts
-type Permission = `${string}:${string}`;            // "orders:write"; enforcement off in v1
+type Permission = `${'read' | 'write'}_${string}`;  // Shopify-style scope: "read_products", "write_orders", "write_refunds"; enforcement off in v1
 type IconName = string;                              // from the UI kit icon set
 type StatusSpec = { label: string; tone: 'success' | 'warning' | 'critical' | 'info' | 'neutral' };
 interface CreateContext {                            // prefill sources for create routes

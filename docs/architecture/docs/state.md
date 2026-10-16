@@ -2,7 +2,7 @@
 
 [← Architecture](../README.md)
 
-State has three homes.
+State has three homes. It is not a layer of its own; where each home sits in the stack is in the [README](../README.md#layers).
 
 | Kind | Home | Examples |
 |---|---|---|
@@ -14,20 +14,20 @@ Flow state (multi-step processes) lives in a state machine; see [machines.md](ma
 
 ## The table loop
 
-```
-URL params ─▶ query key ─▶ cache ─▶ table
-    ▲                                 │
-    └── user changes filter           ▼
-                         command ─▶ API ─▶ set detail / invalidate lists ─▶ refetch
+```mermaid
+flowchart LR
+  URL["URL params"] --> K["Query key"] --> Cache["Query cache"] --> T["Table"]
+  T -- "user changes filter" --> URL
+  T -- "user acts" --> Cmd["Command"] --> API["API"] --> Upd["Set detail · invalidate lists"] --> Cache
 ```
 
 ## Query keys
 
-Defined per resource, merchant ID first; see [../resources/data-access.md](../resources/data-access.md#query-keys).
+Defined per resource as `[domain, storeId, …]`; see [../resources/data-access.md](../resources/data-access.md#query-keys).
 
 ## Rules
 
-- Never copy query data into a store or `useState`.
+- Never copy query data into a store or `useState`, and never mutate it; derive display values at render ([data flow](../service-api/README.md#data-flow-transform-once-never-mutate)).
 - Never fetch in `useEffect`.
 - Writes go through commands; how each updates the UI (pessimistic, optimistic, undoable) is set per command ([../commands/execution.md](../commands/execution.md#modes)).
 - Row selection is UI state; it clears when the URL changes.

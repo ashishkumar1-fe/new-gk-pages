@@ -20,9 +20,4 @@ Source of truth for tokens and visuals: the **Ratio design system** (colors, typ
 - Feature code uses patterns and primitives, never raw Radix.
 - Every component has loading, empty, error and disabled states.
 - Keyboard and screen-reader support are part of "done".
-- A lightweight component playground (non-prod route or Storybook-lite) documents each component.
-
-## Open
-
-- Designs exist only for Login, Home, Products, Product detail, Settings. Orders, customers and others are pending.
-- Final design from the design team (see [open-questions.md](open-questions.md)).
+- A Storybook-lite route documents each shared component.

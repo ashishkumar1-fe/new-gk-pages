@@ -4,6 +4,8 @@
 
 Every resource in the admin. Nav groups follow the Ratio design sidebar.
 
+All routes live under `/store/$storeId` ([routing](../surfaces/routing.md)); paths here and in resource and command definitions are relative to it.
+
 | Resource | Service | Routes | Screen | Nav | Definition |
 |---|---|---|---|---|---|
 | Order | os-order | `/orders`, `/orders/$id`, `/orders/$id/edit` | list + detail view + edit route | Orders (badge: count) | [order](defs/order.md) |
@@ -15,7 +17,7 @@ Every resource in the admin. Nav groups follow the Ratio design sidebar.
 | Transfer | inventory | `/transfers`, `/$id`, `/new`, `/$id/receive` | list + editor + receive | Products › Transfers | [transfer](defs/transfer.md) |
 | Customer | os-customer | `/customers`, `/customers/$id`, `/customers/new` | list + editor | Customers | [customer](defs/customer.md) |
 | Segment | os-customer | `/segments`, `/segments/$id`, `/segments/new`, `/segments/$id/customers` | list + editor | Customers › Segments | [segment](defs/segment.md) |
-| Discount | os-discount | `/discounts`, `/discounts/$id`, `/discounts/new/$kind` | list + editor | Discounts | [discount](defs/discount.md) |
+| Discount | Discount Service V2 (gateway) | `/discounts`, `/discounts/$id`, `/discounts/new` | list + editor | Discounts | [discount](defs/discount.md) |
 | Discount set | os-discount | `/discount-sets`, `/$id`, `/new/$kind` | list + editor | Discounts › Bulk codes | [discount](defs/discount.md#discount-set) |
 
 ## Supporting resources (lookups and settings)
@@ -39,4 +41,4 @@ No list screen of their own in v1; used by pickers, filters and the settings she
 
 ## Design-only (capability off until backend exists)
 
-Gift cards, shipping zones, domains, checkout settings, admin notifications. See [../schema/deferred.md](../schema/deferred.md).
+Gift cards, shipping zones, domains, checkout settings, admin notifications. See [../schema/deferred.md](../domain/deferred.md).

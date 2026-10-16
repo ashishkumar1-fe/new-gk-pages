@@ -1,6 +1,6 @@
 # Customer
 
-[← Resources](../README.md) · Schema: [customers.md](../../schema/customers.md) · Today: `pages/customers/CustomerHome.tsx`, `components/customers/CreateCustomerForm.tsx`, `EditCustomer.tsx`
+[← Resources](../README.md) · Schema: [customers.md](../../domain/customers.md) · Today: `pages/customers/CustomerHome.tsx`, `components/customers/CreateCustomerForm.tsx`, `EditCustomer.tsx`
 
 ## List
 
@@ -12,8 +12,10 @@ list: {
     { id: 'location', header: 'Location',           cell: (c) => [c.defaultAddress?.province, c.defaultAddress?.country] },
     { id: 'orders',   header: 'Orders',             cell: (c) => c.stats.ordersCount },
     { id: 'spent',    header: 'Amount spent',       cell: (c) => money(c.stats.amountSpent) },
+    { id: 'created',  header: 'Created At',         cell: date, hidden: true },
+    { id: 'updated',  header: 'Updated At',         cell: date, hidden: true },
   ],
-  search: { param: 'conditions', placeholder: 'Search customers', debounceMs: 400 },   // today: every keystroke
+  search: { param: 'conditions', placeholder: 'Search customers', debounceMs: 400 },   // today: 500 ms
   filters: [
     { id: 'tags', label: 'Tags', type: 'multi_enum', options: tagsLookup, toParams: (v) => cond('tags', 'contains_any', v) },
   ],
@@ -28,7 +30,11 @@ list: {
 }
 ```
 
-Search, as today: `contains` conditions OR-ed across email, firstName, lastName, name, phone, company, tags, address; when other filters are active, conditions are AND-ed (`CustomerHome.tsx:88-160`). Today's tag options come from the loaded page only; v1 uses the same until a tags lookup exists.
+Search, as today (`CustomerHome.tsx:94-166`):
+
+- `contains` conditions OR-ed across email, firstName, lastName, name, phone, company, tags, address.
+- When other filters are active, conditions are AND-ed.
+- Tag options come from the loaded page only; v1 keeps this until a tags lookup exists.
 
 ## Editor
 
@@ -43,8 +49,8 @@ Search, as today: `contains` conditions OR-ed across email, firstName, lastName,
 | aside | Tags | | |
 | aside | Statistics | orders, amount spent, average order value | read-only |
 
-- `editor: { save: 'customer.save', create: { route: '/customers/new', command: 'customer.create' } }`
-- Save (`customer.save`): `PUT` customer only if fields or custom fields changed; addresses diffed (update changed, create new), as today.
+- `editor: { save: 'customer.update', create: { route: '/customers/new', command: 'customer.create' } }`
+- Save (`customer.update`): `PUT` customer only if fields or custom fields changed; addresses diffed (update changed, create new), as today.
 - Create: customer first, then addresses; then back to the list.
 
 ### Validation (`schemas/customerSchema.ts`)
@@ -75,6 +81,6 @@ relations:    { orders: { resource: 'order', kind: 'many', via: 'customer_id' } 
 search:       { enabled: true, limit: 4 },
 nav:          { group: 'customers', position: 1 },
 customFields: { ownerType: 'customer', placement: 'main' },
-permissions:  { read: 'customers:read', write: 'customers:write' },
+permissions:  { read: 'read_customers', write: 'write_customers' },
 assistant:    { description: 'People who bought or signed up.', readableFields: ['firstName', 'lastName', 'email', 'phone', 'tags', 'stats.ordersCount', 'stats.amountSpent', 'stats.lastOrderAt', 'marketing'] },
 ```

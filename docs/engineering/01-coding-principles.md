@@ -34,17 +34,7 @@ Props down, events up. Siblings communicate by lifting state, the URL, or the qu
 
 ## 6. Make impossible states impossible
 
-Union types over boolean soup:
-
-```ts
-type SaveState =
-  | { status: 'pristine' }
-  | { status: 'dirty' }
-  | { status: 'saving' }
-  | { status: 'error'; error: ApiError };
-```
-
-Three booleans have 8 combinations, 5 of them nonsense. A union has exactly the states that exist. Flows with 3+ steps graduate to a machine.
+Model state as *one value that is exactly one of the real states* (pristine / dirty / saving / error), never as a pile of independent booleans. Three booleans have 8 combinations, 5 of them nonsense ("saving AND failed"); a single-state model has exactly the states that exist, so bugs like double-submit cannot be expressed. Flows with 3+ steps graduate to a machine ([architecture/machines](../architecture/docs/machines.md)).
 
 ## 7. Parse, don't validate
 
@@ -56,11 +46,11 @@ Every data-backed screen ships **skeleton / empty-with-CTA / error-with-retry / 
 
 ## 9. Testing Trophy
 
-Mostly **integration** tests (Testing Library + MSW: "user searches, sees results"), some **unit** tests for pure logic (money, rules, transformers), a few **Playwright smokes** (login → list → save), **zero snapshot tests**. Query like a user: `getByRole('button', { name: 'Save' })`; `getByTestId` is a last resort.
+Mostly **integration** tests ("user searches, sees results"), some **unit** tests for pure logic (money, rules, transformers), a few **Playwright smokes** (login → list → save). Test behaviour, not implementation. *(Tooling specifics — MSW, no-snapshot rule, role-based queries — are proposed defaults, not yet ratified: see the decision log §4.)*
 
 ## 10. Boring > clever; AHA
 
-Duplicate up to three times before abstracting — the wrong abstraction costs more than duplication. ~150-line component guideline; past ~250, split. The review question is never "does it work?" (CI's job) — it is "will a new dev understand this in six months?"
+Duplicate up to three times before abstracting — the wrong abstraction costs more than duplication. Keep components small enough to hold in one read *(the ~150-line guideline is a proposed default)*. The review question is never "does it work?" (CI's job) — it is "will a new dev understand this in six months?"
 
 ## 11. Accessibility by default
 

@@ -22,11 +22,11 @@ Referrer-Policy: strict-origin-when-cross-origin
 Permissions-Policy: camera=(), microphone=(), geolocation=()
 ```
 
-Plus: no secrets in the bundle (public-env allowlist in the build config), no public source maps, login rate-limit confirmed with backend. **Full CSP is deferred, not deleted:** after launch, ship `Content-Security-Policy-Report-Only`, watch reports (PostHog/uploads/visual-editor will surface their endpoints), then enforce. The old dashboard has CSP today — shipping without a plan would be an audit finding.
+Plus: no secrets in the bundle (public-env allowlist in the build config), no public source maps. *(Confirming a login rate-limit with backend is a proposed adjunct, not yet ratified.)* **Full CSP is deferred, not deleted:** after launch, ship `Content-Security-Policy-Report-Only`, watch reports (PostHog/uploads/visual-editor will surface their endpoints), then enforce. The old dashboard has CSP today — shipping without a plan would be an audit finding.
 
 ## Uptime & vitals (d25, d30)
 
-- One external synthetic check per minute (login page + one API round-trip) + CDN error alarms → the same OpsGuard pipe, with a written owner.
+- One external synthetic check (login page + one API round-trip) + CDN error alarms → the same OpsGuard pipe, with a written owner. *(Cadence — e.g. per minute — is a proposed default.)*
 - **API-latency SLOs belong to backend on-call** — we do not duplicate them.
 - **Web Vitals:** PostHog autocapture on, nothing more — no dashboards, no alerting. The data exists for the day someone says "it feels slow" (bundle parse, render and INP are invisible to backend monitoring).
 

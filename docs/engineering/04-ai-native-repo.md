@@ -35,7 +35,7 @@ Every AI session reads it before writing code (CLAUDE.md says so). A landmine st
 
 AI generates code faster than humans can review it; without norms, review becomes rubber-stamping or a bottleneck. The contract (enforced via PR template + review culture):
 
-- **PR ≤ ~400 lines.** "The AI wrote it, that's why it's big" is not an exemption — split it.
+- **Small PRs.** "The AI wrote it, that's why it's big" is not an exemption — split it. *(The exact ≤400-line number is a proposed default — decision log §4.)*
 - The human author states **"I ran it myself"** (screenshots for UI changes). AI-generated code nobody executed does not enter review.
 - **Tests ship in the same PR** — the cheapest thing to ask an AI for.
 - Reviewers read it as AI-generated: the question is **"is this our pattern?"** — "does it work?" is CI's job.

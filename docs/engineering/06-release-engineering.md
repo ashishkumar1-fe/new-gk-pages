@@ -8,7 +8,7 @@
 lint → tsc --noEmit → tests → bundle budget → npm audit (high/critical)
 ```
 
-All blocking, branch protection on, no exceptions (including "the AI wrote it"). On staging, a **Playwright smoke** (login → merchant select → products list → one save) is the **deploy** gate. The 7 legacy failing suites inherited from gk-pages get fixed or quarantined **before** the gate switches on — a gate with known-red tests teaches people to ignore red.
+All blocking, branch protection on, no exceptions (including "the AI wrote it"). On staging, a **Playwright smoke** (login → merchant select → products list → one save) is the **deploy** gate. *(Proposed sequencing, not yet ratified: fix or quarantine any inherited failing suites before the gate switches on — a gate with known-red tests teaches people to ignore red.)*
 
 ## Preview deploys (d32)
 

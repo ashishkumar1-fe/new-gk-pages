@@ -1,225 +1,204 @@
-# Ratio — Decision Log (with rationale & provenance)
+# Ratio — Decision Log
 
-> Status: complete — 42 decisions, zero open · Owner: Ashish Kumar · Updated: 2026-10-16
-> Companion to the draft architecture in this folder (Aman Zaid, v0). Formal spec: [`../specs/2026-10-16-ratio-standalone-design.md`](../specs/2026-10-16-ratio-standalone-design.md). Engineering standards: [`../engineering/`](../engineering/README.md). Jira: INFN-3338.
+> Status: 42 decisions closed, zero open · Owner: Ashish Kumar · Updated: 2026-10-16
+> Companions: draft architecture in this folder (Aman Zaid, v0) · [design spec](../specs/2026-10-16-ratio-standalone-design.md) · [engineering standards](../engineering/README.md) · Jira INFN-3338.
 
-Every decision below records **what** we decided, **why**, and **where it came from**. Two workstreams ran independently — a code-level discovery of today's gk-pages/dashboard (Ashish) and a draft architecture (Aman) — and converged on ~85% of the same answers before we compared notes. This log is the merge of both, with the disagreements and their resolutions recorded honestly.
+This log records each decision **the way it was actually reached** — the question that started it, what we investigated or argued, and what settled it. Two workstreams ran independently (a code-level discovery of today's gk-pages/dashboard, and the draft architecture in this folder) and converged on ~85% of the same answers before comparing notes; the disagreements and their resolutions are recorded honestly.
 
-**Provenance labels:**
-
-| Label | Means |
-|---|---|
-| 🔍 code-verified | Forced by a fact we verified in code/DevTools — not a preference |
-| 🧑‍💻 discovery | Originated in the discovery workstream |
-| 📐 draft | Originated in Aman's draft architecture; adopted after discussion |
-| 🤝 merged | Both workstreams had a position; the final is a deliberate merge |
-| 💬 product call | A judgement call by the product/team, recorded as made |
+A decision marked **ratified** was explicitly discussed and called. Items that came in as recommendations and were accepted in bulk ("close the rest per your recommendation") are decisions too — but the finer defaults inside them that were never individually discussed are collected separately in [§4 Proposed defaults](#4-proposed-defaults-not-yet-ratified), so reviewers can tell a made call from a sensible suggestion.
 
 ---
 
-## 1. Verified ground truth (the facts that forced decisions)
+## 1. Verified ground truth
 
-- **Auth is a gateway cookie, not a header.** The token is an httpOnly + Secure cookie set by the gateway — prod: `token` @ `Domain=.gokwik.in`, **no SameSite attribute → Chrome default Lax**; sandbox: `sandbox_token` @ `api-gw-v4.dev.gokwik.in`, `SameSite=None` (exists only so localhost dev works). `makeAPICall` sends `withCredentials: true` everywhere; **JS never reads or sends the token** — the live utilities bundle's only read of the cookie is a leftover `console.log` that always prints null (httpOnly). *Verified in the shipped `@gokwik/utilities` bundle and production DevTools.*
-- **Entitlement already exists:** `GET /api/dashboard/user/details` → `config.selected_products.pages` gates the GK Pages nav (dashboard `sideNav/index.tsx:1386`). It is menu-only — the app still mounts by URL for anyone who knows it.
-- **Coupling surface of gk-pages:** `makeAPICall` ×39 imports · `dashboardStore` ×17 · `updateBreadcrumbs` ×11 · `validatePermission`/`filterStore`/`logUserEvent`/`getCookie` ×1–2 · `sessionStorage['merchant-mid']` read in **77 places** · one import-map entry + `/gk-pages` activity route.
-- **The gateway is the single enforcement point** for auth and CORS; inner services receive verified context and need zero changes for a new origin. Known gateway-bypass categories: direct service hosts (the discount-V2 CORS incident), `fetch`-based uploads with manual merchant headers, third-party endpoints.
+Facts established in code and DevTools — constraints, not opinions:
 
----
-
-## 2. Decision log
-
-### Identity & access
-
-**d01 — Product name: Ratio.** 💬
-*Why:* product identity needed before domain, analytics project, branding and emails could be scoped. *Source:* product call, closed on the tracker.
-
-**d02 — Domain: name deferred; MUST be a gokwik.in subdomain.** 🔍
-*Why:* the prod auth cookie lives on `Domain=.gokwik.in` and is effectively SameSite=Lax — on a foreign domain the browser never attaches it, so **auth fails in every browser, CORS approval cannot fix it**. On a subdomain the existing cookie is already valid: auth works with zero backend change. *Rejected:* a fully separate domain (e.g. ratio.in) — would require either third-party-cookie reliance (breaks in Safari, fragile in Chrome) or an entirely new header-based auth with backend work; also considered proxying the gateway under the new domain (`api.ratio.in`) — possible but real infra+auth work for no v1 benefit. *Source:* discovery (DevTools cookie table + bundle analysis).
-
-**d03 — Which merchants: the backend's `selected_products.pages` flag is the single source of truth.** 🔍
-*Why:* the mechanism already exists and is already how the dashboard gates access — nothing new to build or migrate. All-at-once vs phased rollout is a cutover-time product call and composes with feature flags (d27). *Source:* traced in dashboard code.
-
-**d04 — Entitlement: reuse the flag + add a real frontend route guard.** 🤝
-*Why:* today the flag only hides a menu item — anyone with the URL can mount the app. Standalone, that hole would be public. A route guard (flag false → blocked + "no access / talk to sales" screen) closes it at the cost of one frontend check. Originally scoped as "backend must build an entitlement flag" (a blocker) — the code trace showed the flag already exists, downgrading this from external blocker to frontend work. *Source:* discovery; Aman's platform.md independently specifies the same guard.
-
-### Auth & session
-
-**d05 — Login/OTP callable from the new origin.** 💬
-*Why:* the only genuinely new thing auth needs. Confirmed with backend as a config change (origin allowlist on login/verify-otp), not a blocker. *Source:* discovery raised it; backend confirmed.
-
-**d06 — Token storage: NOWHERE.** 🔍
-*Why:* the strongest finding of discovery — the frontend never stores a token today (httpOnly gateway cookie + `withCredentials`), which is already best practice: XSS cannot steal what JS cannot read. Standalone **reuses the design unchanged**: login via gateway → gateway sets its cookie → every call `withCredentials: true` → FE keeps only an `is_logged_in`/`me` check. *Rejected:* sessionStorage token (logout on tab close, XSS-readable — and would be a security DOWNGRADE from today), localStorage (same, persists), building a new header-token auth (backend work for negative benefit). *Source:* discovery (verified); Aman's platform.md matches it exactly.
-
-**d07 — Merchant selection: React Query + sessionStorage, no Redux.** 🧑‍💻
-*Why:* after login, `user/details` (fetched via Query) carries the merchant list; picking a store writes `sessionStorage['merchant-mid']` — **the same key today's code reads in 77 places**, so ported code keeps working untouched — plus a `user-details` mirror for sync reads. Components use a `useUserDetails` hook. *Rejected:* rebuilding the shell's Redux store (nothing needs it; two sources of truth invite staleness). *Source:* discovery; explicit user call ("Redux nahi rakhenge").
-
-**d08 — Permissions: the existing roles/permissions model, from the same API.** 💬
-*Why:* the API already returns permissions including whether GK Pages is allowed; a new RBAC model is scope without benefit for v1. Commands declare `permission` keys now so enforcement can tighten later without code changes. *Source:* team call on the tracker.
-
-**d36 — Staff-management UI: out of scope for v1.** 💬
-*Why:* staff continue to be managed in the existing system; a Ratio-native staff & roles section is v2 (the draft's registry/commands make it cheap to add later). *Source:* explicit scope call.
-
-### Routing
-
-**d09 — URLs: `/store/:storeId/…`, prefix dropped, storeId stays in the URL.** 🤝
-*Why:* `/gk-pages` existed only so the Single-SPA root config knew when to mount the app — an artifact, not a design. `storeId` stays in the path so deep links, shared links and multi-store tabs work (and because view state belongs in the URL — see d40/TanStack Router). *Source:* discovery recommendation, user-approved; matches the draft's routes.
-
-**d10 — Old dashboard URLs: redirect stub at cutover.** 💬
-*Why:* merchants' bookmarks and support docs point at `dashboard…/gk-pages/…`; a temporary 301 stub (same path, new domain) for a transition window prevents a 404-and-support-ticket wave at near-zero cost. *Source:* discovery; deferred detail to cutover.
-
-### Platform layer
-
-**d11 — Own `apiClient` with `makeAPICall`'s exact signature.** 🧑‍💻
-*Why:* the riskiest part of any migration is touching working call sites; keeping the signature means 39 call sites port unchanged, and the entire data-access migration concentrates in one file. The client owns merchant headers (attached in exactly one place), credentials, and consistent loading/error behaviour. *Rejected:* adopting a generic HTTP lib interface and rewriting call sites (needless churn). *Source:* discovery; the draft's platform.md specifies the same single-client principle.
-
-**d12 — User/merchant data: Query is the source of truth; no Redux anywhere.** 🤝
-*Why:* the shell's `dashboardStore` (17 imports) is a second copy of server state — the pattern behind an entire family of staleness bugs in gk-pages. One `useUserDetails` hook + sessionStorage mirror replaces it; the old Redux user slice retires. *Source:* discovery + user call; identical to the draft's state.md ("server data never copied into a store").
-
-**d13 — Breadcrumbs dropped; shared components get a Storybook-lite instead.** 💬
-*Why:* the shell's breadcrumb bar (11 call sites) disappears with the shell; good navigation makes breadcrumbs redundant (the Ratio design reference has none). The component-discoverability need behind "document shared components" is served by the `/playground` catalog (d38). *Source:* user call on the tracker.
-
-### Chrome & design
-
-**d14 — Navigation/IA: product finalises; the sidebar supports two levels of nesting.** 💬
-*Why:* IA is a product decision; the build requirement (2-level nesting) is fixed so the shell component can be built without waiting. *Source:* user call.
-
-**d15 — Own UI kit; gokwik-ui-kit/antd not carried over.** 🤝
-*Why:* a standalone product needs its own brand and should not inherit antd's CSS weight and override wars (the `gk-ant` prefix saga). Radix + Tailwind + tokens give accessible primitives with full visual control. *Cost acknowledged:* this is the single biggest scope item in the project; the Storybook-lite and kit governance (d38) exist to keep it coherent. *Rejected:* carrying gokwik-ui-kit for v1 and reskinning later (discovery's original lean) — superseded by the explicit user call "we will create our own" + the draft's identical choice. *Source:* merged.
-
-**d16 — v1 ships global search (+ store switcher, profile/logout).** 💬
-*Why:* table-stakes for a Shopify-class admin. Mechanism settled in d41: reuse per-entity list APIs' search params across 2–3 entities in parallel (no new backend). *Source:* user call.
-
-### Backend & CORS
-
-**d17 — Gateway CORS: one config (exact origin + Allow-Credentials + merchant headers).** 🔍
-*Why:* auth and CORS are both enforced at the gateway, so one config unlocks ~90% of APIs at once; wildcards don't work with credentialed requests (browser rule), and the merchant headers must be explicitly allowlisted (the discount-V2 direct-host failure was exactly this). Inner services need zero changes — they trust gateway-verified context. *Source:* discovery (verified behaviour + incident history).
-
-**d18 — Gateway-bypass audit; backend resolves breakages.** 🧑‍💻
-*Why:* d17's free pass covers only gateway-routed calls. Three known bypass categories (direct hosts, fetch-based uploads, third-party) each carry their own CORS story; the audit tags every call gateway-routed vs bypass and smoke-tests the bypass list from the new origin on staging before launch. *Source:* discovery.
-
-### Delivery
-
-**d19 — Real SPA hosting (own index.html, route fallback, CDN); deploy detail finalised with platform last.** 💬
-*Why:* today "deploy" is replacing one bundle behind an import map — there is no index.html to own. Standalone needs standard SPA hosting; the exact pipeline is platform's domain and intentionally sequenced late. *Source:* user call.
-
-**d20 — Separate PostHog project for Ratio.** 💬
-*Why:* clean event space fully in the team's hands, new login/activation funnels that the shell used to own. *Trade-off accepted:* historical continuity with dashboard events resets. *Source:* user call.
-
-**d21 — Cutover: domain live → dashboard link redirects → import-map entry removed; rollback = restore the entry.** 🧑‍💻
-*Why:* the import map makes rollback a one-line restore — so both apps stay deployable through the transition and launch day has a parachute. *Source:* discovery.
-
-### Production quality
-
-**d22 — Error tracking: Sentry; alerts via the existing Sentry→OpsGuard pipe.** 🤝
-*Why:* Sentry is already in the org (procurement solved) and is the best-in-class error tool; the org's on-call already consumes Sentry alerts through OpsGuard — we add a project to an existing pipe instead of building one. Source maps uploaded privately and stripped from the bundle (readable traces for us, no source disclosure). PostHog remains for events/flags/vitals; replay in exactly one tool. *Rejected:* PostHog error tracking (younger grouping/release-health; chosen initially for vendor-count reasons, flipped when "Sentry already in org" surfaced). *Source:* merged through discussion.
-
-**d23 — Bundle budget + route splitting, enforced in CI.** 💬
-*Why:* bundles grow silently (one `moment.js` import = +70KB nobody notices); a CI size gate catches it at the PR. Today's gk-pages is one unsplit bundle — the anti-example. *Source:* user call ("very important, will do").
-
-**d24 — Security v1: five headers at the CDN; full CSP deferred (report-only → enforce after launch).** 🤝
-*Why:* today the root config owns security headers — standalone inherits the duty. The v1 set (HSTS, `frame-ancestors 'none'` + XFO, Referrer-Policy, Permissions-Policy) is ~30 minutes in one CloudFront policy and closes the real risks (clickjacking on an admin). Full CSP is the one genuinely expensive item; shipping it blind breaks things on launch day, so it rolls out post-launch via Report-Only. **Deferral, not deletion** — the old dashboard has CSP; an audit would flag its absence. *Source:* discovery proposal, user-scoped ("full CSP abhi nahi; Referrer/Permissions-Policy mandatory me daal do").
-
-**d25 — Uptime: one synthetic check + CDN alarms → same OpsGuard pipe.** 🧑‍💻
-*Why:* "the app is down" must reach us before merchants; one login-page + API-round-trip check is sufficient and deliberately minimal. **API-latency SLOs stay with backend on-call** — duplicating them would be noise and theirs to own. *Source:* discovery, scoped down by the user's correct observation that backend already owns API alerting.
-
-**d26 — ErrorBoundary per route + global crash page; blank screens banned.** 🧑‍💻
-*Why:* today's single-spa wrapper literally `return null`s on crash — sections vanish silently. Route-level boundaries (retry card + Sentry capture) keep the rest of the app alive; granularity stays at route/section level so errors don't get swallowed. *Source:* discovery (anti-pattern found in code).
-
-**d27 — Feature flags: PostHog — percentage/per-merchant rollout, kill-switches, flag-debt cleanup rule.** 🧑‍💻
-*Why:* rollback-by-toggle instead of rollback-by-deploy for risky features; PostHog is already integrated so flags are free; launch itself can ride a flag (ties to d03 phased rollout). The cleanup rule exists because stale flags rot into dead if/else forests. *Source:* discovery.
-
-**d28 — CI gates, blocking: lint, tsc, tests, budget, audit; Playwright smoke = deploy gate.** 🧑‍💻
-*Why:* gates that don't block don't exist; the 7 legacy failing suites inherited from gk-pages get fixed/quarantined first because a gate with known-red teaches people to ignore red. *Source:* discovery.
-
-**d29 — UX baseline: 4 states per screen, keyboard, AA contrast — PR checklist.** 🧑‍💻
-*Why:* a new product's first impression is made of loading/empty/error moments; improvised states read as cheap. The scaffolder's page template ships all four so compliance is the default. *Source:* discovery.
-
-### Engine room
-
-**d30 — Web Vitals: PostHog autocapture only; no alerting/SLO dashboards.** 💬
-*Why:* backend on-call owns API latency; the browser-side half (bundle parse, render, INP — invisible to backend monitoring) just needs to be *recorded* so "it feels slow" can be answered with numbers. Zero-effort insurance, deliberately not an alerting system. *Source:* user call after discussion.
-
-**d31 — Query conventions + pragmatic Zod boundaries.** 🤝
-*Why:* query keys `[domain, merchantId, params]` with **merchantId first and mandatory** — cross-merchant cache bleed is a security bug and this makes it structurally impossible. Zod policy is deliberately pragmatic: `safeParse` + Sentry log (never throw) on critical endpoints — detect backend drift without breaking pages; **hard parse for money** (a wrongly-parsed price must stop, not render); full schema coverage is an explicit non-goal (40+ modules of schemas would be over-engineering). *Source:* merged — draft's data-access + discovery's safeParse/money-hard-parse refinement.
-
-**d32 — Release engineering: PR previews, git-tag versioning, contenthash cache strategy.** 🧑‍💻
-*Why:* previews turn review into "open a link" for QA/design/PM; version stamps make "what is prod running?" a console line and rollback a repoint; contenthash + no-cache index means nobody is ever told to hard-refresh (if they are, it's a bug). *Source:* discovery.
-
-**d33 — Asset pipeline: CDN image transforms, lazy loading, font swap, skeleton-first.** 🧑‍💻
-*Why:* product images are a content-heavy admin's biggest weight; skeleton-first keeps layout stable (zero CLS) and is the ground-level half of the d23 budget. *Source:* discovery.
-
-**d34 — Renovate weekly + audit gate + lockfile discipline + browser matrix.** 🧑‍💻
-*Why:* small continuous upgrades instead of one painful yearly migration (gk-pages is pinned on TS 4.3 as the cautionary tale). Enabled once the repo settles, not in month one. *Source:* discovery.
-
-**d35 — Team docs on Confluence; one home per doc.** 💬
-*Why:* docs live where the team already reads (Jira/Confluence org). Four one-pagers: Runbook (before launch), ADRs, Tracking plan (before the first event), PII policy. See d42 for the in-repo exception. *Source:* user call.
-
-### Contribution & AI (problem-first additions — not in the draft; we bring these)
-
-**d37 — Contribution guardrails: CLAUDE.md recipes + scaffolder + lint boundaries + CODEOWNERS.** 🧑‍💻
-*Problem stated by the team:* outside (often backend, AI-assisted) contributors write code in their own style and the codebase degrades. *Why this shape:* instructions alone stop nobody — so recipes teach (AI agents follow steps, not policy prose), the scaffolder makes right the fastest path (generated code *is* the pattern), lint makes wrong unmergeable, CODEOWNERS is the human backstop. Milestone: kit + one golden exemplar first — guardrails without a paved example produce frustration. *Details:* [engineering/02](../engineering/02-contribution-guardrails.md).
-
-**d38 — UI-kit lockdown: CODEOWNERS on `/src/ui/` + closed component APIs + change-request flow + Storybook-lite.** 🧑‍💻
-*Problem stated:* nobody may add/edit/delete kit components; a pink variant must go through the owners — and even direct edits must be unmergeable without approval. *Why this shape:* CODEOWNERS enforces the merge gate; **closed APIs enforce the process in the type system** (no `className`/`style` passthrough — "pink" cannot be expressed without a kit change, which triggers CODEOWNERS); the 1–2-day change-request SLA is the open door that prevents shadow kits. npm packaging deferred with written triggers (second consumer app, or repeated bypasses) because publish-bump-install cycles would kill build-phase velocity. *Details:* [engineering/03](../engineering/03-ui-kit-governance.md).
-
-**d39 — AI-native repo: committed skills, team mistakes.md, AI-PR contract, committed settings.** 🧑‍💻
-*Problem stated:* everyone codes with Claude/Codex now; five developers = five prompting styles, knowledge trapped in individuals' AI sessions, AI-sized PRs collapsing review. *Why this shape:* committed `.claude/skills/` makes prompt quality a repo property; `mistakes.md` turns one person's debugging pain into every AI's permanent knowledge; the PR contract (≤400 lines, "I ran it", tests included) keeps review human-scale; committed settings deny secrets reads uniformly. *Details:* [engineering/04](../engineering/04-ai-native-repo.md).
-
-### Draft-architecture adoptions (from Aman's v0, after discussion)
-
-**d40 — Adopt: Vite, TanStack Router, Zustand (UI flags only), resources/commands registries, XState v5, ⌘K.** 📐
-*Why each:*
-- **Vite** — admin behind login: no SEO/SSR need, so Next.js is complexity without benefit; discovery's webpack mechanics (contenthash, budgets) translate 1:1.
-- **TanStack Router** — our view state lives in the URL, and TanStack Router gives **typed routes + Zod-validated search params** (a path typo is a compile error; `?page=banana` never reaches code). React Router would mean manual string parsing of exactly the state we care most about.
-- **Zustand** — a global `useState` for UI flags (sidebar, modals, selection) with zero boilerplate; does not conflict with "no Redux" because the banned thing was *server data in a store* — which remains banned in Zustand too (lint).
-- **Registries** — "define once, consume everywhere" (see d41 for scope); prior art is mainstream (CQRS, VS Code commands, React-Admin resources, Shopify bulk/extensions, MCP tools) — the pattern is standard, only the assembly is ours.
-- **XState v5** — flows with 3+ steps/booleans become diagrams with impossible states unrepresentable; one record-editor machine serves all 11 entity editors.
-- **⌘K** — falls out of the command registry nearly free (see d41 for the scope cut).
-*Source:* Aman's draft; adopted after a full walkthrough discussion.
-
-**d41 — Scope rules for the adopted architecture.** 🤝
-*Why each rule:*
-- **Writes = 100% commands, no exceptions** — the safety property everything else (AI assistant, audit, consistency) depends on; one bypassed write endpoint = an unsafe path for the assistant.
-- **Registry is a plumber, not a UI generator** — table+form screens (the ~11 resources) are definition-driven; complex UIs (variant matrix, image uploader) are hand-built components **plugged into** definitions; bespoke experiences (visual editor, analytics, onboarding) are normal feature code whose writes still go through commands. This boundary prevents the classic failure of such systems: force-fitting everything.
-- **Unstable backend is an argument FOR the pattern, not against:** every endpoint referenced in exactly one file (backend change = one-file edit), per-service transformers normalise mixed snake/camel at the door, Zod drift-logging alarms us before merchants notice.
-- **Palette-lite only** — navigation + actions are zero-backend (they read the registries); **record search dropped because the backend has no search support**; global search (d16) reuses per-entity list APIs instead.
-- **XState ownership: 2–3 machine authors, everyone else consumes hooks** — contains the learning curve; the 3-steps/3-booleans rule is review-enforced to prevent machine-everything zeal.
-*Source:* merged — draft's architecture, discovery's constraints (backend search, team reality).
-
-**d42 — The last three calls (resolving the only real disagreements).** 🤝
-- **Repo: FRESH codebase** (not in-place conversion of gk-pages). *Why:* the registry model wants a clean skeleton; parity is preserved by lifting domain logic/transformers selectively. This was the one structural disagreement between workstreams (discovery leaned in-place for history/muscle-memory; the draft leaned fresh) — resolved fresh.
-- **Freshness: the draft's defaults win** (lists 30s / detail 60s / lookups 10min) **+ explicit `staleTime: 0` wherever freshness matters.** *Why:* discovery's requirement was "the dashboard must never feel stale" (originally staleTime-0 default); the draft optimised API load. The merge keeps the draft's defaults but neutralises the silent-staleness failure mode with **two mandatory safety nets**: `refetchOnWindowFocus: true` globally (tab-return always revalidates), and the scaffolder requires an explicit `staleTime` on every resource — forgetting is structurally impossible.
-- **Docs: Confluence** (runbook, ADRs, tracking plan, PII policy) — where the team already reads. **Non-negotiable exception:** `CLAUDE.md`, `mistakes.md`, `.claude/skills/`, `.claude/settings.json` stay **in-repo** — they are the AI contributors' operating system (d37/d39 depend on agents reading them from the repo), not documentation.
-*Source:* merged, final call by the team.
+- **Auth is a gateway cookie; the frontend never touches a token.** The shipped `@gokwik/utilities` bundle sends `withCredentials: true` on every call and never puts the token in a header — its only read of the cookie is a leftover `console.log` that always prints null, because the cookie is httpOnly. DevTools confirmed: sandbox `sandbox_token` lives on the **gateway's own domain** (`api-gw-v4.dev.gokwik.in`, httpOnly, Secure, SameSite=None — None only so localhost dev works); production `token` lives on **`Domain=.gokwik.in`** with **no SameSite attribute, which Chrome treats as Lax**.
+- **Entitlement already exists.** `GET /api/dashboard/user/details` returns `config.selected_products` — the per-merchant map of purchased products. The dashboard gates the GK Pages menu on `selected_products.pages` (sideNav/index.tsx:1386). It is **menu-only**: the app still mounts by URL for anyone who knows it.
+- **The coupling surface of gk-pages:** `makeAPICall` ×39 imports · shell Redux `dashboardStore` ×17 · `updateBreadcrumbs` ×11 · `sessionStorage['merchant-mid']` read in **77 places** · one import-map entry + `/gk-pages` activity route. Small and fully enumerable.
+- **The gateway is the single enforcement point** for auth and CORS; inner services receive verified context and need zero changes for a new origin. Known bypass categories: direct service hosts (the discount-V2 CORS incident), fetch-based uploads with manual merchant headers, third-party endpoints.
 
 ---
 
-## 3. How the two workstreams merged (summary)
+## 2. The decisions — as the discussions actually went
+
+### d01 · Name — **Ratio** *(ratified)*
+
+Needed before domain, analytics project and branding could be scoped. Product call.
+
+### d02 + d06 · Domain & token storage — the auth investigation *(ratified; code-forced)*
+
+This began as a normal-sounding question — *"where will we store the token: sessionStorage like today, or an httpOnly cookie?"* — and ended somewhere nobody expected.
+
+First finding (from the shipped utilities bundle): the frontend **doesn't store a token today**. Every call goes out with `withCredentials: true` and the browser attaches a cookie; no JavaScript ever reads or sends the token. The "sessionStorage like today" premise was false.
+
+Second finding (DevTools, raised by Ashish — *"ye dekh bhai, httpOnly h"*): the auth cookie doesn't even live on the app's domain. It lives on the **gateway's** domain — which is why localhost development works at all. Production's cookie sits on `Domain=.gokwik.in` with no SameSite attribute.
+
+That last detail decided the domain question. No SameSite attribute means Chrome treats the cookie as **Lax**: browsers attach it only when the page and the gateway belong to the same site. We walked the scenario explicitly — *"suppose ratio.in is the new domain and backend allows it in CORS?"* — and the answer is that it still fails, because **CORS is the server's permission and SameSite is the browser's rule**; the backend cannot override the browser. A cookie is also never "ours": it belongs to the domain that set it, wherever the page runs.
+
+We also pressure-tested the security model (*"can't someone take the token and hit our APIs from their own site?"*): three independent locks — httpOnly (scripts can't read it), Lax (other sites' fetches don't carry it), CORS preflight on our custom merchant headers (cross-site requests die before sending). Outside a browser (curl with a stolen value) no cookie scheme helps — that's what expiry and server-side validation are for, true of any auth design.
+
+**Decisions:** token is stored **nowhere** — reuse the gateway-cookie design unchanged, with an `is_logged_in`/`me` check for session state; and the new domain **must be a `gokwik.in` subdomain** (exact name open with product). *Rejected:* sessionStorage/localStorage tokens (a security downgrade from today), a foreign domain (auth dead in every browser), proxying the gateway under a new domain (real infra+auth work for no v1 benefit).
+
+### d03 + d04 · Which merchants, and entitlement *(ratified; code-traced)*
+
+Question asked plainly: *"kaise ho raha hai aaj? API me kuch aata hoga? kahan save hota hai?"* Traced end to end: backend stores per-merchant `selected_products`; login's `user/details` returns it; Redux holds it; one line in the sidebar shows or hides the GK Pages menu. So "which merchants get Ratio" already has a mechanism — **nothing new to build**; all-at-once vs phased is a cutover-time call.
+
+The trace also exposed a hole: the flag only hides the **menu**. The app itself mounts by URL — anyone with a link gets in. Fine inside the dashboard (nobody knew the URL); not fine for a standalone product. **Decision:** reuse the flag, and add a real **route guard** — flag false → routes blocked → a clean "no access / talk to sales" screen. What began as an external blocker ("backend must build an entitlement flag") closed as pure frontend work.
+
+### d05 · Login from the new origin *(ratified)*
+
+The only genuinely new thing auth needs: the login/verify-OTP endpoints allowlisting the new origin. Confirmed with backend as a config change — *"hn ye krwa lenge, blocker nahi h"*.
+
+### d07 + d12 · Merchant selection & user data — no Redux *(ratified; explicit call)*
+
+Explicit direction from Ashish: *"Redux nahi rakhenge — React Query is good to have — user details sessionStorage me, sab merchant ka."* Shape that follows: after login, `user/details` via Query → merchant picker → selection writes `sessionStorage['merchant-mid']` (**the same key today's code reads in 77 places**, so ported code keeps working) plus a `user-details` mirror for sync reads. The shell's `dashboardStore` (17 imports) is replaced by one small hook/util; the old Redux user slice retires. Matches the draft's state.md independently.
+
+### d08 + d36 · Permissions & staff UI *(ratified)*
+
+*"Same rahega — gk-pages allowed hai ya nahi wo existing API me aa hi jata hai, kaam ban jayega."* Existing roles/permissions model, unchanged. A Ratio-native staff & roles section: *"abhi nahi, out of scope"* (v2 candidate — the command registry makes it cheap to add later).
+
+### d09 + d10 · URLs *(ratified)*
+
+`/gk-pages` existed only so the Single-SPA root config knew when to mount the app — an artifact, not a design. **`/store/:storeId/…`**, storeId kept in the path so deep links and multi-store tabs keep working. Old dashboard URLs: *"iski koi tension nahi"* — a redirect stub at cutover.
+
+### d11 · The api client *(ratified)*
+
+Own client with **`makeAPICall`'s exact call signature**, so the 39 call sites port untouched and the data-access migration concentrates in one file; it owns merchant headers (attached in exactly one place), credentials and consistent error behaviour.
+
+### d13 · Breadcrumbs *(ratified)*
+
+The shell's breadcrumb bar (11 call sites) dies with the shell; the component-discoverability need behind it is served by the playground catalog instead — *"ye to hum ek component storybook-lite banayenge"*.
+
+### d14–d16 · Chrome *(ratified)*
+
+IA: *"product finalize kar dega — but humein 2-level nesting support karna hai"* (the build requirement is fixed so the shell can be built without waiting). UI kit: *"nahi — we will create our own"* — gokwik-ui-kit/antd not carried over (a standalone product shouldn't inherit antd's weight and override wars; Radix+Tailwind+tokens instead; acknowledged as the project's single biggest scope item). Global search: *"global search to hum denge yr"* — committed for v1; its mechanism was settled later in d41 when the backend-search constraint surfaced.
+
+### d17 + d18 · "Won't every API have to support us?" *(ratified)*
+
+The worry was that every API would need new work for the new origin. The architecture answer: auth and CORS are both enforced **at the gateway** — inner services trust gateway-verified context and need zero changes. So "support the new app" collapses to **one gateway config**: the exact new origin in the allowlist (wildcards don't work with credentialed requests), `Access-Control-Allow-Credentials: true` (or the cookie never flows), and `gk-merchant-id`/`merchant-mid` in allowed headers (the discount-V2 direct-host incident was precisely a missing header allowlist). What the free pass does **not** cover is anything that bypasses the gateway — direct service hosts, fetch-based uploads, third-party — hence a bypass **audit** with smoke tests from the new origin on staging; *"backend will resolve"* what it finds.
+
+### d19–d21 · Hosting, analytics, cutover *(ratified)*
+
+Real SPA hosting (own index.html, route fallback, CDN) with the detailed pipeline deliberately sequenced last with platform — *"deployment process last me discuss karenge"*. A **separate PostHog project** — *"ye to apne haath me hai, gk-pages ka sab alag se hoga"* (accepted trade-off: historical continuity resets). Cutover: new domain live → dashboard link becomes a redirect → import-map entry removed; **rollback = restore the entry**, so both apps stay deployable through the transition.
+
+### d22 · Error tracking — the Sentry/PostHog/OpsGuard discussion *(ratified)*
+
+Started from zero (*"maine ye kaam kabhi kiya nahi — Sentry, p95 — explain karo"*): what an error tracker does, and why **source maps** matter (prod stack traces are minified garbage — `x.js:1:482917`; maps are the translation file that turns them back into `ProductForm.tsx:142`; uploaded privately, stripped from the bundle so the CDN discloses nothing).
+
+First recommendation was PostHog error tracking — purely to avoid a new vendor. Then the real constraint surfaced: *"hum dono use karte hain — Sentry bhi, PostHog bhi."* That flipped the call, and the tools split by their strengths: **Sentry = what broke** (grouping, releases, readable traces), **PostHog = what users do** (events, funnels, feature flags, Web Vitals); session replay in exactly one tool. Then the alerting question — *"mujhe OpsGuard pe alerts chahiye, possible hai na?"* — and the answer that made it cheap: backend already runs a **Sentry→OpsGuard pipe**; we add our project to it rather than building anything.
+
+### d23 · Performance budget *(ratified)*
+
+*"It is very important, will do this."* Route-level code splitting + an initial-bundle budget enforced in CI (bundles grow silently; a gate catches the +70KB import at the PR). Today's gk-pages — one unsplit bundle — is the anti-example.
+
+### d24 · Security — scoped down deliberately *(ratified)*
+
+The full proposal was headers + CSP + bundle hygiene. Pushback was direct: *"ye zaroori hai? main hata dunga naye wale me?"* — so it was re-cut into launch-mandatory vs deferrable. Then *"frame-ancestors 'none' kya hai, kahan likha jata hai?"* — answered (it's the header that stops anyone iframing the admin for clickjacking; it lives in one CDN response-headers policy, not in code; it doesn't affect what *we* embed, so the visual-editor iframe is safe). Final call by Ashish: **HSTS + frame-ancestors/XFO + Referrer-Policy + Permissions-Policy mandatory; full CSP not now** — deferred to a post-launch Report-Only → enforce rollout. Recorded as a deferral, not a deletion: the old dashboard has CSP today, so its absence would be an audit finding.
+
+### d25 + d30 · Monitoring — trimmed to what backend doesn't own *(ratified)*
+
+Key scoping input from Ashish: *"SLO wala part backend me hai — API slow ho toh unka alert aata hai, on-call dekhta hai; mujhe p95/p75 ki zaroorat nahi."* Correct — with one carve-out: backend monitoring ends at the server; the browser half (bundle parse, render, INP) is invisible to it. So: **no FE SLO dashboards, no latency alerting** — just PostHog Web Vitals autocapture as zero-effort insurance for the day someone says "it feels slow", plus one synthetic **is-the-site-up** check (login page + an API round-trip) with CDN alarms into the same OpsGuard pipe — because backend's on-call doesn't watch our domain.
+
+### d26–d29 · Boundaries, flags, CI gates, UX baseline *(ratified in bulk — "close the rest per your recommendation")*
+
+- **d26:** route-level ErrorBoundaries with retry + one global crash page; **blank screens banned** — today's single-spa wrapper literally `return null`s on crash, sections vanish silently; that pattern dies here.
+- **d27:** PostHog feature flags — percentage/per-merchant rollout and kill-switches (rollback = a toggle, not a deploy); launch itself can ride a flag (ties to d03 phased rollout).
+- **d28:** blocking CI gates (lint, types, tests, budget, audit) + a staging Playwright smoke as the deploy gate.
+- **d29:** every screen ships skeleton / empty-with-CTA / error-with-retry / ready, keyboard-operable, AA contrast — via PR checklist and the scaffolder's page template.
+
+### d31 · Data layer — and the React Query freshness debate *(ratified; genuinely argued)*
+
+The honest objection, verbatim in spirit: *"mujhe React Query se dikkat hai — mujhe kuch cache NahiN karna, ye dashboard hai, har second updated value dikhani hai."* The resolution reframed what cache means: Query's model is **stale-while-revalidate** — show the cached result instantly *while fetching fresh in the background* — so the cache kills skeleton flashes, it never serves old data as final. The counter-intuitive part: plain `useEffect` fetching is *staler* (it fetches once on mount and never again; a 20-minute-old tab shows 20-minute-old data), while Query gives focus-refetch and polling. Settled then as freshness-first defaults; **superseded by d42's merge** (architecture defaults + explicit zero where it matters + safety nets). The rest of d31: query keys **`[domain, merchantId, params]` with merchantId first and mandatory** (cross-merchant cache bleed is a security bug, structurally prevented), and pragmatic Zod — `safeParse` + Sentry log on critical reads (detect backend drift without breaking pages), **hard parse for money** (a wrongly-parsed price must stop, not render), full schema coverage an explicit non-goal.
+
+### d32–d35 · Release engineering, assets, hygiene, docs *(ratified in bulk; d35 refined in d42)*
+
+Previews (QA-backend only, env baked at build), git-tag versioning stamped into bundle + Sentry (rollback = repoint), contenthash + no-cache index + CDN invalidation ("hard refresh" is a bug), image CDN/lazy/skeleton-first, Renovate + audit gate. Docs: *"main Confluence pe rakh sakta hoon properly"* — yes, that's where the team reads; see d42 for the in-repo exception.
+
+### d37 · Contribution guardrails — the problem that started the architecture phase *(ratified; problem-first)*
+
+The problem, as stated: *"backend wale aate hain, apne Claude se jaisa marzi code likhwa lete hain, phir bolte hain frontend me support nahi hai. Mujhe code me instruction daalna hai aur aisa pattern banana hai ki koi bhi third person aaye, code hamare level ka hi bane."* The solution's logic: **instructions alone stop nobody — machines enforce, recipes teach, and the paved road makes right the fastest path.** Four layers: recipe-style CLAUDE.md (AI agents follow steps, not policy prose; nested + AGENTS.md for other tools) · a **scaffolder** (`new:resource` generates correct-by-construction skeletons — the generated code *is* the pattern, so contributor creativity goes into business logic, not structure; this was the piece Ashish rated highest) · lint boundaries + pattern bans · CODEOWNERS as the human backstop. Standing milestone: the kit + one golden exemplar must exist early — they're the copy-source every recipe points to.
+
+### d38 · UI-kit lockdown — the pink-tag problem *(ratified; problem-first)*
+
+The problem, as stated: *"kisi ko bhi UI/basic components me add ya delete karne se block karna hai. Maine blue tag banaya, kisi ko pink chahiye — to wo request raise kare, hum change karenge; khud kare to approval ke bina merge na ho."* Three locks plus a door: **CODEOWNERS on `/src/ui/`** (GitHub itself blocks the merge — exactly the "without approval" requirement) · **closed component APIs** — the subtle lock: if `Tag` accepted a style/className prop, pink could happen inside a feature without touching the kit, invisible to CODEOWNERS; with a closed variant list, *pink cannot be expressed* without a kit change, which triggers the owners — the API design enforces the process · lint closing the bypasses (raw elements, kit-internal imports, shadow components). The door: a change-request flow so legitimate needs land fast (slow doors breed shadow kits — how design systems die). Catalog: **Storybook-lite** — a non-prod `/playground` route — chosen over full Storybook (tooling tax while the kit is young) via explicit option pick. Packaging: **in-repo folder**, not an npm package — discussed head-on; publish-bump-install cycles would kill build-phase velocity; written triggers for revisiting (a second consumer app, or repeated bypasses).
+
+### d39 · AI-native repo *(ratified; problem-first)*
+
+Raised by Ashish as its own topic: *"aajkal sab Claude/Codex se hi kaam kar rahe hain — iske liye kaise banayein?"* Gaps identified in today's gk-pages setup: knowledge trapped in one person's AI sessions; five developers = five prompting styles; AI-sized PRs collapsing review; per-laptop AI behaviour. Four pieces, each mapped to a gap: **committed `.claude/skills/`** (shared workflows — prompt quality becomes a repo property) · **team `mistakes.md`** (one person's debugging pain becomes every AI's permanent knowledge, by PR) · an **AI-PR contract** (small PRs, author ran it, tests included; reviewers ask "is this our pattern?" — "does it work" is CI's job) · **committed `.claude/settings.json`** (uniform permissions, secrets reads denied). Confirmed with an explicit problem→solution mapping on the tracker.
+
+### d40 · Adopting the draft's stack — after real scrutiny *(ratified)*
+
+The five adoptions weren't rubber-stamped; each survived a "why?" round:
+
+- **TanStack Router** — because our view state lives in the URL, and it gives typed routes + Zod-validated search params (a path typo is a compile error; `?page=banana` never reaches code). React Router would mean hand-parsing exactly the state we care most about.
+- **Zustand** — challenged against "no Redux". Resolution: the banned thing was *server data in a store*, which stays banned in Zustand too; Zustand is a zero-boilerplate global `useState` for UI flags only.
+- **Registries** — the breakthrough came from Ashish's own summary: *"to basically ye aisa hai ki function ek file me likh diya, wahi function har jagah use ho raha hai"* — exactly. Then the strongest objection: *"hamara backend kaafi unstable hai — order/product APIs alag ho sakti hain."* The answer flipped it into the pattern's best argument: when every endpoint is referenced in exactly one file, a backend change is a one-file edit with every surface fixed at once; per-service transformers quarantine the inconsistencies (snake/camel, staff_id vs staffId) at the door; Zod drift-logging alarms us before merchants notice. The more unstable the backend, the more the single choke point pays.
+- **XState v5** — motivated by the double-save/boolean-soup class of bugs: a flow with three booleans has eight states, five of them nonsense; a machine has exactly the states that exist, so "Save clicked twice during saving" is ignored *by design*. Scoped to multi-step flows only.
+- **Vite** — admin behind login: no SEO, no SSR need; Next.js rejected (its SSR also complicates the cookie story).
+- Also checked: **is any of this actually standard, and what's the profit?** Each piece has mainstream prior art (CQRS, VS Code's command registry, React-Admin's resources, Shopify's bulk/extensions, MCP tools) — the pattern is standard, only the assembly is ours; and the profit math is our scale (11 entities × 5 surfaces × outside contributors × an AI assistant). The honest counter was stated too: for a 3-screen tool this would be overkill.
+
+### d41 · Scope — how far the registry goes *(ratified; the hardest-won one)*
+
+Driven by Ashish's questions in sequence: *"kis extent tak karna hai?"*, then — unsatisfied with the first answer — *"kahan tak kar payenge?"*, then *"profit kya hai, standard hai kya?"* The settled frame:
+
+- **Writes = 100% commands, no exceptions.** The safety property everything else depends on — one bypassed write endpoint is an unsafe path for the AI assistant.
+- **The registry is a plumber, not a UI generator.** The ~11 table+form entity screens are definition-driven; complex UIs (variant matrix, image uploader) are hand-built components **plugged into** definitions — the registry carries their fetching/saving/errors/cache so the component only carries the experience; bespoke screens (visual editor, analytics, onboarding) are normal feature code whose writes still go through commands. The screen-by-screen walkthrough of today's actual pages is what produced satisfaction here.
+- **⌘K: palette-lite only.** Ashish's constraint ended record search: *"palette wala kaam nahi karenge — hamara backend search support nahi karta."* But two of the palette's three parts (navigation, actions) need zero backend and come free from the registry — kept. The same constraint re-scoped d16's global search: reuse the per-entity **list APIs' search params** across 2–3 entities in parallel; no new backend ask.
+- **XState ownership:** 2–3 machine authors; everyone else consumes hooks and never sees XState — contains the learning curve; the 3-steps/3-booleans rule is review-enforced to prevent machine-everything zeal.
+
+### d42 · The last three calls *(ratified — closes the Aman-alignment agenda)*
+
+- **Repo: fresh codebase.** The one structural disagreement (discovery leaned in-place for history; the draft leaned fresh for the registry skeleton). Called fresh by Ashish; parity preserved by lifting domain logic/transformers selectively.
+- **Freshness: the draft's defaults win** (lists 30s / detail 60s / lookups 10min) **+ explicit `staleTime: 0` wherever freshness matters** — Ashish's own formulation: *"Aman wala choose karte hain; jahan chahiye hoga wahan 0 explicitly daal denge — chalega na?"* It works, with one asymmetry acknowledged: the failure mode of a forgotten override is **silent stale data** (vs. a harmless extra API call the other way). Two safety nets close it: `refetchOnWindowFocus: true` globally, and the scaffolder requiring an explicit `staleTime` on every resource — forgetting is structurally impossible.
+- **Docs: Confluence** — with one non-negotiable exception: `CLAUDE.md`, `mistakes.md`, `.claude/skills/`, `.claude/settings.json` stay **in-repo**. They are not documentation; they are the AI contributors' operating system (d37/d39 depend on agents reading them from the repo).
+
+---
+
+## 3. How the two workstreams merged
 
 | Area | Discovery had | Draft had | Final |
 |---|---|---|---|
-| Server state | React Query, no Redux | TanStack Query, no Redux | Same — merged trivially 🤝 |
-| Auth/domain/entitlement | Code-verified facts | Identical conclusions in context/platform.md | Same 🔍 |
-| URL-as-state, Zod-one-schema, own kit | Yes | Yes | Same 🤝 |
-| Router / build tool | React Router / webpack (assumed) | TanStack Router / Vite | **Draft adopted** (d40) 📐 |
-| Data layer shape | Feature folders + api.ts | Resources/commands registries | **Draft adopted, scope-bounded** (d40/d41) 📐 |
-| Flows | Not addressed | XState v5 | **Draft adopted with ownership model** 📐 |
-| Ops layer (Sentry→OpsGuard, security, uptime, release engg, budgets) | Fully decided | Absent | **Discovery contributed** 🧑‍💻 |
-| Contribution & AI (guardrails, lockdown, AI-repo) | d37/d38/d39 | Absent | **Discovery contributed** 🧑‍💻 |
-| Repo strategy | In-place lean | Fresh lean | **Fresh** (d42) 🤝 |
-| Freshness | staleTime-0 default | 30s/60s defaults | **Draft defaults + explicit overrides + 2 safety nets** (d42) 🤝 |
-| Docs home | Confluence | In-repo | **Confluence, AI-files in-repo** (d42) 🤝 |
+| Server state, no Redux, URL-as-state, Zod, own kit | ✓ | ✓ | Same — converged independently |
+| Auth / domain / entitlement | Code-verified facts | Identical conclusions | Same |
+| Router / build tool | React Router / webpack (assumed) | TanStack Router / Vite | **Draft adopted** (d40) |
+| Data-layer shape | Feature folders + api files | Resources/commands registries | **Draft adopted, scope-bounded** (d40/d41) |
+| Flows | — | XState v5 | **Draft adopted + ownership model** (d41) |
+| Ops layer (Sentry→OpsGuard, security, uptime, release engg, budgets) | ✓ fully decided | — | **Discovery contributed** |
+| Contribution & AI (d37/d38/d39) | ✓ | — | **Discovery contributed** |
+| Repo strategy | in-place lean | fresh lean | **Fresh** (d42) |
+| Freshness | staleTime-0 default | 30s/60s defaults | **Draft defaults + explicit 0 + safety nets** (d42) |
+| Docs home | Confluence | in-repo | **Confluence; AI files in-repo** (d42) |
 
-## 4. Answers to the draft's `open-questions.md` from discovery
+## 4. Proposed defaults (NOT yet ratified)
+
+These arrived as recommendations inside bulk-closed decisions and were never individually discussed. They are sensible suggestions awaiting a team call — not commitments. Promote or strike during review:
+
+1. PR size guideline ≤ ~400 lines (d39's contract)
+2. Component size guideline ~150 lines (principles)
+3. Kit change-request SLA of 1–2 days (d38's door)
+4. Uptime check cadence (per minute) (d25)
+5. Flag-debt cleanup rule (d27)
+6. Browser-support matrix as a written one-pager (d34)
+7. PII masking policy as a named doc (d35)
+8. Tracking-plan naming convention `object_verb` snake_case (d35)
+9. "Runbook written before launch" sequencing (d35)
+10. "Renovate on only after the repo settles" timing (d34)
+11. "Fix/quarantine the 7 legacy failing suites before gates go blocking" (d28)
+12. Login rate-limit confirmation with backend (d24 adjunct)
+13. Testing specifics: MSW for integration tests, zero snapshot tests, role-based queries (principles)
+14. The "Rejected:" alternatives recorded per decision above are the author's analysis of the discussion, not separately ratified statements
+
+## 5. Answers to the draft's `open-questions.md`
 
 | OQ | Answer |
 |---|---|
-| 1 (fresh vs reuse) | **Resolved: fresh** (d42). |
-| 2 (name/subdomain) | Name: **Ratio** (d01). Subdomain of gokwik.in **mandatory** — cookie behaviour, verified (d02/d06). Exact name open with product. |
-| 3 (gateway CORS) | Scoped precisely (d17): exact origin + `Allow-Credentials: true` + `gk-merchant-id`/`merchant-mid` headers. One config; services untouched. |
-| 4 (login from new origin) | Confirmed doable with backend; not a blocker (d05). "Who am I" = `user/details` (also carries entitlement + merchant list). |
-| 8 (hosting/CI) | Shape decided (d19/d32): S3/CloudFront SPA hosting, PR previews against QA, git-tag versioning, contenthash + no-cache index + invalidation. Detail with platform near the end. |
-| 9 (gateway bypasses) | Categories identified + audit/smoke-test plan agreed (d18); backend resolves breakages. |
-| 15 (activity log) | v1 = PostHog only — consistent with d35's tracking plan. |
+| 1 (fresh vs reuse) | **Resolved: fresh** (d42) |
+| 2 (name/subdomain) | Name **Ratio** (d01); gokwik.in subdomain **mandatory** — cookie behaviour, verified (d02/d06); exact name open with product |
+| 3 (gateway CORS) | Scoped (d17): exact origin + Allow-Credentials + merchant headers; one config, services untouched |
+| 4 (login from new origin) | Confirmed with backend; not a blocker (d05); "who am I" = `user/details` |
+| 8 (hosting/CI) | Shape decided (d19/d32); detail with platform near the end |
+| 9 (gateway bypasses) | Categories identified + audit/smoke-test plan (d18); backend resolves |
+| 15 (activity log) | v1 = PostHog only (consistent with d35) |
 
-**Nothing remains open between the two workstreams. Next step: the implementation plan.**
+**Nothing is open between the two workstreams. Next: the implementation plan.**

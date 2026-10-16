@@ -10,17 +10,7 @@
 
 ## Lock 2 — Closed component APIs
 
-The subtle one: if `Tag` accepted `className`/`style`, a contributor could make it pink **inside their feature** without touching the kit — invisible to CODEOWNERS. So kit components expose **closed APIs**:
-
-```ts
-type TagProps = {
-  variant: 'default' | 'success' | 'warning' | 'info';  // pink does not exist
-  children: React.ReactNode;
-  // no className, no style, no color prop
-};
-```
-
-A pink tag can only exist by adding `'pink'` to the union — which is a kit change — which triggers CODEOWNERS. **The API design enforces the process.** Colors come only from design tokens; raw hex outside the kit fails lint.
+The subtle one: if `Tag` accepted a `className`/`style` prop, a contributor could make it pink **inside their feature** without ever touching the kit — invisible to CODEOWNERS. So kit components expose **closed APIs**: a fixed list of approved variants and **no styling passthrough of any kind**. "Pink" simply cannot be expressed in feature code — the only way it can exist is by adding it to the kit's variant list, which is a kit change, which triggers CODEOWNERS. **The API design enforces the process.** Colors come only from design tokens; raw hex outside the kit fails lint.
 
 ## Lock 3 — Lint closes the bypasses
 
@@ -31,7 +21,7 @@ In `features/` and `resources/`: raw `<button>/<input>/<select>` banned (use the
 Locks without a fast door create shadow kits (the death of every design system). So:
 
 - GitHub issue template **"UI Kit change request"**: what, why, screenshot/Figma.
-- **SLA:** small variant (new color/size) lands in 1–2 days; new component is a discussion.
+- **SLA:** small variants land fast, new components are a discussion *(the exact 1–2-day number is a proposed default — decision log §4)*.
 - Every approved change appears in the Storybook-lite the same day, and the requester consumes it from there.
 
 ## Catalog — Storybook-lite

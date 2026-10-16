@@ -56,7 +56,7 @@ interface CommandDefinition<TInput, TResult> {
   // ── Bulk and long-running ───────────────────────────────
   bulk?: BulkSpec<TInput>;                       // bulk-and-jobs.md
   job?: JobSpec<TResult>;                        // import / export: command returns when the job starts
-  poll?: { query: (result: TResult) => Promise<unknown>; intervalMs: number; maxAttempts: number; done: (status: unknown) => boolean };
+  poll?: PollPolicy & { query: (result: TResult) => Promise<unknown>; done: (status: unknown) => boolean };   // PollPolicy: machines.md#poll-policy
 
   // ── Exposure ────────────────────────────────────────────
   expose: {
@@ -92,6 +92,7 @@ interface CommandContext {
   record?: unknown;
   selection?: { resource: string; ids: Id[]; rows: unknown[] };
   surface: 'button' | 'row' | 'bulk' | 'palette' | 'shortcut' | 'assistant' | 'extension';
+  confirmed?: boolean;                           // a flow's review step or an approved proposal already confirmed
 }
 
 interface ConfirmSpec {

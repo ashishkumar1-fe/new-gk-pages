@@ -71,7 +71,7 @@ commands: {
 }
 ```
 
-`draftOrder.complete`: [commands](../../commands/defs/orders.md#draftordercomplete-today); payment link watch: [machines](../../docs/machines.md#v1-machines).
+`draftOrder.complete`: [commands](../../commands/defs/orders.md#draftordercomplete-today); payment link watch: [machines](../../docs/machines.md#page-machines).
 
 ## Other
 

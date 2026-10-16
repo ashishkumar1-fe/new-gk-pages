@@ -9,7 +9,7 @@ Every command, from every surface, runs through `runCommand(id, input?, ctx)`.
 | 1 | Resolve | ID → definition | not found (unknown, or capability off) |
 | 2 | Availability | visible? permission? enabled? | `denied`, with reason |
 | 3 | Input | `fromContext` + caller input → form if incomplete → schema validate | `invalid` |
-| 4 | Confirm | policy from definition + effect + surface → dialog | `cancelled` (dismissed) |
+| 4 | Confirm | policy from definition + effect + surface → dialog; skipped when the caller passes `confirmed` | `cancelled` (dismissed) |
 | 5 | Optimistic | apply cache updates (optimistic / undoable modes) | — |
 | 6 | Run | steps in order; idempotency key; timeout | — |
 | 7 | Settle | success → set detail cache, invalidate keys; failure → roll back optimistic, compensate finished steps in reverse | `success` / `partial` / `error` |
@@ -37,8 +37,8 @@ The server remains the final authority; a passed client check is a UX hint, not 
 | `effect.destructive` | Yes, critical tone |
 | `effect.external` (customer-facing, money, other systems) | Yes |
 | Bulk above 25 items (proposed) | Yes, with the count in the label |
-| Surface is `assistant` and `effect.readOnly` is false | Always yes, regardless of the above |
-| Assistant + destructive | Proposal card, then a second critical confirm (no destructive command is assistant-exposed in v1) |
+| Surface is `assistant` and `effect.readOnly` is false | The approved proposal card is the confirm |
+| Run from a flow's review step (refund review, wizard finish) | That step is the confirm ([machines](../docs/machines.md#rules)) |
 | Everything else | No |
 
 Confirm labels state the action and count ("Archive 12 orders"), never "OK".
@@ -49,7 +49,7 @@ Confirm labels state the action and count ("Archive 12 orders"), never "OK".
 |---|---|---|
 | Pessimistic | Wait for the server, then update UI | Default; money, stock, status changes with server rules |
 | Optimistic | Update UI now, roll back on failure | Cheap reversible edits (tags, notes) |
-| Undoable | Update UI now, toast with Undo; undo runs the inverse command | Archive, status toggles where an inverse exists |
+| Undoable | Update UI now, toast with Undo; undo runs the inverse command | Reversible changes with an inverse command (none in v1) |
 
 ## Steps and compensation
 
@@ -103,5 +103,5 @@ API modules map `ApiError` ([client](../platform/api-client.md#what-the-client-d
 | Other 409 (business rule, e.g. location has stock) | `error` with the server message |
 | Known business code (`ALREADY_ARCHIVED`) | `success` with a warning, when harmless |
 | 2xx body with `success: false` | `error` (never shown as success) |
-| 401 | session expired; boot sends the user to login |
+| 401 | session expired; the session machine sends the user to login |
 | 5xx / network | `error`, retryable |

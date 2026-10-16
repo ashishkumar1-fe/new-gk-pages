@@ -6,8 +6,8 @@ The [resource](../resources/registry.md) and [command](../commands/registry.md) 
 
 | Step | Scope | Output |
 |---|---|---|
-| 1. Platform shell | [Platform](../platform/README.md): login, boot machine, entitlement guard, merchant picker, API client, chrome, CI and previews, Sentry, security headers, UI primitives | Empty app a merchant can log into on staging |
-| 2. Products | Product and collection list and editor | Confirmed resource contract, record editor machine |
+| 1. Platform shell | [Platform](../platform/README.md): login, session machine, entitlement guard, merchant picker, API client, chrome, CI and previews, Sentry, security headers, UI primitives | Empty app a merchant can log into on staging |
+| 2. Products | Product and collection list and editor | Confirmed resource contract, record save machine |
 | 3. Orders | Order list and detail, notes, tags, archive, cancel, refund, edit (session), fulfilment and holds, drafts (complete, invoice) | Confirmed command contract, refund, order-edit-session and draft-payment-watch machines |
 | 4. Assistant | Panel, screen context, read tools, proposal flow over v1 topics | AI over products and orders |
 | 5. Remaining resources | Inventory, purchase orders, transfers, customers, segments, discounts | Ported through the registries |

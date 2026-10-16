@@ -19,7 +19,8 @@ Columns: **Effect** R read-only · D destructive · I idempotent · X external. 
 | `product.duplicate` | record | navigate to create with `sourceId` prefill | — | R | — | — |
 | `product.copyLink` | record | build storefront URL, copy | — | R | — | toast "Link copied" |
 | `product.importPreview` | page | bulk-ops ([bulk-ops.md](bulk-ops.md)) | — | — | P | shows validation; enables import |
-| `product.import` | page | bulk-ops ([bulk-ops.md](bulk-ops.md)) | "Import N rows? Existing products may be updated." | X | P (job) | job indicator |
+| `product.import` | page | bulk-ops ([bulk-ops.md](bulk-ops.md)) | the preview step: "Import N rows? Existing products may be updated." | X | P (job) | job indicator |
+| `product.exportPreview` | page | bulk-ops ([bulk-ops.md](bulk-ops.md)) | — | R | P | shows estimate; enables export |
 | `product.export` | page | bulk-ops job ([bulk-ops.md](bulk-ops.md)) | — | R | P (job) | file emailed; job indicator |
 | `variant.update` | record | `PUT /variants/:id` | — | I | P | toast; set detail |
 | `product.generateContent` | record | `POST /content/title-and-description`; apply with `PATCH /content/:requestId/smart` | — | — | P | fills title and description in the draft; does not save |
@@ -70,6 +71,6 @@ All invalidate field definitions for the owner type. The design's inline "Create
 |---|---|---|---|
 | create, update, setStatus, bulkEdit, duplicate, copyLink, generateContent | ✓ | ✓ (topic: catalog) | ✓ |
 | delete, bulkDelete, import | ✓ | — | — |
-| export, importPreview | ✓ | export only | — |
+| export, exportPreview, importPreview | ✓ | exportPreview, export | — |
 | priceSchedule.* | ✓ | — | — |
 | fieldDefinition.* | ✓ | create only | — |

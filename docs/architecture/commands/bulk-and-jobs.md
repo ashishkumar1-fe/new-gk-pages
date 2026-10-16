@@ -36,8 +36,7 @@ For work that outlives one request.
 interface JobSpec<TResult> {
   start: (input: unknown) => Promise<{ jobId: Id }>;
   poll: (jobId: Id) => Promise<JobStatus<TResult>>;
-  intervalMs: number;                            // as today per job: bulk-ops 5000, customer export 3000
-  maxAttempts?: number;
+  policy: PollPolicy;                            // machines.md#poll-policy
   cancel?: (jobId: Id) => Promise<void>;
 }
 
@@ -48,8 +47,8 @@ type JobStatus<TResult> =
   | { state: 'cancelled' };
 ```
 
-- A job runs in the background; the user can leave the page. Progress shows in a jobs indicator in the top bar and in a notification when finished.
-- Import jobs have a preview step (validate file, show row errors) before the import runs, as a two-command flow: `*.importPreview` then `*.import`.
+- A job runs in the background; the user can leave the page. Progress shows in the top-bar jobs indicator and a toast when it ends (Jobs machine).
+- Bulk-ops jobs have a preview step before they run, as two commands: `*.importPreview` then `*.import` (row errors), `*.exportPreview` then `*.export` (estimate). The Import and Export machines run them for every resource.
 - Export results: emailed for bulk-ops jobs; downloaded for inventory and customer exports.
 - Job history (who ran what, when, result) is a read-only resource.
 
@@ -57,10 +56,8 @@ type JobStatus<TResult> =
 
 Some single commands finish asynchronously (a refund is accepted, then processed):
 
-- The command returns once accepted.
-- The command declares the status query, interval and limit; the flow's machine (refund, job tracker) runs the polling.
+- The command returns once accepted and declares `poll`; the flow's machine runs it ([poll policy](../docs/machines.md#poll-policy)).
 - The UI shows initiated → completed / failed.
-- Transient poll errors are ignored until the limit.
 
 ## Concurrency
 

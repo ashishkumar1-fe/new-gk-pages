@@ -67,7 +67,7 @@ detail: {
 
 ## Edit order (`/orders/$id/edit`)
 
-Runs the order edit session machine ([machines](../../docs/machines.md#v1-machines)); line rules `canIncreaseQuantities`, `editAmountLabel`, `paid` ([domain](../../domain/orders.md#rules)); saved by `order.update` ([commands](../../commands/defs/orders.md#order)).
+Runs the order edit session machine ([machines](../../docs/machines.md#page-machines)); queries `orderEdit.preview` (`…/edit/:sid/preview`, cache `calc`) and `orderEdit.session` (`GET …/edit/:sid`); line rules `canIncreaseQuantities`, `editAmountLabel`, `paid` ([domain](../../domain/orders.md#rules)); saved by `order.update` ([commands](../../commands/defs/orders.md#order)).
 
 ## Commands
 

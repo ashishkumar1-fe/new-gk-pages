@@ -55,7 +55,7 @@ sequenceDiagram
   P->>AI: asks
   AI->>C: picks a command, fills its input
   Note over C: action, target(s), filled form, AI-filled fields highlighted<br/>update: field diff current → proposed · preview result if any
-  P->>C: edits or approves (destructive: second confirm)
+  P->>C: edits or approves (approval is the confirm)
   C->>X: runCommand(surface: 'assistant')
   X-->>AI: result
   AI-->>P: result in the conversation, links to affected records

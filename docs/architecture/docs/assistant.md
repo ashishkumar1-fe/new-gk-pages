@@ -10,11 +10,7 @@ The design names it **Arya**: a side panel that stays open while the user moves 
 
 The assistant is another surface over the same contracts. It gets no special access.
 
-```mermaid
-flowchart LR
-  Q["User message<br/>+ screen context"] --> L["Backend LLM call<br/>tools = commands the user may run + read queries"]
-  L --> T["Tool call proposed"] --> C["Confirm card"] --> R["runCommand()"] --> F["Cache refresh"]
-```
+The conversation loop is the [assistant machine](machines.md#assistant).
 
 ## Screen context
 

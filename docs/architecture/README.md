@@ -20,7 +20,7 @@ This file is the map. Each linked doc is short and covers one topic.
 ```mermaid
 flowchart TB
   S["<b>6 · Surfaces</b><br/>tables · forms · buttons · detail pages · ⌘K · assistant · extensions · chrome"]
-  O["<b>5 · Orchestration</b><br/>state machines · app boot · entitlement guard"]
+  O["<b>5 · Orchestration</b><br/>state machines · session · jobs · assistant"]
   C["<b>4 · Contracts</b><br/>defineResource() — reads, query cache<br/>defineCommand() — writes, runCommand"]
   A["<b>3 · Service API</b><br/>one module per service: endpoints · wire schema · transformer"]
   D["<b>2 · Domain</b><br/>Zod schemas · pure rules · formatters"]
@@ -69,7 +69,7 @@ State is not a layer: server data sits in the query cache (client in platform co
 | 2 · Domain | [domain/](domain/README.md): entities, business rules, formatters |
 | 3 · Service API | [service-api/](service-api/README.md): data flow, wire schema → transformer, what transformers normalise |
 | 4 · Contracts | [resources/](resources/README.md) reads · [commands/](commands/README.md) writes |
-| 5 · Orchestration | [machines.md](docs/machines.md): boot, login, refund, editor, import… |
+| 5 · Orchestration | [machines.md](docs/machines.md): session, jobs, assistant, refund, order edit, import, export… |
 | 6 · Surfaces | [surfaces/](surfaces/README.md) routing, chrome · [assistant.md](docs/assistant.md) · [extensions.md](docs/extensions.md) · [ui-kit.md](docs/ui-kit.md) |
 
 | Cross-cutting | Docs |

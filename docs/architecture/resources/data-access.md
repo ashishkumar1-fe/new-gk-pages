@@ -78,7 +78,7 @@ export const ACTIVE_POLICY: keyof typeof policies = 'balanced';   // ← the swi
 - Data providers declare a class, never a number; the `new:resource` scaffolder won't generate one without it. A resource that must always be fresh overrides with `0` and a comment.
 - `refetchOnWindowFocus: true` globally, in every policy: returning to the tab always revalidates.
 - Either policy renders cached data instantly while the background refetch runs.
-- Polling stays per command (refund status: 5 s, up to 24 times, as today).
+- Polling is declared on commands and jobs and run by machines ([poll policy](../docs/machines.md#poll-policy)).
 
 ## Invalidation
 

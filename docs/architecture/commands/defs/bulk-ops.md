@@ -12,13 +12,12 @@ Products and orders import and export run as background jobs on the bulk-ops ser
 
 ## Export (`product.export`, `order.export`)
 
-| # | Call | Result |
+| Command | Call | Result |
 |---|---|---|
-| 1 | `GET /export/template/{entity}` | column groups to include |
-| 2 | `POST /export/preview?user-email&user-name&store-id` `{entities:[{entityType, configuration:{groups}, filters?:{dateFrom, dateTo}}], fileFormat: 'csv' \| 'xlsx'}` | `jobId` |
-| 3 | `POST /export/process/{jobId}` | job runs; file emailed to the staff member |
+| `*.exportPreview` | `GET /export/template/{entity}` (column groups), then `POST /export/preview?user-email&user-name&store-id` `{entities:[{entityType, configuration:{groups}, filters?:{dateFrom, dateTo}}], fileFormat: 'csv' \| 'xlsx'}` | `jobId` + estimated time |
+| `*.export` | `POST /export/process/{jobId}` | job runs; file emailed to the staff member |
 
-Input: `{ entity, groups, dateRange?, format }`. Two user steps, as today: create the job (shows its id and estimated time), then "Start export" runs step 3; toast "Export started. The file will be emailed to {email}."
+Input: `{ entity, groups, dateRange?, format }`. Toast "Export started. The file will be emailed to {email}."
 
 ## Import (`product.import`, `order.import`)
 
@@ -38,5 +37,4 @@ Shared by both:
 
 - Progress: `GET /job/{jobId}/progress` → `{status, totalRows, completedRows, progressPercentage, isCompleted}`, every 5 s.
 - Cancel: `POST /job/{jobId}/cancel` (`bulkOps.cancel`, confirm "Cancel this job?", permission of the job's resource).
-- History: `GET /job`, the `job` supporting resource ([registry](../../resources/registry.md)); download opens the result file URL; a pending export or import can be started from history (`bulkOps.start`).
-- Running jobs show in the top-bar jobs indicator and notify when finished.
+- History: `GET /job`, the `job` supporting resource ([registry](../../resources/registry.md)); download opens the result file URL; a pending export or import is started from history with `*.export` / `*.import` and its `jobId`.

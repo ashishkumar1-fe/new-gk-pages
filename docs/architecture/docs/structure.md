@@ -32,5 +32,5 @@ Same layers as the [README](../README.md#layers). A layer imports only from laye
 | Side: UI kit | `ui/` | nothing in the app | domain types, contracts |
 
 - Machines import `runCommand` and resource queries directly; async work stays in `actors.ts` so tests can replace it.
-- Every write endpoint is called from exactly one command ([ADR 0001](../adr/0001-resources-and-commands.md)).
+- Every write endpoint is called from exactly one command ([ADR 0001](../adr/0001-resources-and-commands.md)). Exception: login, OTP, logout and store switch are platform session calls.
 - Enforced with ESLint import boundaries, one element per row above.

@@ -37,30 +37,12 @@ interface FieldSpec<TInput> {
 }
 ```
 
-## Draft lifecycle
+## Saving
 
-Driven by the record editor machine ([../docs/machines.md](../docs/machines.md)):
-
-```mermaid
-stateDiagram-v2
-  [*] --> Loading
-  Loading --> Pristine
-  Pristine --> Dirty: edit
-  Dirty --> Pristine: discard
-  Dirty --> Invalid: validation fails
-  Invalid --> Dirty: fix
-  Dirty --> Saving: save
-  Saving --> Pristine: saved
-  Saving --> Conflict: changed elsewhere
-  Conflict --> Loading: reload
-  Conflict --> Dirty: keep mine
-  Saving --> Error: request fails
-  Error --> Saving: retry (draft kept)
-```
-
-- Save is enabled only when dirty and valid. Validation is the input schema plus runtime custom-field schemas, always run before save.
-- Save bar with Discard / Save (design). Leaving with a dirty draft asks to discard or stay.
-- With `calculate`, totals shown come from the server response, never computed locally (today's tax fallback is the one exception, kept as is).
+- Dirty and valid come from the form; Save is enabled only when both hold. Validation is the input schema plus runtime custom-field schemas, always run before save.
+- The save itself runs the [record save machine](../docs/machines.md#page-machines); one save bar with Discard / Save (design).
+- Every editor has the [leave guard](../docs/machines.md#other-orchestration).
+- With `calculate`, totals shown come from the server response, never computed locally (today's tax fallback is the one exception, kept as is). A response older than the latest request is dropped.
 
 ## Children
 

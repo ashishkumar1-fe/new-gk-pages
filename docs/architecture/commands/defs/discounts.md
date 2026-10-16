@@ -10,8 +10,8 @@ Payload encoding (paise, unlimited, no end date): domain rules `unlimited`, `noE
 
 | Command | Scope | Steps | Confirm | Effect | Mode | After |
 |---|---|---|---|---|---|---|
-| `discount.create` | page | `POST /create` (`status: 'draft' \| 'published'` from the finish choice) | "Publish this discount?": Publish now / Save as draft / Cancel | — | P | toast "Discount published" / "Saved as draft"; go to list |
-| `discount.update` | record | `PUT /update/:id` (full wizard payload; status from the finish choice; `mode` ignored by the engine) | same finish dialog | I | P | toast; go to list |
+| `discount.create` | page | `POST /create` (`status: 'draft' \| 'published'` from the finish choice) | the wizard finish step ([discount](../../resources/defs/discount.md#editor)) | — | P | toast "Discount published" / "Saved as draft"; go to list |
+| `discount.update` | record | `PUT /update/:id` (full wizard payload; status from the finish choice; `mode` ignored by the engine) | the wizard finish step | I | P | toast; go to list |
 | `discount.publish` | record | `PUT /bulk/update {merchant_id, discount_ids: [id], status: 'published', updated_by}` | "Publish {code}? Customers can use it right away." | I X | P | toast "Discount published" |
 | `discount.moveToDraft` | record | `PUT /bulk/update {…, status: 'draft'}` | — | I | P | toast |
 | `discount.markInactive` | record | `PUT /bulk/update {…, status: 'inactive'}` | "Deactivate {code}?" | I X | P | toast |
@@ -58,4 +58,4 @@ In the new admin this flow runs inside the assistant panel (topic: discounts). `
 | Command | Palette | Assistant | Extensions |
 |---|---|---|---|
 | create, update, moveToDraft, createWithAssistant, downloadCodes | ✓ | ✓ (topic: discounts) | — |
-| publish, markInactive, discountSet.create, discountSet.update | ✓ | ✓, proposal + confirm (customer-facing) | — |
+| publish, markInactive, discountSet.create, discountSet.update | ✓ | ✓, proposal (customer-facing) | — |

@@ -34,7 +34,7 @@ URL = base + path, joined verbatim. Some bases already end in `/api`, so real pa
 |---|---|
 | Credentials | `credentials: 'include'` on every call (cookie session) |
 | Merchant | `merchant-mid` and `gk-merchant-id` = current `storeId` |
-| Other headers | None, except an idempotency header a service needs; anything else fails the gateway CORS preflight ([access](../gateway/access.md#cors-change-platform-team)) |
+| Other headers | None, except an idempotency header a service needs, and `Authorization: Bearer` from the [token broker](auth-session.md#app-tokens) for app-store and editor services; anything else fails the gateway CORS preflight ([access](../gateway/access.md#cors-change-platform-team)) |
 | Idempotency | `newIdempotencyKey()` (UUID v4, one per attempt); the service module shapes it and puts it where its service wants it (refunds: `refund-<orderId>-<uuid>`, ≤ 64 chars) ([commands](../commands/execution.md#idempotency-and-retry)) |
 | Response | Returns status and body as-is; envelopes differ per service, so unwrapping is the service module's job |
 | Request id | `X-Request-Id` from every response goes into a Sentry breadcrumb (method, path, status) and into `ApiError` |

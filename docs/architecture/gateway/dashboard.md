@@ -123,11 +123,12 @@ interface NavItem { key: string; label: string; path: string; permission: string
 
 ## Other dashboard endpoints gk-pages uses
 
-Source: gk-pages `src/modules/ratio-reports/api.ts`, `src/modules/ratio-reports/endpoints.ts`, `src/library/utilities/userLogEvents/userLogEvents.ts`
+Source: gk-pages `src/modules/ratio-reports/api.ts`, `src/modules/ratio-reports/endpoints.ts`, `src/library/utilities/userLogEvents/userLogEvents.ts`, `src/modules/visual-editor/editorToken.ts`
 
 | Endpoint | Request | Response |
 |---|---|---|
 | `GET /dashboard_filters?dashboard=merchant\|admin&page=reports` | query | `DashboardFilter[]` |
+| `POST /dashboard/gk-pages/editor-token` | empty; merchant from `merchant-mid` | `{ token, expires_at }` (unix seconds; `data.data ?? data`) |
 | `POST /event` ? | `{ event_type, event_name, screen_name, request_id: email, session_id: '<email>_<userSessionId>', merchant_id, merchant_name, username, timestamp: ISO, data }` | ignored |
 
 ```ts

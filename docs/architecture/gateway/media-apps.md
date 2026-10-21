@@ -78,7 +78,7 @@ interface AppStoreApp {
 // ExtensionManifest: type from gokwik-ui-extensions-core (not vendored); host reads id, appId, appName, handle, siblings ?
 ```
 
-- App-store calls (except `/auth/merchant/token`) add `Authorization: Bearer <appStoreToken>` (JWT in `localStorage.appStoreToken`) alongside the cookie and merchant headers.
+- App-store calls (except `/auth/merchant/token`) add `Authorization: Bearer <appStoreToken>` alongside the cookie and merchant headers. Today the JWT sits in `localStorage.appStoreToken`; Ratio keeps it in the [token broker](../platform/auth-session.md#app-tokens).
 - The Apps page mints a fresh token on every load; extensions mint one only when it is missing or `exp` is within 60s.
 - Extensions on `401` (`status` or `data.statusCode`, camelCase) → drop token, re-mint, retry once.
 - The App Store UI opens at `${REACT_APP_MERCHANT_APP_STORE_URL}/app-store/apps?d=<token>` (token in the query).

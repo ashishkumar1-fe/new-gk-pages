@@ -5,7 +5,7 @@
 | # | Decision |
 |---|---|
 | d05 | Login and OTP APIs allow the new origin (backend team; confirmed). |
-| d06 | The token is stored nowhere in the frontend: an httpOnly, Secure cookie set by the gateway. |
+| d06 | The session token is stored nowhere in the frontend: an httpOnly, Secure cookie set by the gateway. App and editor tokens live in memory only ([below](#app-tokens)). |
 | d07 | Merchant selection: user details via React Query; the picker writes `merchant-mid` (same key as today) and `user-details` to sessionStorage. No Redux. Switching also calls the server ([merchant context](#merchant-context)). |
 | d12 | User and merchant data: React Query is the source of truth; sessionStorage mirrors it for synchronous code. `dashboardStore` imports are replaced by one small util. |
 
@@ -25,16 +25,20 @@ sequenceDiagram
 - JavaScript never reads or sends the token (`document.cookie` shows nothing; checked in prod DevTools by the tracker).
 - Session check: `GET /user/details`; `401` = logged out. The dashboard's `is_logged_in` cookie is set by JavaScript and proves nothing; `/user/auth/me` exists but is unused.
 - Login: `signin` → OTP → `verify-otp`, or Google. The password is AES-encrypted client-side (`REACT_APP_PUBLIC_CRYPTO_KEY`). Branches (unverified email, forced password change, old-dashboard redirect): [gateway › dashboard](../gateway/dashboard.md#auth-and-session).
-- Logout: `GET /user/logout`, then clear the query cache and the sessionStorage keys.
+- Logout: `GET /user/logout`, then clear the query cache, app tokens and the sessionStorage keys.
 
-### Why a gokwik.in subdomain
+### Domain options
 
 The cookie is effectively `SameSite=Lax`: the browser attaches it only when the page and the gateway are the same site.
 
 | Origin | Cookie | Auth |
 |---|---|---|
-| `<ratio>.gokwik.in` | attached (cookie `Domain=.gokwik.in` already valid) | works, zero backend change |
+| `<ratio>.gokwik.in` | attached (cookie `Domain=.gokwik.in` already valid) | works, zero backend change (default) |
+| `ratio.in` with the API on `api.ratio.in` | first-party again: the gateway sets `Domain=.ratio.in` for that host | works; gateway hostname, TLS and cookie-domain work |
+| `ratio.in` with the gokwik cookie as `SameSite=None` | third-party: Safari, iOS browsers, Incognito and Brave block it | rejected: works in a Chrome demo, fails on phones |
 | any other domain | withheld | broken in every browser |
+
+The prod cookie was seen on `Domain=.gokwik.in`, but a later trace showed prod hosts under `gokwik.co`; confirm before the first staging deploy ([open questions](../docs/open-questions.md) #2).
 
 ## Merchant context
 
@@ -52,3 +56,11 @@ getMerchantId()           // synchronous read for non-React code
 - Switching store: `POST /team/switch-merchant { merchant_id: id }` → refetch `user/details` → write `sessionStorage['merchant-mid']` and `['user-details']` → clear the query cache and merchant-scoped UI state.
 - The route's `storeId` ([routing](../surfaces/routing.md)) and the selected merchant must agree; opening a link for another store switches first.
 - Store list: `user_details.allowed_merchants`; internal users search with `GET /user/merchant-search?q=`.
+
+## App tokens
+
+`getToken(audience)` for embedded tools and apps: `editor` (visual editor, A/B testing: `POST {BASE}/dashboard/gk-pages/editor-token`) and `appstore` (apps, extensions: [`POST /auth/merchant/token`](../gateway/media-apps.md)).
+
+- Cached in memory per `storeId` and audience; reused while ≥ 60 s remain (from the response's expiry), otherwise one mint shared by all callers. A failed mint is not cached.
+- Refreshed when asked (a request, or a 401 then one retry), never on a timer. Never in localStorage, a URL query or logs.
+- Cleared by the Session machine on store switch and logout; a mint that finishes for the previous store is dropped.

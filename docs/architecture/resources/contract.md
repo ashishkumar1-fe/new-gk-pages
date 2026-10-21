@@ -23,12 +23,12 @@ interface ResourceDefinition<
 
   // ── Routes ──────────────────────────────────────────────
   routes: {
-    list: string;                                // "/orders"
+    list?: string;                               // "/orders"; collections only
     detail?: string;                             // "/orders/$id"
     create?: string;                             // "/orders/new"
     sub?: Record<string, string>;                // { receive: "/purchase-orders/$id/receive" }
   };
-  kind?: 'collection' | 'singleton';
+  kind?: 'collection' | 'singleton';             // singleton: one record per store, editor only, no id (settings)
 
   // ── Screens ─────────────────────────────────────────────
   list?: ListConfig<TItem>;                      // list.md
@@ -55,6 +55,7 @@ interface ResourceDefinition<
   // ── Discovery ───────────────────────────────────────────
   search?: { enabled: boolean; limit?: number }; // ⌘K
   nav?: { group: string; position: number; parent?: string; badge?: { params: Partial<ListParams>; cap?: number } };   // count = getList({...params, limit: 1}).total
+  settings?: { tab: string; group: string; position: number; keywords?: string[] };   // a settings sheet tab instead of a nav entry
 
   // ── Extensibility ───────────────────────────────────────
   customFields?: { ownerType: OwnerType; placement: 'main' | 'aside'; readOnly?: boolean };

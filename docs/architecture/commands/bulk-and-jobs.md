@@ -9,7 +9,7 @@ A bulk command acts on a selection with one API call carrying all IDs (native). 
 ```ts
 interface BulkSpec<TInput> {
   maxItems?: number;                             // hard cap with a clear message
-  toItems: (input: TInput) => Id[];
+  scope: (input: TInput) => { ids: Id[] } | { filter: unknown };   // filter: the service's filter shape, only where the API takes one
 }
 ```
 

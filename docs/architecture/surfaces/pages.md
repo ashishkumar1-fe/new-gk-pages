@@ -11,9 +11,10 @@ Pages are built from contracts, not written per resource. A resource's config pi
 | List | [`ListConfig`](../resources/list.md) | Header (title, page commands) · view tabs · search and filter · table · bulk bar on selection · pagination |
 | Editor | [`EditorConfig`](../resources/editor.md) | Header · main 65 / aside 35 sections · save bar |
 | Detail | [`DetailConfig`](../resources/contract.md) | Header with previous / next · read sections · record commands (orders) |
+| Embed | the [Embed machine](../docs/machines.md#embed) | Iframe with loading and failed states; the [bridge](../docs/extensions.md#bridge) carries toast, save bar, navigation |
 | Flow | a [machine](../docs/machines.md) hook | A dialog for a short decision (import, export), a drawer for a task beside the page (refund), its own route for anything longer or a create (wizard, order edit) |
 
-- List, editor and detail routes are generated from the [resources registry](../resources/registry.md); flow and settings routes are written by hand.
+- List, editor and detail routes and settings tabs are generated from the [resources registry](../resources/registry.md); flow routes are written by hand.
 - A section or cell given as a `ComponentId` is resolved in `features/components.ts`, the one map from id to React component. Extension targets render there too ([extensions](../docs/extensions.md)).
 - Header: title, status, record commands ([commands › surfaces](../commands/surfaces.md)). Back returns to the list with its URL filters (no breadcrumbs, d13). On detail pages `j` / `k` move to the previous / next record.
 - Money and dates render only through domain formatters ([conventions](../domain/conventions.md)).
@@ -32,6 +33,8 @@ Pages are built from contracts, not written per resource. A resource's config pi
 | Discount wizard | `/discounts/new`, `/discounts/$id`; finish dialog |
 | Draft payment watch | Banner on the draft order |
 | Import, Export | Dialog opened by the list's page commands |
+| Embed | `/apps/$handle/*`, the visual editor route |
+| Bulk action | Flash sale and bulk SEO pages |
 
 ## Page states
 

@@ -13,6 +13,7 @@
 allowed_origins   += https://<ratio>.gokwik.in       (exact origin; wildcards don't work with credentials)
 Access-Control-Allow-Credentials: true
 allowed_headers   += gk-merchant-id, merchant-mid, idempotency-key, x-idempotency-key
+expose_headers    += x-request-id
 ```
 
 - Auth (cookie) and CORS are both enforced at the gateway, so this one change opens every gateway-routed API.

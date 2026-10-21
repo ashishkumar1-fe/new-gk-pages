@@ -32,7 +32,7 @@ No list screen of their own in v1; used by pickers, filters and the settings she
 | Taxonomy | item | Product category |
 | Field definition | inventory | Settings › Custom fields; editors (runtime fields) |
 | Metaobject | inventory | Settings › Custom fields; reference fields |
-| Price schedule | item | Products › Flash sale (page action) |
+| Price schedule | item | Products › Flash sale ([bulk-action machine](../docs/machines.md#bulk-action)) and its schedules list with cancel |
 | App | media-apps | Settings › Apps |
 | Media asset | media-apps | Media pickers; Content |
 | Timeline event | os-order (timeline) | Order and customer detail |

@@ -18,6 +18,6 @@
 | Search (⌘K) | Groups: Recent · Commands · records (Products, Orders, Customers) · Settings and pages. Records via the list APIs' search params, 2–3 resources in parallel (no backend search, d41). Order and matching: [commands › surfaces](../commands/surfaces.md#k-palette) |
 | Store switcher | In the store menu; lists merchants from user details; the leave guard asks first, then the Session machine switches and lands on the new store's home ([auth-session](../platform/auth-session.md#merchant-context)) |
 | Jobs indicator | Running jobs from the Jobs machine; a toast when one ends |
-| Settings sheet | Opens over any page as `?settings=<tab>`; tabs: General, Apps, Metafields (field definitions), with search over them; Checkout, Shipping, Domains are capability off |
+| Settings sheet | Opens over any page as `?settings=<tab>`; tabs, groups and search come from resource `settings` ([contract](../resources/contract.md)). Search matches tab labels and keywords and feeds ⌘K's Settings group; a tab whose capability is off or permission missing is hidden |
 | Assistant panel | Right-side panel, stays open across pages; open by default on Home ([assistant](../docs/assistant.md)) |
 | Notifications | Capability off until an admin feed API exists |

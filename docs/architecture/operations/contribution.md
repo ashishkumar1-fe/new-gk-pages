@@ -22,6 +22,12 @@ The UI kit and one polished exemplar (products) come first: every recipe points 
 - `.claude/settings.json` committed: safe commands allowed, `.env` and secrets reads denied, lint after edits.
 - PR template with the checklist. AI-PR contract: small PRs (size: [open question 23](../docs/open-questions.md)), tests in the same PR, author states "I ran it" (screenshots for UI). Reviewers ask "is this our pattern?"; "does it work?" is CI's job.
 
+## Fixing a bug (`fix-bug` skill)
+
+- **Intake.** Required: Error ID or support-box text ([quality](quality.md#bug-evidence-d44-d45)), page link, what was expected. The assistant collects the rest itself (Sentry event, breadcrumbs, request ids, release, recent commits on the route) and asks for anything missing in **one** ticket comment. It never guesses.
+- **Buckets.** Frontend bug: failing test first, fix, small PR with a preview link. Backend bug: comment with request id, endpoint and response, reassign; never worked around in a transformer. Not a bug: explain with the rule's source, change nothing. Information missing: one comment with every question.
+- **Two checks:** a developer reviews the code; the reporter checks the preview.
+
 ## Code
 
 - Colocate a component's styles, tests, hooks and schema; move to shared only on the third use.

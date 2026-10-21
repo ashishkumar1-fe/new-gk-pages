@@ -13,6 +13,8 @@ Plumbing every layer above uses; no feature code. Imports nothing from the app (
 | `permissions` | Entitlement flag, `can(scope)` | [identity-access.md](identity-access.md) |
 | `query` | Query client and [cache policy](../resources/data-access.md#cache-policy) | — |
 | `telemetry` | Sentry, PostHog | [quality](../operations/quality.md#errors) |
+| `tokens` | Short-lived tokens for embedded tools and apps, in memory per store | [auth-session.md](auth-session.md#app-tokens) |
+| `embed` | Typed postMessage with iframes: origin and source checks, handshake, request ids | [extensions](../docs/extensions.md#bridge) |
 
 Login and Session machines are orchestration ([machines](../docs/machines.md)); chrome is [surfaces](../surfaces/README.md); backend contracts are in [gateway](../gateway/README.md).
 

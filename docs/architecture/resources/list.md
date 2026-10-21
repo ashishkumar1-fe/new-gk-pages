@@ -87,7 +87,7 @@ Changing search, filters, sort, view or scope resets `page`.
 
 ## Selection and bulk
 
-- Selection is per page; there is no "select all matching" (no API supports filter-based bulk).
+- Selection is per page; "all matching" only where the API takes a filter (price schedule, bulk SEO), through the [bulk-action machine](../docs/machines.md#bulk-action).
 - Optional cap (orders: 100, with a warning).
 - Some bulk commands are conditional on the selection (orders: Unarchive only if all selected are archived).
 - Selection clears when the URL changes.

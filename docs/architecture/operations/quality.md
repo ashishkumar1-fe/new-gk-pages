@@ -23,7 +23,13 @@
 - Tags: release (`ratio@<version>`), merchant ID, route. No PII.
 - Reported: 5xx, network errors, schema drift, boundary crashes. Not reported: 4xx `ApiError`s, which are results.
 - Release health checked after each deploy; a regression is a rollback.
-- Session replay in one tool only.
+- Session replay in PostHog; Microsoft Clarity for heatmaps, rage and dead clicks (d45). Inputs masked in both, recording sampled; Sentry replay off.
+
+## Bug evidence (d44, d45)
+
+- **Support box** on every error screen: a short Error ID (also a Sentry tag), route, filters, time, version, store, the last failed call (method, path, status, request id prefix) and the last few steps in words; Copy button. Never stack traces or request bodies. "Report a problem" in the help menu opens the same box.
+- **Passbook:** every `runCommand` leaves a breadcrumb (command id, target, result), so a replay plus the passbook show which command a button really ran.
+- **Invariants** (a refund can't exceed the order total; saved data equals what was sent) report to Sentry without crashing.
 
 ## Error boundaries
 

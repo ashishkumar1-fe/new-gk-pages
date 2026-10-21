@@ -2,7 +2,7 @@
 
 [← Resources](README.md)
 
-The record page for resources edited in place: product, collection, PO, transfer, draft order, customer, segment, discount. Orders use a read view with a separate edit route (see [defs/order.md](defs/order.md)).
+The record page for resources edited in place: product, collection, PO, transfer, draft order, customer, segment, discount. Orders use a read view with a separate edit route (see [defs/order.md](defs/order.md)). Singletons (settings) use it too, without create, delete or pager.
 
 ## Config
 

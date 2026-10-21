@@ -17,7 +17,7 @@ What each backend service accepts and returns, inferred from how gk-pages `main`
 | Page | Service | Base | Endpoints used |
 |---|---|---|---|
 | [dashboard](dashboard.md) | Login, session, user details, merchant config | `{BASE}/api/dashboard` | 20 |
-| [os-order](os-order.md) | Orders, edit session, fulfilment, refunds, drafts, tags, timeline | `{ORDER}` | 54 |
+| [os-order](os-order.md) | Orders, edit session, fulfillment, refunds, drafts, tags, timeline | `{ORDER}`, `{TIMELINE}` | 54 |
 | [item](item.md) | Products, variants, options, collections, lookups, price schedules | `{BASE}` | 41 |
 | [inventory](inventory.md) | v3 stock and locations, v1 import/export, POs, transfers, custom fields | `{INVENTORY}` | 76 |
 | [os-customer](os-customer.md) | Customers, addresses, segments, export; KwikPass customer host | `{CUSTOMER}`, `{KWIKPASS_CUSTOMER}` | 29 |

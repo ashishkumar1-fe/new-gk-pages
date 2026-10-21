@@ -16,7 +16,7 @@ interface ResourceDefinition<
   subtitle?: (r: T | TItem) => string;
 
   // ── Data ────────────────────────────────────────────────
-  service: 'item' | 'inventory' | 'os-order' | 'os-customer' | 'os-discount' | 'os-resources' | 'apps' | 'timeline' | 'bulk-ops';   // see gateway/README.md#services
+  service: 'dashboard' | 'os-order' | 'item' | 'inventory' | 'os-customer' | 'discount' | 'bulk-ops' | 'media-apps';   // gateway page ids (gateway/README.md#services)
   schema: { detail: ZodType<T>; item: ZodType<TItem>; input?: ZodType<TInput> };
   data: DataProvider<T, TItem>;                  // data-access.md
   keys: QueryKeys;
@@ -40,7 +40,7 @@ interface ResourceDefinition<
   relations?: Record<string, {
     resource: string;
     kind: 'one' | 'many';
-    via: string;                                 // field on T, or list param ("customer_id")
+    via: string;                                 // field on T, or list scope ("customerId")
   }>;
 
   // ── Actions (references only) ───────────────────────────
@@ -75,7 +75,7 @@ interface ResourceDefinition<
 interface DetailConfig<T> {
   layout: { main: Section<T>[]; aside?: Section<T>[] };
   pager?: (r: T) => { previous?: Id; next?: Id };   // orders: from the API; J/K keys
-  editRoute?: (r: T) => string | undefined;          // orders: "/orders/$id/edit", hidden when not editable
+  editRoute?: (r: T) => string;                      // orders: "/orders/$id/edit"; the Edit entry is a command, so disabled-with-reason comes from its `enabled`
 }
 ```
 
@@ -92,6 +92,7 @@ interface DetailConfig<T> {
 
 ```ts
 type Permission = `${'read' | 'write'}_${string}`;  // Shopify-style scope: "read_products", "write_orders", "write_refunds"; enforcement off in v1
+type ComponentId = string;                          // custom cell / section; surfaces resolve it
 type IconName = string;                              // from the UI kit icon set
 type StatusSpec = { label: string; tone: 'success' | 'warning' | 'critical' | 'info' | 'neutral' };
 interface CreateContext {                            // prefill sources for create routes

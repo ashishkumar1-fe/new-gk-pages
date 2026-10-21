@@ -14,7 +14,7 @@ list: {
     { id: 'received',    header: 'Received', cell: date },        // completedAt
     { id: 'expected',    header: 'Expected arrival', cell: date },
   ],
-  search: { param: 'query', placeholder: 'Search transfers', debounceMs: 500 },   // today: search drops paging
+  search: { placeholder: 'Search transfers', debounceMs: 500 },   // today: search drops paging
   views: { source: 'static', mode: 'client', items: ['all', 'draft', 'pending', 'partially_received', 'received'].map(statusView) },
   pageSize: 50,
   selection: { enabled: false },          // today's bulk actions are stubs
@@ -31,19 +31,17 @@ Status tabs filter the current page client-side today; kept until the API suppor
 | main | Locations | originLocationId, destinationLocationId | |
 | main | Products | lines (child) | create: editable; edit: read-only, as today |
 | aside | Shipping | expectedAt, shipping.carrier, shipping.trackingNumber | |
-| aside | Additional | referenceNumber, note, tags | |
+| aside | Additional | referenceNumber, note (read-only: not sent today), tags | |
 
 Save: `editor: { save: 'transfer.update', create: { route: '/transfers/new', command: 'transfer.create' } }`.
 
 Products child (create): columns Product, SKU, Quantity; picker searches inventory of the origin location (debounce 500 ms). Create still accepts `?selectedItems` prefill, but the inventory list no longer offers it.
 
-### Validation (`TransferForm/ValidationSchemas.ts`)
-
-Origin ≠ destination; quantity ≥ 1; ≥ 1 line.
+Rules: `transferValidate` ([domain](../../domain/inventory.md#rules)).
 
 ## Receive (`/transfers/$id/receive`)
 
-Same as purchase order receive; command `transfer.receive` sends `{st_item_id, quantity_received, quantity_rejected}`.
+Same as purchase order receive (`receivePayload` differs: cumulative).
 
 ## Commands (status-driven)
 

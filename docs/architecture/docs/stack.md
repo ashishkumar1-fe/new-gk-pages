@@ -2,7 +2,7 @@
 
 [← Architecture](../README.md)
 
-Proposed. Each choice lists the main alternative we considered.
+Adopted (d40). Each choice lists the main alternative we considered.
 
 | Concern | Choice | Why | Alternative |
 |---|---|---|---|

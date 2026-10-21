@@ -11,7 +11,7 @@ The backend names the same thing differently per service (`m_id`, `merchant_id`,
 ## Decision
 
 - **One name per concept** across the frontend; where open, use the Shopify Admin vocabulary. Tenant `storeId`; writes `resource.create` / `resource.update` / `resource.delete`; permissions as scopes `read_products`, `write_orders`. Table in [conventions](../domain/conventions.md#naming).
-- **Transform once, never mutate.** Backend data is converted to the domain shape once, in the service's API module, into a new object. Above that it is read-only. Display formats are derived at render time by pure functions that return new values. Details in [conventions](../service-api/README.md#data-flow-transform-once-never-mutate).
+- **Transform once, never mutate.** Backend data is converted to the domain shape once, in the service's API module, into a new object. Above that it is read-only. Display formats are derived at render time by pure functions that return new values. Details in [service API](../service-api/README.md#data-flow-transform-once-never-mutate).
 
 ## Consequences
 

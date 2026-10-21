@@ -15,13 +15,13 @@ list: {
     { id: 'created',  header: 'Created At',         cell: date, hidden: true },
     { id: 'updated',  header: 'Updated At',         cell: date, hidden: true },
   ],
-  search: { param: 'conditions', placeholder: 'Search customers', debounceMs: 400 },   // today: 500 ms
+  search: { placeholder: 'Search customers', debounceMs: 500 },   // as today
   filters: [
-    { id: 'tags', label: 'Tags', type: 'multi_enum', options: tagsLookup, toParams: (v) => cond('tags', 'contains_any', v) },
+    { id: 'tags', label: 'Tags', type: 'multi_enum', options: tagsLookup, toQuery: (v) => ({ tags: v }) },
   ],
   views: { source: 'static', items: [
     { id: 'all', label: 'All' },
-    { id: 'email', label: 'Email subscribed', params: cond('hasEmailSubscription', 'equals', true) },
+    { id: 'email', label: 'Email subscribed', params: { filters: { marketingEmail: true } } },
   ] },
   // sort fixed: createdAt desc, as today
   pageSize: 50,
@@ -30,11 +30,7 @@ list: {
 }
 ```
 
-Search, as today (`CustomerHome.tsx:94-166`):
-
-- `contains` conditions OR-ed across email, firstName, lastName, name, phone, company, tags, address.
-- When other filters are active, conditions are AND-ed.
-- Tag options come from the loaded page only; v1 keeps this until a tags lookup exists.
+Search: `customerSearch` ([domain](../../domain/customers.md#rules)); the module builds the conditions. Tag options come from the loaded page only, as today, until a tags lookup exists.
 
 ## Editor
 
@@ -43,25 +39,14 @@ Search, as today (`CustomerHome.tsx:94-166`):
 | main | Overview | firstName, lastName, language, email, phone (+91), email and SMS consent | consent toggles disabled until email / phone entered |
 | main | Addresses | addresses (child) | modal with address schema; delete runs `customer.deleteAddress` immediately |
 | main | Custom fields | runtime fields | edit only |
-| main | Orders | latest order, "Create order", "View all orders (n)" | edit only; links to orders scoped by `customer_id` |
+| main | Orders | latest order, "Create order" (`draftOrder.createForCustomer`), "View all orders (n)" | edit only; links to orders scoped by `customerId` |
 | main | Timeline | events and comments (`customer.comment`) | edit only |
 | aside | Notes | ≤ 5000 chars | |
 | aside | Tags | | |
 | aside | Statistics | orders, amount spent, average order value | read-only |
 
 - `editor: { save: 'customer.update', create: { route: '/customers/new', command: 'customer.create' } }`
-- Save (`customer.update`): `PUT` customer only if fields or custom fields changed; addresses diffed (update changed, create new), as today.
-- Create: customer first, then addresses; then back to the list.
-
-### Validation (`schemas/customerSchema.ts`)
-
-| Rule | Source |
-|---|---|
-| First and last name required, letters only | `:7-16` |
-| Email required, valid | `:18` |
-| Country code +91 | `:20` |
-| Phone required, `^[6-9]\d{9}$` | `:28` |
-| Notes ≤ 5000 | `:32` |
+Validation: `customerValidation` ([domain](../../domain/customers.md#rules)). Save and create steps: [commands](../../commands/defs/customers.md#customer).
 
 ## Commands
 
@@ -69,7 +54,7 @@ Search, as today (`CustomerHome.tsx:94-166`):
 commands: {
   page: ['customer.export', 'customer.create'],
   row:  ['customer.setBlocked', 'customer.delete'],          // delete asks to confirm
-  more: (c) => ['customer.setBlocked', 'draftOrder.createForCustomer', 'customer.delete'],
+  more: () => ['customer.setBlocked'],                        // "Create order" lives in the Orders card
 }
 ```
 
@@ -77,7 +62,7 @@ commands: {
 
 ```ts
 service:      'os-customer',
-relations:    { orders: { resource: 'order', kind: 'many', via: 'customer_id' } },
+relations:    { orders: { resource: 'order', kind: 'many', via: 'customerId' } },
 search:       { enabled: true, limit: 4 },
 nav:          { group: 'customers', position: 1 },
 customFields: { ownerType: 'customer', placement: 'main' },

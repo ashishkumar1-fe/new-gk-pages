@@ -64,7 +64,7 @@ erDiagram
 | [catalog.md](catalog.md) | Product, option, variant, images, collection, taxonomy |
 | [pricing-tax.md](pricing-tax.md) | Tax, price schedules |
 | [inventory.md](inventory.md) | Location, item, level, adjustments, suppliers, POs, transfers |
-| [orders.md](orders.md) | Order, line item, totals, payment, refund, edit, draft, fulfilment, timeline |
+| [orders.md](orders.md) | Order, line item, totals, payment, refund, edit, draft, fulfillment, timeline |
 | [customers.md](customers.md) | Customer, address, segment |
 | [discounts.md](discounts.md) | Discount kinds, conditions, limits, bulk codes |
 | [custom-fields.md](custom-fields.md) | Field definitions, values, metaobjects, runtime schema |
@@ -75,7 +75,7 @@ erDiagram
 
 1. **Every product has at least one variant.** Price, SKU and stock live on the variant. A product without options has one default variant.
 2. **Orders snapshot, they don't reference.** A line item copies title, SKU and price at purchase time.
-3. **Status is more than one field.** An order has a payment and a fulfilment status; a product has a lifecycle status and channel visibility.
+3. **Status is more than one field.** An order has a payment and a fulfillment status; a product has a lifecycle status and channel visibility.
 4. **Money is never a float.** Integer paise plus currency.
 5. **Stock is per location, in named states.** Not one `quantity` number.
 

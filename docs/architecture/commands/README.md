@@ -4,8 +4,7 @@
 
 A **command** is every action that changes data or has an effect outside the page: update a product, cancel an order, export customers.
 
-- Each is defined once.
-- Buttons, menus, the bulk bar, ⌘K, shortcuts, the assistant and extensions all run the same definition through one execution path.
+Defined once, run through one path from every surface ([principles](../README.md#principles)).
 
 Background on the model and the products it draws from: [ADR 0001](../adr/0001-resources-and-commands.md).
 
@@ -54,9 +53,9 @@ Found while mapping gk-pages. Plumbing defects are fixed in the commands. Defect
 | Discount delete toast says "draft"; no confirm | No | Delete not in v1 (menu disabled today) |
 | Single product and collection delete without confirmation | No | Fixed: critical confirm |
 | Product bulk edit converts product-level prices to paise twice | Yes (prices ×100) | Needs sign-off; high priority |
-| PO "Mark as ordered" sends costs not converted to paise (close/reopen do) | Yes (costs) | Needs sign-off |
+| PO close and reopen convert already-paise costs again (×100); mark as ordered is correct | Yes (costs) | Needs sign-off |
+| PO update sends the header `totalCost` in rupees | Yes (costs) | Needs sign-off |
 | Bulk cancel sends auto-refund without the single-cancel eligibility rule | Yes (refunds) | Needs sign-off |
-| Receive drops lines with only a rejected quantity (PO, transfer) | Yes (stock) | Needs sign-off |
 | Price schedule conflicts (`interferingTasks`) not shown | No | Fixed: shown in the error |
 | Inventory export errors use `alert()` | No | Fixed: standard error result |
 

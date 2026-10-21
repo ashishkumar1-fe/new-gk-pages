@@ -54,8 +54,8 @@ sequenceDiagram
   participant X as runCommand
   P->>AI: asks
   AI->>C: picks a command, fills its input
-  Note over C: action, target(s), filled form<br/>AI-filled fields highlighted
-  P->>C: edits or approves (destructive: second confirm)
+  Note over C: action, target(s), filled form, AI-filled fields highlighted<br/>update: field diff current → proposed · preview result if any
+  P->>C: edits or approves (approval is the confirm)
   C->>X: runCommand(surface: 'assistant')
   X-->>AI: result
   AI-->>P: result in the conversation, links to affected records
@@ -64,6 +64,7 @@ sequenceDiagram
 - No write runs without the person's approval in that conversation.
 - The assistant can only propose what the person may do (same permissions, enablement and capability).
 - Bulk proposals list the target records before approval.
+- One command per proposal in v1; multi-step plans (approve once, run in order, stop at the first failure) come later.
 - Every assistant run is audited with the conversation and the approved proposal.
 
 ## Extensions

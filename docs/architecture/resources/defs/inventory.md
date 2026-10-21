@@ -8,7 +8,7 @@ A list with per-cell adjust popovers (each save is immediate); no record editor.
 
 ```ts
 list: {
-  scope: { param: 'location', source: lookups.locations, required: true },   // v3, active only; changing it resets page
+  scope: { source: lookups.locations, required: true },   // v3, active only; changing it resets page
   columns: [
     { id: 'product',     header: 'Product',     cell: variantImageTitle },   // links to variant (product if single-variant), returnTo
     { id: 'sku',         header: 'SKU' },
@@ -18,14 +18,14 @@ list: {
     { id: 'onHand',      header: 'On hand' },                                // popover (set on hand)
     { id: 'incoming',    header: 'Incoming',    cell: IncomingCell },        // total only
   ],
-  search: { param: 'search', placeholder: 'Search inventory', debounceMs: 400 },   // today: 500 ms
+  search: { placeholder: 'Search inventory', debounceMs: 500 },   // as today
   filters: [ // single-select chips, each one range (InventoryHome.tsx:40-60, levelRangeFilters.ts:25-49)
     'availability', 'incoming', 'committed', 'onHand',
-  ].map(singleRangeFilter),          // → available_min/max, incoming_min/max, committed_min/max, on_hand_min/max
-  sort: { params: ['sort_by', 'sort_dir'], fields: ['available', 'committed', 'on_hand'] },
+  ].map(singleRangeFilter),          // one { min, max } range each
+  sort: { source: 'column' },          // available, committed, onHand
   views: { source: 'static', items: [
     { id: 'all', label: 'All' },
-    { id: 'incoming', label: 'Incoming', params: { incoming_min: 1 } },
+    { id: 'incoming', label: 'Incoming', params: { filters: { incoming: { min: 1 } } } },
   ] },
   pageSize: 50,                     // today 10
   selection: { enabled: true },
@@ -34,19 +34,7 @@ list: {
 }
 ```
 
-Search uses `GET /v3/admin/inventory/levels?search` (SKU, product name, variant title), one page; as today it does not combine with filters or views.
-
-### Derived values
-
-Bulk edit, as today (`BulkInventoryEditModal.tsx:36,67-74`):
-
-
-- Editing **available** → `onHand = available + (onHand₀ − available₀)`
-- Editing **on hand** → `available = onHand − (onHand₀ − available₀)` (negatives allowed)
-
-### Unavailable
-
-No move action; the popover sets or adjusts reserved / damaged / safety stock / quality control directly, with a reason. Each save is immediate.
+Search covers SKU, product name and variant title, one page; as today it does not combine with filters or views. Derived values: `bulkEditDerive` ([domain](../../domain/inventory.md#rules)).
 
 ## Commands
 
@@ -57,8 +45,7 @@ commands: {
 }
 ```
 
-- `inventory.adjust`: v3 `set-on-hand` / `set-quantities` / `adjust-quantities` for one level.
-- `*.createFromSelection`: the transfer / PO create routes still accept `?selectedItems` prefill, but gk-pages no longer offers the action from the inventory list.
+Commands: [inventory](../../commands/defs/inventory.md#inventory).
 
 ## Other
 

@@ -4,24 +4,17 @@
 
 ## Bulk
 
-A bulk command acts on a selection. Three strategies, chosen by what the API offers:
+A bulk command acts on a selection with one API call carrying all IDs (native). Long work is a page-level job, below.
 
 ```ts
 interface BulkSpec<TInput> {
-  strategy:
-    | { kind: 'native' }                         // one API call with all IDs; API returns per-item results
-    | { kind: 'fan-out'; concurrency: number }   // one call per item, client-side
-    | { kind: 'job' };                           // API creates a background job
   maxItems?: number;                             // hard cap with a clear message
   toItems: (input: TInput) => Id[];
 }
 ```
 
-| Strategy | When | Result |
-|---|---|---|
-| Native | API takes a list (bulk cancel, bulk tags, bulk delete) | Per-item outcome from the response |
-| Fan-out | No bulk endpoint; small selections only | Per-item outcome collected client-side; concurrency limited. Reserved: no v1 command uses it |
-| Job | Large or slow operations (import, export, price updates) | Job ID, then progress |
+- Per-item outcome when the API returns one (bulk cancel, tags, archive, fulfill, draft delete).
+- Count-only APIs (product bulk delete / update) succeed or fail as a whole.
 
 ### Partial failure
 
@@ -31,8 +24,7 @@ interface BulkSpec<TInput> {
 
 ### Selection rules
 
-- Bulk input is the selected IDs on the current page. No filter-based "all matching" unless the API accepts a filter.
-- Conditional bulk commands check the whole selection (Unarchive only if all selected are archived).
+- Bulk input is the selection ([list](../resources/list.md#selection-and-bulk)).
 - After the command, the selection clears on success and keeps failed items on partial.
 
 ## Background jobs
@@ -43,8 +35,7 @@ For work that outlives one request.
 interface JobSpec<TResult> {
   start: (input: unknown) => Promise<{ jobId: Id }>;
   poll: (jobId: Id) => Promise<JobStatus<TResult>>;
-  intervalMs: number;                            // as today per job: bulk-ops 5000, customer export 3000
-  maxAttempts?: number;
+  policy: PollPolicy;                            // machines.md#poll-policy
   cancel?: (jobId: Id) => Promise<void>;
 }
 
@@ -55,19 +46,17 @@ type JobStatus<TResult> =
   | { state: 'cancelled' };
 ```
 
-- A job runs in the background; the user can leave the page. Progress shows in a jobs indicator in the top bar and in a notification when finished.
-- Import jobs have a preview step (validate file, show row errors) before the import runs, as a two-command flow: `*.importPreview` then `*.import`.
-- Export results are a download link when ready; small exports may return the file directly.
+- A job runs in the background; the user can leave the page. Progress shows in the top-bar jobs indicator and a toast when it ends (Jobs machine).
+- Bulk-ops jobs have a preview step before they run, as two commands: `*.importPreview` then `*.import` (row errors), `*.exportPreview` then `*.export` (estimate). The Import and Export machines run them for every resource.
+- Export results: emailed for bulk-ops jobs; downloaded for inventory and customer exports.
 - Job history (who ran what, when, result) is a read-only resource.
 
 ## Polling a single operation
 
 Some single commands finish asynchronously (a refund is accepted, then processed):
 
-- The command returns once accepted.
-- A status query polls until a terminal state; interval and limit are defined on the command.
+- The command returns once accepted and declares `poll`; the flow's machine runs it ([poll policy](../docs/machines.md#poll-policy)).
 - The UI shows initiated → completed / failed.
-- Transient poll errors are ignored until the limit.
 
 ## Concurrency
 

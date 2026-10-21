@@ -4,7 +4,7 @@
 
 A **resource** is one entity as the admin presents it: how it is fetched, listed, edited and found. Each is defined once; list screens, editors, ⌘K search, the assistant and extensions read the same definition.
 
-Built on the [schema](../domain/README.md) → [data access](data-access.md) → definition → generic screens ([list](list.md), [editor](editor.md)).
+Built on the [domain](../domain/README.md) → [data access](data-access.md) → definition → generic screens ([list](list.md), [editor](editor.md)).
 
 ## Files
 
@@ -20,7 +20,7 @@ Built on the [schema](../domain/README.md) → [data access](data-access.md) →
 ## Rules
 
 1. **Reads only.** Writes are commands, referenced by ID.
-2. **Declarative first, escape hatch always.** Any column, filter, field or section can be a custom component; any route can use its own page.
+2. **Declarative first, escape hatch always.** Any column, filter, field or section can be a custom component; any route can use its own page. Bespoke screens (visual editor, analytics, onboarding) are plain feature code; their writes are still commands (d41).
 3. **Behaviour as today** ([parity rule](../domain/README.md#five-rules-that-shape-everything)): filters map to today's API params; validations and derived values cite their gk-pages source lines.
 
 ## Today's UI issues and how the new admin treats them

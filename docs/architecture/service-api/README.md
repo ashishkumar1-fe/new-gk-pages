@@ -2,7 +2,7 @@
 
 [← Architecture](../README.md)
 
-One module per backend service, `api/<service>/`: client calls, wire schema, transformer. The only place that knows backend shapes. Per-service details: [gateway](../gateway/README.md).
+One module per backend service, `api/<service>/`: the anti-corruption layer (DDD) between backend shapes and the domain. The only place that knows them. Per-service details: [gateway](../gateway/README.md).
 
 ## Data flow: transform once, never mutate
 
@@ -15,7 +15,7 @@ flowchart LR
 2. **Above:** domain objects are read-only. Never mutated, reshaped in hooks or copied into state.
 3. **Display:** labels, formatted money, grouped rows come from pure `domain/<entity>/format.ts` functions at render time.
 
-Writes go the other way: the command builds the request payload from its input as a new object; the module adds scoping params and staff fields.
+Writes go the other way: the command passes domain input; the module's `toWire` builds the request (wire names, units, scoping params, staff fields). Commands never see wire names.
 
 | | Wire schema | Domain schema |
 |---|---|---|
@@ -23,13 +23,26 @@ Writes go the other way: the command builds the request payload from its input a
 | Lives in | `api/<service>/wire.ts` | `domain/<entity>/schema.ts` |
 | Changes when | The backend changes | The business meaning changes |
 
+## Module contract
+
+| File | Holds |
+|---|---|
+| `client.ts` | One exported function per endpoint: typed input in domain names → domain output; options `{ signal, idempotencyKey }`. List functions take a typed query and return `Page<T>` |
+| `wire.ts` | Wire schemas, generated from OpenAPI when the service has one ([open question #20](../docs/open-questions.md)) |
+| `transformer.ts` | `toDomain` and `toWire`, pure |
+| `errors.ts` | `ApiError` bodies (`code`, `error_code`, v3 `errors[]`, `status_code` + `message`) and any 2xx `success: false` → the [command result](../commands/execution.md#errors-from-the-server), field paths in domain names. gk-pages' soft failures were mostly `makeAPICall` swallowing non-2xx |
+| `fixtures/` | Recorded responses; tests parse each with its wire schema, and MSW serves the same files |
+
+- No React, caching, retries or UI text here: the query client and commands own those.
+- An endpoint is called from one function only; a backend change is a one-module change.
+
 ## What transformers normalise
 
 The domain sees one shape; every row below is fixed in the service's transformer.
 
 | Concern | Wire today |
 |---|---|
-| Case | snake_case: dashboard, os-order orders / fulfilment / edit / refund requests, item reads, inventory, discounts. camelCase: os-customer, media, apps, bulk-ops, os-order drafts / refund responses / tags, item collections. PascalCase keys in bulk-ops import preview |
+| Case | snake_case: dashboard, os-order orders / fulfillment / edit / refund requests, item reads, inventory, discounts. camelCase: os-customer, media, apps, bulk-ops, os-order drafts / refund responses / tags, item collections. PascalCase keys in bulk-ops import preview |
 | Envelope | dashboard `{ status_code, data }`; os-customer, discount, media `{ success, …, data }`; inventory v3 `{ data, errors, api_version, request_id }`; os-order `{ orders \| draft_orders, pagination }`; others per endpoint (bare arrays, `{ data, meta }`, `{ assets, pagination }`) |
 | Pagination | Mostly page + limit; v3 levels by offset; totals as `total`, `total_pages`, `pages` / `current_page` or `hasNextPage` |
 | Money | Paise as integers or decimal strings (`"600000.00"`). Rupees: customer amounts, draft `shippingLine.price`, edit-commit `refund_amount`, PO line tax |

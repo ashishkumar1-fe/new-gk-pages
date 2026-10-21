@@ -15,14 +15,14 @@ list: {
     { id: 'status',   header: 'Status', cell: draftStatusBadge },   // open blue, invoice sent yellow, completed green
     { id: 'total',    header: 'Total', cell: money },
   ],
-  search: { param: 'search', placeholder: 'Search draft orders', debounceMs: 400 },   // today: 500 ms
+  search: { placeholder: 'Search draft orders', debounceMs: 500 },   // as today
   views: { source: 'server', default: 'is_default' },   // /draft-orders/views
-  sort:  { source: 'server', default: { field: 'created_at', direction: 'desc' } },   // /draft-orders/sortby; column click sets sort_field / sort_direction
+  sort:  { source: 'server', default: { field: 'createdAt', direction: 'desc' } },   // server sort options; column click sets sort
   filters: [
-    { id: 'status',   type: 'enum', options: ['open', 'invoice_sent', 'completed'], toParams: (v) => ({ status: v }) },
-    { id: 'created',  type: 'date_range', toParams: ([a, b]) => ({ created_from: ymd(a), created_to: ymd(b) }) },   // inclusive both ends
-    { id: 'customer', type: 'text', toParams: (v) => ({ customer_id: v }) },
-    { id: 'tags',     type: 'text', toParams: (v) => ({ tags: v }) },   // comma-separated, OR
+    { id: 'status',   type: 'enum', options: ['open', 'invoice_sent', 'completed'], toQuery: (v) => ({ status: v }) },
+    { id: 'created',  type: 'date_range', toQuery: ([a, b]) => ({ createdAt: { from: a, to: b } }) },   // inclusive both ends
+    { id: 'customer', type: 'text', toQuery: (v) => ({ customerId: v }) },
+    { id: 'tags',     type: 'text', toQuery: (v) => ({ tags: v }) },   // comma-separated, OR
   ],
   pageSize: 50,
   selection: { enabled: true },
@@ -47,7 +47,7 @@ Draft filters are server-side query params, as today.
 editor: {
   readOnlyWhen: (d) => d.status === 'completed',
   calculate: {
-    query: (d) => draftOrdersApi.calculate({ line_items: d.lineItems, discount_code: d.discountCode }),
+    query: (d) => api.osOrder.calculateDraft({ lineItems: d.lineItems, discountCode: d.discountCode }),
     debounceMs: 500,
     skipWhen: (d) => d.lineItems.length === 0,   // totals reset to 0, "Please add at least one product"
   },
@@ -60,15 +60,6 @@ editor: {
 - Line price: editable per catalog line (override vs `originalPrice`); freebies not editable.
 - Shipping line: today's modal has no opener, so no shipping line is sent; same in v1.
 
-### Validation
-
-| Rule | Source |
-|---|---|
-| Custom item: name required, price > 0, quantity required | `DraftOrder.tsx:1127-1152` |
-| Quantity ≤ 1,000,000 | `ProductSection.tsx:1003-1004` |
-| New customer: names, email, phone 10–15 digits, address1, city, state, PIN 6 digits | `CreateCustomerModal.tsx:73-126` |
-| Addresses: letters-only names and city, PIN 6 digits, phone 10 digits | `EditShippingAddressModal.tsx:113-164` |
-
 ## Commands
 
 ```ts
@@ -80,11 +71,7 @@ commands: {
 }
 ```
 
-`draftOrder.complete` keeps today's single call:
-
-- Requires a saved, clean draft, and a customer when a coupon is applied.
-- `POST /draft-orders/:id/complete`, then opens the new order.
-- While a payment link is live, the page polls the draft and opens the order when it converts (`useDraftPaymentWatch`).
+`draftOrder.complete`: [commands](../../commands/defs/orders.md#draftordercomplete-today); Draft payment watch: [machines](../../docs/machines.md#draft-payment-watch).
 
 ## Other
 

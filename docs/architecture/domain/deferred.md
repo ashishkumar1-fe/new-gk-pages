@@ -25,13 +25,12 @@ Seams used throughout:
 | 1 | GST per product | `taxable` + `hs_code`; server calculates | GST rate picker | Tax is its own editor section and its own schema block (`ProductTax`); adding `gstRate` is one field + one input |
 | 2 | Tax lines | Generic lines from server; 18% display fallback | CGST/SGST/IGST split | UI renders `taxLines[]` as a list, never assumes one line; fallback lives in one function (`displayTax`) |
 | 3 | Compare-at price | `compare_at_price` | Labelled MRP | Label from the copy dictionary |
-| 4 | Sales channels | online, pos | Marketplaces | Modelled as channel rows now (`channels: { channelId, published }[]`); marketplaces are more rows |
+| 4 | Sales channels | online, pos | Marketplaces | `channels` is a list ([catalog](catalog.md)); marketplaces are more values |
 | 5 | Inventory edits | v3 set / adjust with a reason; adjustment history page per variant | Reasons and history across the list | All stock writes go through `inventory.adjust` and `inventory.bulkEdit` (v3); the endpoint stays inside the command. Stock model already has named states |
 | 6 | Variant save | Full replace | Diff-based save | Replace vs diff decided inside `product.update` only |
 | 7 | Validations, discount %, margin | As in gk-pages | Ported as is | One rules module per entity with characterization tests |
 | 7a | Product status names | Active / Draft / Archived | Active / Draft / Hidden | Status labels from the copy dictionary |
 | 7b | Pricing with variants | Pricing section hidden when variants exist | Pricing shown with the variants table | Pricing is its own section with `visibleWhen`; one predicate changes |
-| 7c | Receive with only rejected quantity | Line dropped (not sent) | Send it | One line in `purchaseOrder.receive` / `transfer.receive` |
 
 ## C. New features: no backend today, out of v1 unless product prioritises
 
@@ -51,7 +50,7 @@ Seams used throughout:
 | 19 | Free shipping discounts | Discounts | V2 already has SHIPPING `cross_domain_effects` (editor hidden in gk-pages, value round-tripped); turning it on is one editor section + a capability flag |
 | 20 | Product insights (sell-through, days of inventory, ABC) | Products list | List `insights` slot, capability off |
 | 21 | Return window, COD and package per product | Product editor, Shipping | Shipping section fields behind a capability |
-| 22 | Server-side status and filter params for POs, transfers, segment search | Lists | Filters declared with `toParams`; moving off client-side is a provider change |
+| 22 | Server-side status and filter params for POs, transfers, segment search | Lists | Filters declared with `toQuery`; moving off client-side is an API-module change |
 | 23 | Server sort for products and collections; sort UI for customers and segments (their APIs already take `sortBy` / `sortOrder`) | Lists | `sort` config per resource; add options when the API sorts |
 
 Group C screens ship only when their backend exists; until then they are hidden, not faked.

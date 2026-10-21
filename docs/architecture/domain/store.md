@@ -66,4 +66,4 @@ Upload: images, documents and audio are one multipart request; video is presign 
 | `storeMode` | live when `config.enhancer_app`, or KYC status empty, or permission `live_mode` with KYC approved; skipped for internal users | dashboard-ui `store/user` ([dashboard](../gateway/dashboard.md#user-and-merchant)) |
 | `hasPages` | `config.selected_products.pages` → entitlement ([identity](../platform/identity-access.md#entitlement)) | dashboard-ui `sideNav/index.tsx:1476` |
 
-Design-only store features (shipping zones, domains, checkout, notifications): [deferred](deferred.md).
+Design-only store features: [deferred](deferred.md).

@@ -8,11 +8,11 @@ Each resource has a read-only data provider. Writes are commands, which call the
 
 ```ts
 interface DataProvider<T, TItem> {
-  getList(params: ListParams): Promise<Page<TItem>>;
-  getOne(id: Id): Promise<T>;
-  getMany?(ids: Id[]): Promise<TItem[]>;            // pickers, references
-  search?(text: string, limit: number): Promise<TItem[]>;   // ⌘K and pickers
-  count?(params: ListParams): Promise<number>;      // nav badges
+  cache: CacheClass;                                 // cache policy below
+  getList(params: ListParams, opts: { signal }): Promise<Page<TItem>>;
+  getOne(id: Id, opts: { signal }): Promise<T>;
+  getMany?(ids: Id[], opts: { signal }): Promise<TItem[]>;            // pickers, references
+  search?(text: string, limit: number, opts: { signal }): Promise<TItem[]>;   // ⌘K and pickers
 }
 ```
 
@@ -20,26 +20,19 @@ interface DataProvider<T, TItem> {
 interface ListParams {
   view?: string;                         // active tab
   search?: string;
-  filters?: Record<string, unknown>;     // filter id → value; mapped by each filter's toParams
-  scope?: Record<string, string>;        // required scope (location) or relation scope (customer_id)
+  filters?: Record<string, unknown>;     // filter id → value; turned into the typed query by each filter's toQuery
+  scope?: Record<string, string>;        // required scope (location) or relation scope (customerId)
   sort?: { field: string; direction: 'asc' | 'desc' };
   page?: number;                         // 1-based
   limit?: number;                        // 50
 }
 ```
 
-Inside a provider: map `ListParams` to the service's params → call → unwrap the envelope → transform each row → parse with the schema → return `Page<TItem>`.
+A provider only builds the typed query and calls the API module, which parses, transforms and returns `Page<TItem>` ([service API](../service-api/README.md#module-contract)):
 
-Service-specific mapping lives here, for example:
-
-| Resource | List call today |
-|---|---|
-| Product | `GET /products/?storeId&search&vendor&tags&productType&status&page&limit&show_variants=true` |
-| Collection | `GET /collections/?storeId&search&types&published&page&limit` |
-| Inventory | `GET /v3/admin/inventory/levels?location_id&<range filters>&sort_by&sort_dir&page&limit`; search adds `search` |
-| Order | `GET /orders?page&limit&sort_field&sort_direction&search&<filters>` + `/orders/views`, `/orders/sortby` |
-| Customer | `POST /customers/filter { conditions, conditionLogic, page, limit, sortBy, sortOrder }` |
-| Discount | `POST {BASE}/dashboard/v2/discount/fetch { status, search, sort_by, sort_order, page, limit, pageSize }` |
+```ts
+getList: (p, { signal }) => api.osOrder.listOrders(toQuery(p), { signal })
+```
 
 ## Query keys
 
@@ -68,29 +61,29 @@ Today's gk-pages has no cache: every navigation refetches. In Ratio, freshness i
 type CacheClass = 'list' | 'detail' | 'lookup' | 'calc';
 
 const policies = {
-  fresh:    { list: 0,      detail: 0,      lookup: 10 * 60_000, calc: 0 },   // revalidate on every mount and focus (tracker: "never feel stale")
-  balanced: { list: 30_000, detail: 60_000, lookup: 10 * 60_000, calc: 0 },   // fewer refetches
+  balanced: { list: 30_000, detail: 60_000, lookup: 10 * 60_000, calc: 0 },   // default (d42)
+  fresh:    { list: 0,      detail: 0,      lookup: 10 * 60_000, calc: 0 },   // revalidate on every mount
 } satisfies Record<string, Record<CacheClass, number>>;
 
-export const ACTIVE_POLICY: keyof typeof policies = 'fresh';   // ← the switch
+export const ACTIVE_POLICY: keyof typeof policies = 'balanced';   // ← the switch
 ```
 
 | Class | Used by | Why |
 |---|---|---|
-| `list` | list screens | Orders arrive constantly; refetch on window focus in both policies |
+| `list` | list screens | Orders arrive constantly |
 | `detail` | detail and editor reads | The editor keeps its own draft |
 | `lookup` | vendors, types, tags, taxonomy, locations, suppliers, sort options, views | Rarely change |
 | `calc` | server calculations (`/calculate`, edit-session preview) | Always current |
 
-- Data providers declare a class, never a number; a per-resource override needs a comment saying why.
+- Data providers declare a class, never a number; the `new:resource` scaffolder won't generate one without it. A resource that must always be fresh overrides with `0` and a comment.
+- `refetchOnWindowFocus: true` globally, in every policy: returning to the tab always revalidates.
 - Either policy renders cached data instantly while the background refetch runs.
-- Polling stays per command (refund status: 5 s, up to 24 times, as today).
+- Polling is declared on commands and jobs and run by machines ([poll policy](../docs/machines.md#poll-policy)).
 
 ## Invalidation
 
 - Commands declare what they invalidate.
 - After a save the detail cache is set from the response; lists are invalidated.
-- Cross-resource effects are explicit: refund → order, timeline; receive PO/transfer → inventory; order cancel with restock → inventory; product save → inventory (stock edits).
 - Timeline: refetched immediately and again after 2.5 s after an order mutation, as today (events are written asynchronously).
 
 ## Seeding and prefetch
@@ -102,8 +95,8 @@ export const ACTIVE_POLICY: keyof typeof policies = 'fresh';   // ← the switch
 
 | Error | Behaviour |
 |---|---|
-| Schema parse failure | Reported with resource and field path; the row shows "can't display", list continues |
+| Schema drift | Logged to Sentry; data still renders ([ADR 0004](../adr/0004-validate-every-response.md)). Only a bad money value stops: the row shows "can't display", list continues |
 | 401 | Session flow |
-| 403 | Permission screen (detail), hidden action (commands) |
+| 403 | Permission screen (detail); for commands see [execution](../commands/execution.md#errors-from-the-server) |
 | 404 | Not-found screen with link to the list |
-| Network / 5xx | 2 retries with backoff (proposed; same as commands), then error state with retry |
+| Network / 5xx | 2 retries with backoff, then error state with retry |

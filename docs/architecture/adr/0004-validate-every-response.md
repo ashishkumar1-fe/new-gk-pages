@@ -10,7 +10,7 @@ Tracker d31 limited Zod validation to critical endpoints, because converting gk-
 
 ## Decision
 
-Every response is parsed with its schema in the API module, the same way everywhere: `safeParse`, shape drift logged to Sentry with endpoint and field path, data still rendered. Money values are parsed strictly and stop the render on a bad value. See [data flow](../service-api/README.md#data-flow-transform-once-never-mutate).
+Every response is parsed with its schema in the API module, the same way everywhere: `safeParse`, shape drift logged to Sentry with endpoint and field path, data still rendered. Money values are parsed strictly: a bad value shows "can't display" in its place and the rest renders ([data access](../resources/data-access.md#errors)). See [data flow](../service-api/README.md#data-flow-transform-once-never-mutate).
 
 ## Consequences
 

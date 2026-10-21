@@ -14,7 +14,7 @@ Plumbing every layer above uses; no feature code. Imports nothing from the app (
 | `query` | Query client and [cache policy](../resources/data-access.md#cache-policy) | — |
 | `telemetry` | Sentry, PostHog | [quality](../operations/quality.md#errors) |
 
-Login and boot flows are orchestration ([machines](../docs/machines.md)); chrome is [surfaces](../surfaces/README.md); backend contracts are in [gateway](../gateway/README.md).
+Login and Session machines are orchestration ([machines](../docs/machines.md)); chrome is [surfaces](../surfaces/README.md); backend contracts are in [gateway](../gateway/README.md).
 
 What this layer replaces from the dashboard shell (gk-pages `main`, 2026-10-14):
 

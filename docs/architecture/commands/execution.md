@@ -9,7 +9,7 @@ Every command, from every surface, runs through `runCommand(id, input?, ctx)`.
 | 1 | Resolve | ID → definition | not found (unknown, or capability off) |
 | 2 | Availability | visible? permission? enabled? | `denied`, with reason |
 | 3 | Input | `fromContext` + caller input → form if incomplete → schema validate | `invalid` |
-| 4 | Confirm | policy from definition + effect + surface → dialog | `cancelled` (dismissed) |
+| 4 | Confirm | policy from definition + effect + surface → dialog; skipped when the caller passes `confirmed` | `cancelled` (dismissed) |
 | 5 | Optimistic | apply cache updates (optimistic / undoable modes) | — |
 | 6 | Run | steps in order; idempotency key; timeout | — |
 | 7 | Settle | success → set detail cache, invalidate keys; failure → roll back optimistic, compensate finished steps in reverse | `success` / `partial` / `error` |
@@ -37,8 +37,8 @@ The server remains the final authority; a passed client check is a UX hint, not 
 | `effect.destructive` | Yes, critical tone |
 | `effect.external` (customer-facing, money, other systems) | Yes |
 | Bulk above 25 items (proposed) | Yes, with the count in the label |
-| Surface is `assistant` and `effect.readOnly` is false | Always yes, regardless of the above |
-| Assistant + destructive | Proposal card, then a second critical confirm (no destructive command is assistant-exposed in v1) |
+| Surface is `assistant` and `effect.readOnly` is false | The approved proposal card is the confirm |
+| Run from a flow's review step or the command's own form (refund review, wizard finish, send invoice, tracking, order edit save) | That step or form is the confirm ([machines](../docs/machines.md#rules)) |
 | Everything else | No |
 
 Confirm labels state the action and count ("Archive 12 orders"), never "OK".
@@ -49,7 +49,7 @@ Confirm labels state the action and count ("Archive 12 orders"), never "OK".
 |---|---|---|
 | Pessimistic | Wait for the server, then update UI | Default; money, stock, status changes with server rules |
 | Optimistic | Update UI now, roll back on failure | Cheap reversible edits (tags, notes) |
-| Undoable | Update UI now, toast with Undo; undo runs the inverse command | Archive, status toggles where an inverse exists |
+| Undoable | Update UI now, toast with Undo; undo runs the inverse command | Reversible changes with an inverse command (none in v1) |
 
 ## Steps and compensation
 
@@ -60,9 +60,8 @@ Confirm labels state the action and count ("Archive 12 orders"), never "OK".
 
 ## Idempotency and retry
 
-- `per-attempt` key: generated when the dialog opens and reused for retries of that attempt (prevents double refunds on a double click or flaky network).
-- `per-input` key: derived from input, for APIs that dedupe by key (order bulk archive / unarchive, draft completion, v3 inventory set / adjust today; bulk-ops does not).
-- Automatic retry only for idempotent commands, on network errors and 5xx, 2 attempts with backoff (proposed; same as reads).
+- Key: generated per attempt (when the dialog opens, or per user action) and reused for that attempt's retries; prevents double refunds on a double click or flaky network. As today: refunds, bulk archive, draft completion, v3 inventory writes; bulk-ops takes none.
+- Automatic retry only for idempotent commands, on network errors and 5xx, 2 retries with backoff, as for reads.
 - The same command for the same target can't run twice at once; a second call while the first is running is ignored.
 
 ## Cache
@@ -100,8 +99,9 @@ API modules map `ApiError` ([client](../platform/api-client.md#what-the-client-d
 |---|---|
 | Validation error with field | `invalid` with field paths in domain names |
 | 403 | `denied` |
-| 409 / version mismatch | `error` with "changed elsewhere", editor offers reload |
+| 409 with a version or `COMPARE_AND_SET_CONFLICT` | `error` with "changed elsewhere", editor offers reload |
+| Other 409 (business rule, e.g. location has stock) | `error` with the server message |
 | Known business code (`ALREADY_ARCHIVED`) | `success` with a warning, when harmless |
 | 2xx body with `success: false` | `error` (never shown as success) |
-| 401 | session expired; boot sends the user to login |
+| 401 | session expired; the session machine sends the user to login |
 | 5xx / network | `error`, retryable |

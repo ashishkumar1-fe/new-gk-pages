@@ -51,16 +51,6 @@ interface ApiError {
 }
 ```
 
-Today's `makeAPICall` (read from the live utilities bundle by Ashish), and what Ratio does instead:
-
-| `makeAPICall` | Ratio |
-|---|---|
-| Never throws; errors come back as data with a flag | Throws `ApiError`, so Query retries and boundaries work |
-| Sends 5 security headers (CSP, HSTS…) as request headers | Dropped; they belong on responses ([quality](../operations/quality.md#security-v1)) |
-| Sets the merchant header, and gk-pages adds it again | Set once |
-| Blocks non-GET calls for internal users unless allowlisted | Not copied; server-side enforcement to confirm ([open questions](../docs/open-questions.md) #25) |
-| Adds a `mode` param from localStorage for non-internal users | Not copied until its meaning is known (#25) |
-| Fires a global loader event | Dropped; query state drives loading UI |
-| Inlines the whole build env (69 keys) into the bundle | Public-key allowlist only |
+Not carried over from today's `makeAPICall` (read from the live bundle by Ashish): errors returned as data, security headers sent as request headers, the duplicate merchant header, the global loader event, the whole build env inlined into the bundle. Its internal-user write block and `mode` param: [open question 25](../docs/open-questions.md).
 
 **Not the client's job** (layer 3, `api/<service>/`): envelopes, `success: false` in a 2xx body, scoping params (`?storeId=`, `merchant_id`, `?merchantId=`), staff fields in write bodies, case conversion, schema validation ([data flow](../service-api/README.md#data-flow-transform-once-never-mutate)).

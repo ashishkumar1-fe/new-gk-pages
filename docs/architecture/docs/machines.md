@@ -327,7 +327,7 @@ machines/refund/
   actors.ts    # async work (resource queries, runCommand), replaceable in tests
   actions.ts   # pure assign helpers
   types.ts     # context and events
-  index.ts
+  index.ts     # useRefund(): plain values and senders
 machines/jobs/
   machine.ts   # parent: spawns one jobMachine per TRACK
   jobMachine.ts

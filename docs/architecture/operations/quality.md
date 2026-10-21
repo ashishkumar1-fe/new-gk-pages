@@ -30,7 +30,6 @@
 - **Support box** on every error screen: a short Error ID (also a Sentry tag), route, filters, time, version, store, the last failed call (method, path, status, request id prefix) and the last few steps in words; Copy button. Never stack traces or request bodies. "Report a problem" in the help menu opens the same box.
 - **Passbook:** every `runCommand` leaves a breadcrumb (command id, target, result), so a replay plus the passbook show which command a button really ran.
 - **Invariants** (a refund can't exceed the order total; saved data equals what was sent) report to Sentry without crashing.
-- A backend defect is reported with its request id, never worked around in a transformer.
 
 ## Error boundaries
 

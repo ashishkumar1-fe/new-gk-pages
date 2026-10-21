@@ -18,7 +18,6 @@ expose_headers    += x-request-id
 
 - Auth (cookie) and CORS are both enforced at the gateway, so this one change opens every gateway-routed API.
 - The idempotency headers are needed by v3 inventory writes and refunds ([inventory](inventory.md), [os-order](os-order.md)). Any other custom header fails the preflight, as it does today.
-- `X-Request-Id` is already generated per call but not exposed, so JavaScript can't read it; exposing it lets a frontend report point at the backend log line.
 
 ## Bypass audit
 

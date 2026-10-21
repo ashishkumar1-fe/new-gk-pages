@@ -46,6 +46,8 @@ flowchart TB
   class G ext
 ```
 
+In the tracker's terms (Ashish's TRD): the **platform shell** is layer 1 plus the Session machine and chrome; the **registry engine** is layers 4 and 5; **resources** are the per-entity content of layers 2–4; **bespoke screens** are feature code in layer 6.
+
 A layer uses only layers below it (any of them, not just the next), never one above. The UI kit is a side layer used only by surfaces. Who may import what: [structure](docs/structure.md#layers-and-imports).
 
 State is not a layer: server data sits in the query cache (client in platform core, queries and keys in contracts), view state in the URL (router, in surfaces), UI flags in components or a small store ([state](docs/state.md)).

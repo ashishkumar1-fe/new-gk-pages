@@ -27,14 +27,18 @@ sequenceDiagram
 - Login: `signin` → OTP → `verify-otp`, or Google. The password is AES-encrypted client-side (`REACT_APP_PUBLIC_CRYPTO_KEY`). Branches (unverified email, forced password change, old-dashboard redirect): [gateway › dashboard](../gateway/dashboard.md#auth-and-session).
 - Logout: `GET /user/logout`, then clear the query cache and the sessionStorage keys.
 
-### Why a gokwik.in subdomain
+### Domain options
 
 The cookie is effectively `SameSite=Lax`: the browser attaches it only when the page and the gateway are the same site.
 
 | Origin | Cookie | Auth |
 |---|---|---|
-| `<ratio>.gokwik.in` | attached (cookie `Domain=.gokwik.in` already valid) | works, zero backend change |
+| `<ratio>.gokwik.in` | attached (cookie `Domain=.gokwik.in` already valid) | works, zero backend change (default) |
+| `ratio.in` with the API on `api.ratio.in` | first-party again: the gateway sets `Domain=.ratio.in` for that host | works; gateway hostname, TLS and cookie-domain work |
+| `ratio.in` with the gokwik cookie as `SameSite=None` | third-party: Safari, iOS browsers, Incognito and Brave block it | rejected: works in a Chrome demo, fails on phones |
 | any other domain | withheld | broken in every browser |
+
+The prod cookie was seen on `Domain=.gokwik.in`, but a later trace showed prod hosts under `gokwik.co`; confirm before the first staging deploy ([open questions](../docs/open-questions.md) #2).
 
 ## Merchant context
 

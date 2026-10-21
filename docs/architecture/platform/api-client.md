@@ -37,6 +37,7 @@ URL = base + path, joined verbatim. Some bases already end in `/api`, so real pa
 | Other headers | None, except an idempotency header a service needs; anything else fails the gateway CORS preflight ([access](../gateway/access.md#cors-change-platform-team)) |
 | Idempotency | `newIdempotencyKey()` (UUID v4, one per attempt); the service module shapes it and puts it where its service wants it (refunds: `refund-<orderId>-<uuid>`, ≤ 64 chars) ([commands](../commands/execution.md#idempotency-and-retry)) |
 | Response | Returns status and body as-is; envelopes differ per service, so unwrapping is the service module's job |
+| Request id | `X-Request-Id` from every response goes into a Sentry breadcrumb (method, path, status) and into `ApiError` |
 | Errors | Non-2xx → `ApiError` (below). `401` also emits `session-expired`, which sends the Session machine to login |
 | Uploads | Presigned storage PUTs bypass the client (no cookie, no merchant headers) |
 
@@ -45,8 +46,21 @@ interface ApiError {
   status: number;
   code?: string;          // first of: body.code, body.error_code, body.errors[0].code (v3)
   message: string;        // body.message; a Nest string[] is joined
+  requestId?: string;     // X-Request-Id, for backend logs
   raw: unknown;           // full body, for the service module
 }
 ```
+
+Today's `makeAPICall` (read from the live utilities bundle by Ashish), and what Ratio does instead:
+
+| `makeAPICall` | Ratio |
+|---|---|
+| Never throws; errors come back as data with a flag | Throws `ApiError`, so Query retries and boundaries work |
+| Sends 5 security headers (CSP, HSTS…) as request headers | Dropped; they belong on responses ([quality](../operations/quality.md#security-v1)) |
+| Sets the merchant header, and gk-pages adds it again | Set once |
+| Blocks non-GET calls for internal users unless allowlisted | Not copied; server-side enforcement to confirm ([open questions](../docs/open-questions.md) #25) |
+| Adds a `mode` param from localStorage for non-internal users | Not copied until its meaning is known (#25) |
+| Fires a global loader event | Dropped; query state drives loading UI |
+| Inlines the whole build env (69 keys) into the bundle | Public-key allowlist only |
 
 **Not the client's job** (layer 3, `api/<service>/`): envelopes, `success: false` in a 2xx body, scoping params (`?storeId=`, `merchant_id`, `?merchantId=`), staff fields in write bodies, case conversion, schema validation ([data flow](../service-api/README.md#data-flow-transform-once-never-mutate)).

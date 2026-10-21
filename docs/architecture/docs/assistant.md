@@ -39,4 +39,4 @@ Tools, topics, the proposal flow and approval rules: [commands › surfaces](../
 
 ## Open
 
-Core feature or installed app, backend, model and cost limits: [open questions](open-questions.md) #5, #10.
+Core feature or installed app, backend, model and cost limits: [open questions](open-questions.md) #5, #10. No external MCP server in v1; commands already carry the schema and effect annotations one would need (d43, pending), and it would need a per-merchant API token, since the session is a browser cookie.

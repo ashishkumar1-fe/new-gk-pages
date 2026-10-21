@@ -35,11 +35,12 @@ interface CommandDefinition<TInput, TResult> {
     external: boolean;                           // reaches customers, money or other systems (refund, notify)
   };
   confirm: 'never' | 'always' | ((input: TInput, ctx: CommandContext) => ConfirmSpec | false);
+  preview?: (input: TInput, deps: CommandDeps) => Promise<unknown>;   // server dry run shown in confirm and proposal card (refund calculate, order-edit preview)
 
   // ── Execution ───────────────────────────────────────────
   mode?: 'pessimistic' | 'optimistic' | 'undoable';   // required unless effect.readOnly (navigate, copy, download)
   steps: Step<TInput>[];                         // one step for most commands; navigate commands have a navigate step
-  idempotencyKey?: 'per-attempt' | 'per-input';  // header when the API supports it
+  idempotencyKey?: boolean;                      // a fresh key per attempt, placed by the API module (header or body)
   timeoutMs?: number;
 
   // ── After ───────────────────────────────────────────────
@@ -55,12 +56,11 @@ interface CommandDefinition<TInput, TResult> {
   // ── Bulk and long-running ───────────────────────────────
   bulk?: BulkSpec<TInput>;                       // bulk-and-jobs.md
   job?: JobSpec<TResult>;                        // import / export: command returns when the job starts
-  poll?: { query: (result: TResult) => Promise<unknown>; intervalMs: number; maxAttempts: number; done: (status: unknown) => boolean };
+  poll?: PollPolicy & { query: (result: TResult) => Promise<unknown>; done: (status: unknown) => boolean };   // PollPolicy: machines.md#poll-policy
 
   // ── Exposure ────────────────────────────────────────────
   expose: {
     palette: boolean;
-    shortcut: boolean;
     assistant: false | { topic: string; instructions?: string };   // grouped like Agentforce topics
     extensions: false | { targets: ('record' | 'selection')[] };
   };
@@ -75,13 +75,24 @@ interface Step<TInput> {
   onFailure: 'abort' | 'continue-with-warning';  // abort → compensate earlier steps in reverse
 }
 
+// From the libraries or other layers: QueryKey, CacheUpdate (TanStack Query); ApiModules (the api/ index); StepResults = Record<stepId, unknown>; InputFormSpec = editor FieldSpec[].
+
+interface CommandDeps {
+  api: ApiModules;                               // api/<service> modules, injected (tests swap them)
+  session: { staff: { id: Id; name: string }; storeId: Id };
+  signal: AbortSignal;                           // from timeoutMs and cancel
+  idempotencyKey?: string;                       // this attempt's key
+}
+
 interface CommandContext {
-  merchantId: Id;
-  staff: { id: Id; name: string; permissions: Permission[] };
+  storeId: Id;                                   // the merchant (backend m_id / merchant_id)
+  staff: { id: Id; name: string };
+  can: (scope: Permission) => boolean;           // platform permissions; unmapped scopes pass while enforcement is off
   route: string;
   record?: unknown;
   selection?: { resource: string; ids: Id[]; rows: unknown[] };
   surface: 'button' | 'row' | 'bulk' | 'palette' | 'shortcut' | 'assistant' | 'extension';
+  confirmed?: boolean;                           // a flow's review step or an approved proposal already confirmed
 }
 
 interface ConfirmSpec {
@@ -89,7 +100,6 @@ interface ConfirmSpec {
   body?: string;
   confirmLabel: string;                          // the verb: "Cancel order", "Delete 12 products"
   tone: 'default' | 'critical';
-  typeToConfirm?: string;                        // reserved: no v1 command uses it
 }
 
 type CommandResult<TResult> =
@@ -107,5 +117,5 @@ type CommandResult<TResult> =
 - **`effect` sets defaults.** Destructive → critical confirm. External → confirm and audit. Non-idempotent → never retried automatically. The same flags become the assistant tool annotations (`readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`).
 - **`fromContext` + `form`.** If context gives complete input, the command runs (after confirm, if any). If not, its form opens. The assistant fills the same form; the user sees it before approving.
 - **Steps.** Most commands have one step. Multi-call writes (save with children, complete a draft) list their calls in order, with compensation where an undo exists. Where it doesn't (an order can't be un-created), the step is marked and the result reports what succeeded.
-- **Endpoints live only in steps.** Surfaces know IDs and inputs, never URLs.
+- **Endpoints live only in API modules.** Steps call their functions through `deps`; surfaces know IDs and inputs, never URLs. The endpoint and payload shown in each [defs](defs/) table document what that function sends.
 - **One result type** for every command, so every surface handles success, field errors, partial bulk results and failures the same way.

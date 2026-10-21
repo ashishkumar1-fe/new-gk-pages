@@ -1,6 +1,6 @@
 # Segment
 
-[← Resources](../README.md) · Schema: [customers.md](../../schema/customers.md#segment) · Today: `pages/customers/CustomerSegments.tsx`, `components/customers/SegmentForm.tsx`, `CustomersInSegment.tsx`
+[← Resources](../README.md) · Schema: [customers.md](../../domain/customers.md#segment) · Today: `pages/customers/CustomerSegments.tsx`, `components/customers/SegmentForm.tsx`, `CustomersInSegment.tsx`
 
 ## List
 
@@ -12,7 +12,7 @@ list: {
     { id: 'updated',     header: 'Updated', cell: date },
     { id: 'created',     header: 'Created', cell: date },
   ],
-  search: { param: 'name', placeholder: 'Search segments', debounceMs: 300, mode: 'client' },   // as today: filters the loaded page
+  search: { placeholder: 'Search segments', debounceMs: 300, mode: 'client' },   // as today: filters the loaded page
   pageSize: 50,                                 // sorted createdAt desc
   rowLink: (s) => `/segments/${s.id}/customers`,
   selection: { enabled: false },
@@ -27,9 +27,8 @@ list: {
 | Details | name, description (both required) |
 | Conditions | match AND / OR; rows of field, operator, value |
 
-- Fields: totalSpent, tags, firstName, lastName, isDeleted, isActive, createdAt, updatedAt (`SegmentForm.tsx:307`); operators by field type (`:26`); comma-separated values split into lists (`:139`).
-- Edit reads the saved AND / OR (today it resets to AND).
-- `editor: { save: 'segment.save', create: { route: '/segments/new', command: 'segment.create' } }`
+- Rules: `segmentFields`, `segmentDefaultOperator`, `segmentValueSplit`, `segmentLogic` ([domain](../../domain/customers.md#rules)); edit reads the saved AND / OR.
+- `editor: { save: 'segment.update', create: { route: '/segments/new', command: 'segment.create' } }`
 
 ## Customers in segment (`/segments/$id/customers`)
 
@@ -49,6 +48,6 @@ commands: {
 ```ts
 service:     'os-customer',
 nav:         { group: 'customers', parent: 'customer', position: 2 },
-permissions: { read: 'customers:read', write: 'customers:write' },
-assistant:   { description: 'Saved groups of customers by conditions.', readableFields: ['name', 'description', 'conditions', 'customerCount'] },
+permissions: { read: 'read_customers', write: 'write_customers' },
+assistant:   { description: 'Saved groups of customers by conditions.', readableFields: ['name', 'description', 'conditions', 'logic', 'customerCount'] },
 ```

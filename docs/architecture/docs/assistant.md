@@ -4,21 +4,7 @@
 
 An in-app AI panel, similar to Rovo in Jira. It reads what the user is looking at and can propose actions. The user confirms every write.
 
-The design names it **Arya**: a side panel that stays open while the user moves between pages. Its conversation state lives at the app root, not in a page.
-
-## How it fits
-
-The assistant is another surface over the same contracts. It gets no special access.
-
-```
-User message + screen context
-        │
-        ▼
-Backend LLM call ── tools = commands the user may run + read queries
-        │
-        ▼
-Tool call proposed ─▶ UI renders a confirm card ─▶ runCommand() ─▶ cache refresh
-```
+The design names it **Arya**: a side panel that stays open while the user moves between pages ([chrome](../surfaces/chrome.md)). It is another surface over the same contracts; the conversation loop is the [assistant machine](machines.md#assistant).
 
 ## Screen context
 
@@ -29,20 +15,28 @@ Sent with each message so "refund these" works:
 - selected row ids,
 - open record id.
 
-## Tools
+A chip above the input shows what is shared; the user can remove it.
 
-- **Read tools** — list/get queries per resource (search orders, get product).
-- **Write tools** — generated from command input schemas. Same permissions, same confirm policy, same execution path.
+## Results
+
+| Result | Shown as |
+|---|---|
+| Text | Streamed message, with Stop |
+| Records (list, get, search) | Record cards or a table with links; more than a few rows opens the list page with those filters |
+| "Show me…" | Navigates or sets URL filters; no write, no approval |
+| Write | [Proposal card](../commands/surfaces.md#assistant) |
+| Command result | Outcome with links to affected records |
+| Error | Message with Retry |
+
+Unknown result types fall back to text.
 
 ## Rules
 
+Tools, topics, the proposal flow and approval rules: [commands › surfaces](../commands/surfaces.md#assistant).
+
 - LLM calls and API keys stay on the backend; the browser streams responses.
-- Writes always need user confirmation. No silent writes, no "auto-approve" in v1.
-- Tool results are rendered as UI (tables, record cards), not only text.
-- Every proposed and executed action is logged for audit.
+- No "auto-approve" in v1.
 
 ## Open
 
-- Is Arya part of the core product or an installed app? The design lists it under Settings → Apps.
-- Which backend hosts the assistant endpoint (see [open-questions.md](open-questions.md)).
-- Model and cost limits per merchant.
+Core feature or installed app, backend, model and cost limits: [open questions](open-questions.md) #5, #10.

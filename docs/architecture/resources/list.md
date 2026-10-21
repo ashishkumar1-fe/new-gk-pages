@@ -10,44 +10,42 @@ interface ListConfig<TItem> {
   columns: Column<TItem>[];
   defaultColumns?: string[];
   search?: {
-    param: string;                         // "search", "query", "search_term"
     placeholder: string;
-    debounceMs: number;                    // as today per resource, 400 where today has none
+    debounceMs: number;                    // 500, as today's shared toolbar
     minLength?: (q: string) => boolean;    // orders: ≥2 chars or an order number
-    endpoint?: 'list' | 'search';          // inventory and POs use a separate search endpoint
     mode?: 'server' | 'client';            // client = filters the loaded page (as today where the API lacks it)
   };
   filters?: Filter[];
   views?: { source: 'static'; items: View[]; mode?: 'server' | 'client' } | { source: 'server'; default: 'is_default' | 'first' };
   sort?: { source: 'static'; options: SortOption[]; default: SortOption }
        | { source: 'server'; default: SortOption }      // orders, drafts: /sortby
-       | { source: 'column' };                           // discounts: sort_by on column click
+       | { source: 'column' };                           // column click sets sort { field, direction }
   pageSize: number;                        // 50 everywhere
   selection?: { enabled: boolean; max?: number };   // orders: max 100
-  inlineEdit?: InlineEditConfig<TItem>;    // inventory grid
-  insights?: { component: ComponentType; capability: string };   // design: strip above the products table
+  cellEdit?: { cells: string[]; command: CommandId };   // inventory: per-cell popover, immediate save
+  insights?: { component: ComponentId; capability: string };   // design: strip above the products table
   rowLink?: 'detail' | ((r: TItem) => string) | false;
   empty: { title: string; body?: string; action?: CommandId };
 }
 
-type Filter = {
+type Filter<TQuery = unknown> = {
   id: string;
   label: string;
-  toParams: (value: unknown) => Record<string, unknown>;   // exact API mapping
+  toQuery: (value: unknown) => Partial<TQuery>;   // the list function's typed query, domain names
   mode?: 'server' | 'client';
 } & (
   | { type: 'enum' | 'multi_enum'; options: Option[] | (() => Promise<Option[]>) }
   | { type: 'text' }
   | { type: 'number_range' }
-  | { type: 'money_range' }                // entered in rupees, sent in paise
-  | { type: 'date_range' }                 // local day start/end, sent as ISO
+  | { type: 'money_range' }                // entered in rupees, becomes Money
+  | { type: 'date_range' }                 // local days, { from, to } DateOnly
   | { type: 'conditions'; fields: ConditionField[] }   // customers: condition list
 );
 
 interface Column<TItem> {
   id: string;
   header: string;                          // copy key
-  cell?: (row: TItem) => ReactNode | CellSpec;   // default: field with the column id
+  cell?: (row: TItem) => CellSpec | { component: ComponentId };   // default: field with the column id
   sortKey?: string;                        // only where the API sorts by column
 }
 type CellSpec = { kind: 'text' | 'money' | 'date' | 'datetime' | 'status' | 'image_title' | 'count'; value: unknown };
@@ -56,15 +54,11 @@ interface SortOption { field: string; direction: 'asc' | 'desc'; label?: string 
 interface ScopeSelector { param: string; source: () => Promise<Option[]>; required: boolean }
 interface ConditionField { field: string; type: 'text' | 'number' | 'money' | 'date' | 'boolean' | 'tags' }
 interface Option { value: string; label: string }
-
-interface InlineEditConfig<TItem> {
-  editable: string[];                      // column ids
-  derive?: (row: TItem, changed: string) => Partial<TItem>;   // inventory: on hand ↔ available
-  save: CommandId;                         // one call with changed rows
-}
 ```
 
-`toParams` is required because each service encodes filters differently: comma-joined (products), repeated arrays (inventory), min/max pairs (orders), condition objects (customers).
+Custom cells and sections name a component by `ComponentId`; surfaces resolve it, so contracts never import React components ([structure](../docs/structure.md#layers-and-imports)).
+
+`toQuery` speaks domain names and units; the API module encodes them for its service (comma-joined, repeated arrays, min/max pairs, condition objects, paise, day bounds), as listed in [gateway](../gateway/README.md).
 
 ## URL state
 
@@ -80,7 +74,7 @@ interface InlineEditConfig<TItem> {
 | `sort` | `field:direction` |
 | `page` | Page (size fixed per resource) |
 | scope | e.g. `location` for inventory |
-| relation scope | e.g. `customer_id` for a customer's orders |
+| relation scope | e.g. `customerId` for a customer's orders |
 
 Changing search, filters, sort, view or scope resets `page`.
 
@@ -88,8 +82,8 @@ Changing search, filters, sort, view or scope resets `page`.
 
 - **Server views** (orders, drafts): loaded from `/views`; a view's query (`["k=v"]`) becomes URL params. Default is the view marked default, else the first.
 - **Server sort options** (orders, drafts): loaded from `/sortby`.
-- **Column sort** (discounts): clicking a sortable column sets `sort_by` / `sort_order`.
-- **No sort** (products, collections, customers fixed to newest first): no sort UI, because the API doesn't sort.
+- **Column sort** (discounts, orders, drafts): clicking a sortable column sets `sort`; the API module encodes it per service.
+- **No sort** (products, collections fixed to newest first): no sort UI, because the API doesn't sort. Customers: the API sorts, the UI is deferred ([deferred](../domain/deferred.md)).
 
 ## Selection and bulk
 
@@ -97,10 +91,6 @@ Changing search, filters, sort, view or scope resets `page`.
 - Optional cap (orders: 100, with a warning).
 - Some bulk commands are conditional on the selection (orders: Unarchive only if all selected are archived).
 - Selection clears when the URL changes.
-
-## Inline edit
-
-Inventory edits quantities in the table. Changed rows are tracked; a save bar shows "N items modified" with Cancel and Save. Save sends only changed rows in one command. Cancel restores the loaded values.
 
 ## Column preferences
 

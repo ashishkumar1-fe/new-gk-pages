@@ -8,32 +8,37 @@ Each resource has a read-only data provider. Writes are commands, which call the
 
 ```ts
 interface DataProvider<T, TItem> {
-  getList(params: ListParams): Promise<Page<TItem>>;
-  getOne(id: Id): Promise<T>;
-  getMany?(ids: Id[]): Promise<TItem[]>;            // pickers, references
-  search?(text: string, limit: number): Promise<TItem[]>;   // ⌘K and pickers
-  count?(params: ListParams): Promise<number>;      // nav badges
+  cache: CacheClass;                                 // cache policy below
+  getList(params: ListParams, opts: { signal }): Promise<Page<TItem>>;
+  getOne(id: Id, opts: { signal }): Promise<T>;
+  getMany?(ids: Id[], opts: { signal }): Promise<TItem[]>;            // pickers, references
+  search?(text: string, limit: number, opts: { signal }): Promise<TItem[]>;   // ⌘K and pickers
 }
 ```
 
-Inside a provider: map `ListParams` to the service's params → call → unwrap the envelope → transform each row → parse with the schema → return `Page<TItem>`.
+```ts
+interface ListParams {
+  view?: string;                         // active tab
+  search?: string;
+  filters?: Record<string, unknown>;     // filter id → value; turned into the typed query by each filter's toQuery
+  scope?: Record<string, string>;        // required scope (location) or relation scope (customerId)
+  sort?: { field: string; direction: 'asc' | 'desc' };
+  page?: number;                         // 1-based
+  limit?: number;                        // 50
+}
+```
 
-Service-specific mapping lives here, for example:
+A provider only builds the typed query and calls the API module, which parses, transforms and returns `Page<TItem>` ([service API](../service-api/README.md#module-contract)):
 
-| Resource | List call today |
-|---|---|
-| Product | `GET /products/?storeId&search&vendor&tags&productType&status&page&limit&show_variants=true` |
-| Collection | `GET /collections/?storeId&search&types&published&page&limit` |
-| Inventory | `GET /inventory/warehouse/:warehouseId?filter&…&page&limit`; search uses `GET /inventory/search` |
-| Order | `GET /orders?page&limit&sort_field&sort_direction&search&<filters>` + `/orders/views`, `/orders/sortby` |
-| Customer | `POST /customers/filter { conditions, conditionLogic, page, limit, sortBy, sortOrder }` |
-| Discount | `POST /os-discount/fetch { status, search, sort_by, sort_order, page, limit }` |
+```ts
+getList: (p, { signal }) => api.osOrder.listOrders(toQuery(p), { signal })
+```
 
 ## Query keys
 
 ```ts
 const keys = {
-  all:     [merchantId, 'product'] as const,
+  all:     ['product', storeId] as const,             // [domain, storeId, …] (d31)
   lists:   () => [...keys.all, 'list'] as const,
   list:    (p: ListParams) => [...keys.lists(), p] as const,
   details: () => [...keys.all, 'detail'] as const,
@@ -42,25 +47,43 @@ const keys = {
 };
 ```
 
-Merchant ID first, so switching store never shows another store's data.
+`storeId` is in every key, so one store's cache never shows in another.
 
 ## Cache policy
 
-Today's gk-pages has no cache: every navigation refetches. Proposed starting values, tuned after launch with real traffic:
+Today's gk-pages has no cache: every navigation refetches. In Ratio, freshness is one setting, not per-screen code:
 
-| Data | Fresh for | Why |
+- Every query takes its `staleTime` from a named class.
+- The classes come from one policy object in `platform/query/cachePolicy.ts`.
+- Switching policy is a one-line change.
+
+```ts
+type CacheClass = 'list' | 'detail' | 'lookup' | 'calc';
+
+const policies = {
+  balanced: { list: 30_000, detail: 60_000, lookup: 10 * 60_000, calc: 0 },   // default (d42)
+  fresh:    { list: 0,      detail: 0,      lookup: 10 * 60_000, calc: 0 },   // revalidate on every mount
+} satisfies Record<string, Record<CacheClass, number>>;
+
+export const ACTIVE_POLICY: keyof typeof policies = 'balanced';   // ← the switch
+```
+
+| Class | Used by | Why |
 |---|---|---|
-| Lists | 30 s, refetch on window focus | Orders arrive constantly |
-| Detail | 60 s | The editor keeps its own draft |
-| Lookups (vendors, types, tags, taxonomy, warehouses, suppliers, sort options, views) | 10 min | Rarely change |
-| Server calculations (`/calculate`) | 0 | Always current |
-| Refund status | Polled 5 s, up to 24 times | As today |
+| `list` | list screens | Orders arrive constantly |
+| `detail` | detail and editor reads | The editor keeps its own draft |
+| `lookup` | vendors, types, tags, taxonomy, locations, suppliers, sort options, views | Rarely change |
+| `calc` | server calculations (`/calculate`, edit-session preview) | Always current |
+
+- Data providers declare a class, never a number; the `new:resource` scaffolder won't generate one without it. A resource that must always be fresh overrides with `0` and a comment.
+- `refetchOnWindowFocus: true` globally, in every policy: returning to the tab always revalidates.
+- Either policy renders cached data instantly while the background refetch runs.
+- Polling is declared on commands and jobs and run by machines ([poll policy](../docs/machines.md#poll-policy)).
 
 ## Invalidation
 
 - Commands declare what they invalidate.
 - After a save the detail cache is set from the response; lists are invalidated.
-- Cross-resource effects are explicit: refund → order, timeline; receive PO/transfer → inventory; order cancel with restock → inventory; product save → inventory (stock edits).
 - Timeline: refetched immediately and again after 2.5 s after an order mutation, as today (events are written asynchronously).
 
 ## Seeding and prefetch
@@ -72,8 +95,8 @@ Today's gk-pages has no cache: every navigation refetches. Proposed starting val
 
 | Error | Behaviour |
 |---|---|
-| Schema parse failure | Reported with resource and field path; the row shows "can't display", list continues |
+| Schema drift | Logged to Sentry; data still renders ([ADR 0004](../adr/0004-validate-every-response.md)). Only a bad money value stops: the row shows "can't display", list continues |
 | 401 | Session flow |
-| 403 | Permission screen (detail), hidden action (commands) |
+| 403 | Permission screen (detail); for commands see [execution](../commands/execution.md#errors-from-the-server) |
 | 404 | Not-found screen with link to the list |
-| Network / 5xx | 2 retries with backoff (proposed; same as commands), then error state with retry |
+| Network / 5xx | 2 retries with backoff, then error state with retry |

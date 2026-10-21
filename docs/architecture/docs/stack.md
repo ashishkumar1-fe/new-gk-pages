@@ -2,7 +2,7 @@
 
 [← Architecture](../README.md)
 
-Proposed. Each choice lists the main alternative we considered.
+Adopted (d40). Each choice lists the main alternative we considered.
 
 | Concern | Choice | Why | Alternative |
 |---|---|---|---|
@@ -20,8 +20,3 @@ Proposed. Each choice lists the main alternative we considered.
 | Unit tests | Vitest + Testing Library | Fast, Vite-native | Jest |
 | E2E tests | Playwright | Real flows across browsers | Cypress |
 | Lint/format | ESLint + Prettier (or Biome) | Standard | — |
-
-## Not included
-
-- Redux — server data lives in the query cache.
-- antd / gokwik-ui-kit — replaced by our own kit.

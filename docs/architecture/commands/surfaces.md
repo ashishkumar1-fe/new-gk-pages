@@ -46,17 +46,25 @@ Read tools come from resources (list, get, search) with their `assistant.readabl
 
 **Proposal flow.**
 
-```
-user asks → assistant picks a command and fills input
-          → proposal card: action, target(s), the filled form with AI-filled fields highlighted
-          → user edits or approves (destructive: second confirm)
-          → runCommand(surface: 'assistant')
-          → result shown in the conversation, with links to affected records
+```mermaid
+sequenceDiagram
+  actor P as Person
+  participant AI as Assistant
+  participant C as Proposal card
+  participant X as runCommand
+  P->>AI: asks
+  AI->>C: picks a command, fills its input
+  Note over C: action, target(s), filled form, AI-filled fields highlighted<br/>update: field diff current → proposed · preview result if any
+  P->>C: edits or approves (approval is the confirm)
+  C->>X: runCommand(surface: 'assistant')
+  X-->>AI: result
+  AI-->>P: result in the conversation, links to affected records
 ```
 
 - No write runs without the person's approval in that conversation.
 - The assistant can only propose what the person may do (same permissions, enablement and capability).
 - Bulk proposals list the target records before approval.
+- One command per proposal in v1; multi-step plans (approve once, run in order, stop at the first failure) come later.
 - Every assistant run is audited with the conversation and the approved proposal.
 
 ## Extensions
@@ -65,10 +73,9 @@ Installed apps can add commands and call allowed ones.
 
 - **Adding.** An app registers commands for a target: `record` (a details page More menu) or `selection` (an index page bulk bar), with a should-render check per record. They appear like built-in commands and run inside the extension sandbox.
 - **Calling.** An app can call built-in commands exposed to extensions, through the same `runCommand`, with the app as the actor and the merchant's confirmation for anything not read-only.
-- Apps never receive session tokens or call write endpoints directly.
 
 ## Keyboard
 
 - Shortcuts are bound to command IDs, scoped to the screens where the command is visible.
-- `mod+k` opens the palette; `mod+s` saves the editor; `?` lists shortcuts for the current screen.
+- Bindings: [registry](registry.md#shortcuts).
 - Shortcuts never fire inside text inputs unless they use a modifier.

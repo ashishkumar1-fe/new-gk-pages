@@ -1,6 +1,6 @@
 # Purchase order
 
-[← Resources](../README.md) · Schema: [inventory.md](../../schema/inventory.md#purchase-order) · Today: `pages/purchase-orders/*`, `components/purchase-orders/PurchaseOrderDetails.tsx`
+[← Resources](../README.md) · Schema: [inventory.md](../../domain/inventory.md#purchase-order) · Today: `pages/purchase-orders/*`, `components/purchase-orders/PurchaseOrderDetails.tsx`
 
 ## List
 
@@ -15,7 +15,7 @@ list: {
     { id: 'total',       header: 'Total', cell: money },
     { id: 'expected',    header: 'Expected arrival', cell: date },
   ],
-  search: { param: 'query', endpoint: 'search', placeholder: 'Search purchase orders', debounceMs: 500 },
+  search: { placeholder: 'Search purchase orders', debounceMs: 500 },
   views: { source: 'static', mode: 'client', items: ['all', 'draft', 'ordered', 'partially_received', 'received'].map(statusView) },
   pageSize: 50,
   selection: { enabled: false },          // today's bulk actions are stubs
@@ -34,22 +34,15 @@ Status tabs filter the current page client-side today (no API param); kept until
 | main | Products | lines (child) |
 | aside | Additional | referenceNumber, noteToSupplier, tags |
 
-Save: `editor: { save: 'purchaseOrder.save', create: { route: '/purchase-orders/new', command: 'purchaseOrder.create' } }`.
+Save: `editor: { save: 'purchaseOrder.update', create: { route: '/purchase-orders/new', command: 'purchaseOrder.create' } }`.
 
 Products child: columns Product, SKU, Quantity, Cost, Total. Picker searches inventory of the destination location (debounce 500 ms; destination required first); picked cost seeds the line.
 
-### Validation (`ValidationSchemas.ts`)
-
-Reference number, supplier and destination required; quantity ≥ 1; cost ≥ 0; ≥ 1 line.
-
-### Derived values
-
-- Line total = quantity × cost (`PurchaseOrderItemsCard.tsx:100-109`)
-- Order total and quantity = sums (`PurchaseOrderDetails.tsx:167-171`)
+Rules: `poValidate`, `poLineTotal`, `poTotals` ([domain](../../domain/inventory.md#rules)).
 
 ## Receive (`/purchase-orders/$id/receive`)
 
-Columns: Product, Ordered, Previously received, Accept, Reject, Remaining. Accept and reject are capped at remaining and clamp each other (`ReceiveInventory.tsx:43-100`). Command `purchaseOrder.receive` sends `{po_item_id, quantity_received, quantity_rejected}` per line.
+Columns: Product, Ordered, Previously received, Accept, Reject, Remaining. Rules: `receiveRemaining`, `receiveCaps`, `receivePayload`.
 
 ## Commands (status-driven)
 
@@ -58,13 +51,7 @@ commands: {
   page: ['purchaseOrder.create'],
   primary: (po) => po.status === 'draft' ? 'purchaseOrder.markOrdered'      // confirm first
                  : po.status !== 'closed' ? 'purchaseOrder.openReceive' : undefined,
-  more: (po) => ({
-    draft:              ['purchaseOrder.delete'],
-    ordered:            ['purchaseOrder.close'],
-    partially_received: ['purchaseOrder.close'],
-    received:           ['purchaseOrder.close'],
-    closed:             ['purchaseOrder.reopen'],    // back to draft
-  })[po.status],
+  more: (po) => poActions(po),       // domain rule; received: close in v1 (today falls back to the draft menu)
 }
 ```
 
@@ -76,6 +63,6 @@ Today's "Edit" toggle becomes editing in place. "Export PDF" has an endpoint but
 service:     'inventory',
 relations:   { supplier: { resource: 'supplier', kind: 'one', via: 'supplierId' }, destination: { resource: 'location', kind: 'one', via: 'destinationLocationId' } },
 nav:         { group: 'products', parent: 'product', position: 4 },
-permissions: { read: 'inventory:read', write: 'inventory:write' },
+permissions: { read: 'read_inventory', write: 'write_inventory' },
 assistant:   { description: 'Stock ordered from suppliers.', readableFields: ['referenceNumber', 'status', 'supplier.companyName', 'expectedAt', 'totalCost', 'lines.title', 'lines.quantityOrdered', 'lines.quantityReceived'] },
 ```

@@ -172,6 +172,8 @@ Whether the merchant_id query parameter is still needed beside the header; the m
 
 ## 4. Code architecture
 
+> This topic is a summary. The exhaustive, example-rich reference for every layer, contract type, registry entry and state machine, with 22 diagrams, is [Ratio — Code Architecture Reference](ratio-code-architecture.md) (TRD-003).
+
 ### 4.1 The stack, each piece with its reason
 
 Vite builds the application: an admin behind a login needs neither search-engine indexing nor server-side rendering, and Next.js was rejected for that reason and because its server rendering complicates the cookie story. TanStack Router handles routing, because view state lives in the URL and the router gives typed routes and Zod-validated search parameters. TanStack Query holds server data. React Hook Form with Zod schemas handles forms. XState v5 handles multi-step flows. Zustand holds interface flags. Registries define entities and actions (d40).

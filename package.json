@@ -4,18 +4,18 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc --noEmit && vite build",
-    "preview": "vite preview",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "lint": "eslint src --ext .ts,.tsx",
+    "dev": "vite --config config/vite.ts",
+    "build": "tsc --noEmit && vite build --config config/vite.ts",
+    "preview": "vite preview --config config/vite.ts",
+    "test": "vitest run --config config/vite.ts",
+    "test:watch": "vitest --config config/vite.ts",
+    "lint": "eslint src --ext .ts,.tsx --config config/eslint.cjs",
     "typecheck": "tsc --noEmit",
-    "new:resource": "plop resource",
-    "new:command": "plop command",
+    "new:resource": "plop --plopfile config/plop/plopfile.cjs --dest . resource",
+    "new:command": "plop --plopfile config/plop/plopfile.cjs --dest . command",
     "prepare": "husky",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\"",
-    "check-format": "prettier --check \"src/**/*.{ts,tsx,css,json}\""
+    "format": "prettier --write --config config/prettier.json --ignore-path config/prettierignore \"src/**/*.{ts,tsx,css,json}\"",
+    "check-format": "prettier --check --config config/prettier.json --ignore-path config/prettierignore \"src/**/*.{ts,tsx,css,json}\""
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -65,11 +65,12 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "prettier --write",
-      "eslint --max-warnings=0"
+      "prettier --write --config config/prettier.json --ignore-path config/prettierignore",
+      "eslint --max-warnings=0 --config config/eslint.cjs"
     ],
     "*.{css,json}": [
-      "prettier --write"
+      "prettier --write --config config/prettier.json --ignore-path config/prettierignore"
     ]
-  }
+  },
+  "prettier": "./config/prettier.json"
 }

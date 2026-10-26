@@ -1,4 +1,4 @@
-# mistakes.md
+# mistakes.md (docs/mistakes.md)
 
 Every AI session reads this first. Entry: what went wrong · the correct way · how it was caught.
 

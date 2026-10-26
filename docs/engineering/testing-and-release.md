@@ -60,7 +60,7 @@ One feature, three small tests, each in its own layer. `npm run new:command` sca
 
 ## 5. Fixing a bug
 
-`.claude/skills/fix-bug`: write a **failing test first** that shows the bug. If you cannot make it fail, you have not understood the bug; go back to the report. Then fix, the test goes green, the suite stays green, small PR with the preview link on the ticket. Propose a `mistakes.md` entry if the trap could catch someone again.
+`.claude/skills/fix-bug`: write a **failing test first** that shows the bug. If you cannot make it fail, you have not understood the bug; go back to the report. Then fix, the test goes green, the suite stays green, small PR with the preview link on the ticket. Propose a `docs/mistakes.md` entry if the trap could catch someone again.
 
 ## 6. Commit message rule
 

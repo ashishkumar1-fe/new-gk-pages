@@ -1,6 +1,6 @@
 # Ratio — contributor recipes
 
-Read this first. Then `mistakes.md`. Recipes, not prose.
+Read this first. Then `docs/mistakes.md`. Recipes, not prose.
 
 ## New entity screen?
 1. `npm run new:resource <name>` (asks: service, cache class, route). It generates domain, api functions, fixture, MSW handlers, resource card, command cards, tests and registry entries.
@@ -28,6 +28,9 @@ Read this first. Then `mistakes.md`. Recipes, not prose.
 - raw hex / px / `className` on kit components; raw `<button>` `<input>` in features
 - `any`
 
+## Repo layout
+Root holds only what identifies the project (package.json, tsconfig.json, index.html, CLAUDE.md, README). Every tool config lives in `config/` (eslint, prettier, tailwind, postcss, vite + vitest setup, plop + templates); npm scripts pass the paths, so always run tools through `npm run …`. Scripts in `scripts/`, the mistakes log in `docs/mistakes.md`.
+
 ## Layers (import only downward)
 surfaces → machines → contracts (resources, commands) → api → domain → platform → lib. `ui/` is a side layer used only by surfaces.
 
@@ -36,4 +39,4 @@ surfaces → machines → contracts (resources, commands) → api → domain →
 - **commit-msg**: `[Type]: one-line description`. Type is `Hotfix` | `Bugfix` | `Feature`; `Refactor` | `Chore` | `Docs` | `Test` only when none of the three fit. One line, under 100 chars, no body, no footer, no Co-Authored-By. `scripts/check-commit-msg.mjs`.
 - **pre-push**: everything CI runs: `typecheck`, `lint`, `check-format`, `test`, `build`. Red = push blocked. Fix, do not `--no-verify`.
 - CI repeats all of it on the PR plus the bundle budget, so a hook skipped locally still fails the PR.
-- Format is prettier (`.prettierrc`: 140 cols, single quotes, trailing commas). `npm run format` fixes everything; never argue about style in review.
+- Format is prettier (`config/prettier.json`: 140 cols, single quotes, trailing commas). `npm run format` fixes everything; never argue about style in review.

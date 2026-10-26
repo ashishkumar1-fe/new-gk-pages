@@ -25,7 +25,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=$(jq -r '.tool_input.file_path // empty'); case \"$f\" in *.ts|*.tsx) npx eslint \"$f\" >&2 || exit 2 ;; esac"
+            "command": "f=$(jq -r '.tool_input.file_path // empty'); case \"$f\" in *.ts|*.tsx) npx eslint --config config/eslint.cjs \"$f\" >&2 || exit 2 ;; esac"
           }
         ]
       }

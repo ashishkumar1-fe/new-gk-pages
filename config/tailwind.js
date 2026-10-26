@@ -1,6 +1,10 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
 /** Tokens live here; the kit reads only these. Feature code never uses raw hex (lint). */
 export default {
-  content: ['./index.html', './src/**/*.{ts,tsx}'],
+  content: [path.join(root, 'index.html'), path.join(root, 'src/**/*.{ts,tsx}')],
   theme: {
     colors: {
       transparent: 'transparent',

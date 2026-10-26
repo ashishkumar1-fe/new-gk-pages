@@ -69,6 +69,10 @@ Testing and release, end to end: `docs/engineering/testing-and-release.md`.
 
 Husky runs three hooks: `pre-commit` (prettier + eslint on staged files), `commit-msg` (`[Feature|Bugfix|Hotfix]: one line`), `pre-push` (typecheck, lint, format check, tests, build). Rules in CLAUDE.md › Git rules.
 
+## Repo layout
+
+Tool config lives in `config/` (eslint, prettier, tailwind, postcss, vite, vitest setup, plop); npm scripts pass the paths. Root keeps only package.json, tsconfig.json, index.html and the docs people read first.
+
 ## Guardrails
 
-CLAUDE.md recipes · `mistakes.md` · `.claude/skills/{new-resource,add-command,review-pr,fix-bug}` · ESLint boundaries · CODEOWNERS · PR template · CI workflow with bundle budget.
+CLAUDE.md recipes · `docs/mistakes.md` · `.claude/skills/{new-resource,add-command,review-pr,fix-bug}` · ESLint boundaries · CODEOWNERS · PR template · CI workflow with bundle budget.

@@ -74,4 +74,4 @@ A developer reviews the code; the reporter verifies the behaviour. Both are need
 
 ## 5. After the fix
 
-If the bug came from a trap someone could fall into again, propose an entry for `mistakes.md` in the same PR.
+If the bug came from a trap someone could fall into again, propose an entry for `docs/mistakes.md` in the same PR.

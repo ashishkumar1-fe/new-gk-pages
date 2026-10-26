@@ -1,4 +1,4 @@
-/* Layer boundaries: a layer imports only from layers below it. Red lint locks merge. */
+/* Layer boundaries: a layer imports only from layers below it. Red lint locks merge. Run from the repo root: eslint --config config/eslint.cjs */
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
@@ -77,5 +77,5 @@ module.exports = {
     /* Machines: no React components, no ui/. */
     { files: ['src/machines/**'], excludedFiles: ['**/index.ts'], rules: { 'no-restricted-imports': ['error', { patterns: [{ group: ['react', '@xstate/react'], message: 'machine.ts / actors.ts stay React-free; the hook lives in index.ts.' }] }] } },
   ],
-  ignorePatterns: ['dist', 'node_modules', 'plop-templates'],
+  ignorePatterns: ['dist', 'node_modules', 'config/plop/templates'],
 };

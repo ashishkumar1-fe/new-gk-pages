@@ -2,6 +2,6 @@ dist
 node_modules
 coverage
 public/mockServiceWorker.js
-plop-templates
+config/plop/templates
 docs
 *.md

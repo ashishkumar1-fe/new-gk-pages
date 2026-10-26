@@ -1,0 +1,4 @@
+import type { {{pascal name}} } from './schema';
+
+/** Pure rules. Each cites the gk-pages line it was ported from and has a test in rules.test.ts. */
+export const canDelete = (_r: Pick<{{pascal name}}, 'id'>) => true;   // gk-pages: <file>:<line>

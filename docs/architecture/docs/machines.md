@@ -18,7 +18,7 @@ Lists, records and single commands don't need one: the query cache and `runComma
 - **One state per distinct outcome.** A state exists only if it allows different events, exits or UI; failures with the same exits share a state.
 - **Every async state has a way out:** a timeout (`after`) or a limit, an error state, and RETRY or CLOSE.
 - **Ids, not copies.** Context holds ids and flow choices; server data stays in the query cache, form values in the form.
-- **Actors call contracts only:** `runCommand` and resource queries, with the actor's `signal`; Session and Login also call platform session; Embed calls the platform token broker and bridge. The idempotency key is created on entering the submit state and reused for its retries; changed input gets a new key.
+- **Actors call contracts only:** `runCommand` and resource queries, with the actor's `signal`; Session and Login also call platform session. The idempotency key is created on entering the submit state and reused for its retries; changed input gets a new key.
 - **Flow-owned confirm.** A review state (refund review, wizard finish, assistant proposal) is the confirm: the machine runs the command with `confirmed: true` ([execution](../commands/execution.md#confirmation-policy)).
 - **UI reads tags.** One hook per machine returns plain values and senders; components never import XState.
 - **Lifetime.** Page machines start with their route, drawer or dialog and stop when it closes, aborting their actors. App-wide machines live at the root with a `systemId`. A store switch stops everything merchant-scoped.
@@ -46,7 +46,7 @@ stateDiagram-v2
   CheckingEntitlement --> Ready: pages = true
   CheckingEntitlement --> NoAccess: pages = false
   Ready --> SwitchingStore: switch
-  SwitchingStore --> Booting: stop merchant actors · clear cache and tokens
+  SwitchingStore --> Booting: stop merchant actors · clear cache
   Ready --> Login: 401 on any call · return to the same URL
   Ready --> LoggingOut: logout
   LoggingOut --> Login
@@ -115,8 +115,6 @@ Start with their route, drawer or dialog; stop when it closes. Where each appear
 | [Draft payment watch](#draft-payment-watch) | draft order detail query | 8 s · ≤ 30 min · 5 errors in a row |
 | [Import](#import) | `*.importPreview`, `*.import` | — |
 | [Export](#export) | `*.exportPreview`, `*.export` | — |
-| [Embed](#embed) | token broker, bridge | handshake 10 s |
-| [Bulk action](#bulk-action) | product filter query (`bulk-operations/filter-products`), `priceSchedule.create` | preview debounced |
 
 ### Login
 
@@ -287,46 +285,11 @@ stateDiagram-v2
 
 - One machine for every export. Page-scope exports are built in the browser; customer "all" is a job; inventory "all" is a file download.
 
-### Embed
-
-```mermaid
-stateDiagram-v2
-  [*] --> Minting
-  Minting --> Loading: token from the broker
-  Loading --> Handshaking: iframe load
-  Handshaking --> Ready: READY → INIT → ACK
-  Ready --> Refreshing: token request or 401
-  Refreshing --> Ready: new token
-  Refreshing --> Expired: mint failed
-  Minting --> Failed: error or timeout
-  Handshaking --> Failed: no ACK in 10 s
-  Failed --> Minting: RETRY
-  Expired --> Minting: RETRY
-```
-
-- One per mounted embed. The token stays in the broker, never in context or a URL query; the visual editor's first-load `#token=` is read and cleared by the editor. Requests in Ready (toast, save bar, navigate, picker) follow the [bridge](extensions.md#bridge) rules.
-
-### Bulk action
-
-```mermaid
-stateDiagram-v2
-  [*] --> Filtering
-  Filtering --> Previewing: conditions (debounced)
-  Previewing --> Choosing: total + sample
-  Choosing --> Filtering: edit conditions
-  Choosing --> Confirming: action and params valid
-  Confirming --> Submitting: run now or schedule (new key)
-  Submitting --> Choosing: error · conflicting schedules
-  Submitting --> [*]: done · schedules list or TRACK jobId → Jobs
-```
-
-- Preview shows the server's total, not the sample size (gk-pages counts the first 100 rows). A scheduled run re-evaluates the filter when it runs; times are in the store time zone (gk-pages sends browser-local hours). Conflicting schedules (`interferingTasks`) are shown, not dropped.
-
 ## Other orchestration
 
 | Piece | Does |
 |---|---|
-| Leave guard | Every editor, order edit, the wizard and an embedded app's save bar: router blocker plus `beforeunload` while the form is dirty or the machine has tag `unsaved`. "Discard unsaved changes?" / "Your unsaved changes will be lost." / Discard · Keep editing |
+| Leave guard | Every editor, order edit and the wizard: router blocker plus `beforeunload` while the form is dirty or the machine has tag `unsaved`. "Discard unsaved changes?" / "Your unsaved changes will be lost." / Discard · Keep editing |
 | Save bar | One bar for the page: Save / Discard and `mod+s`, from form state and Record save tags |
 | Poll policy | [below](#poll-policy) |
 | Toast queue | Ordered, deduplicated by key, with Retry where the result is retryable |
@@ -364,7 +327,7 @@ machines/refund/
   actors.ts    # async work (resource queries, runCommand), replaceable in tests
   actions.ts   # pure assign helpers
   types.ts     # context and events
-  index.ts     # useRefund(): plain values and senders
+  index.ts
 machines/jobs/
   machine.ts   # parent: spawns one jobMachine per TRACK
   jobMachine.ts

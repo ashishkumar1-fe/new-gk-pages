@@ -1,0 +1,7 @@
+dist
+node_modules
+coverage
+public/mockServiceWorker.js
+plop-templates
+docs
+*.md

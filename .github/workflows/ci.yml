@@ -1,0 +1,20 @@
+name: ci
+on: [pull_request, push]
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run check-format
+      - name: commit message format
+        if: github.event_name == 'pull_request'
+        run: git log --format=%s origin/${{ github.base_ref }}..HEAD | while read -r m; do printf '%s\n' "$m" > /tmp/m; node scripts/check-commit-msg.mjs /tmp/m || exit 1; done
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: bundle budget
+        run: test $(stat -c%s dist/assets/index-*.js | sort -n | tail -1) -lt 900000

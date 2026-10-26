@@ -34,10 +34,9 @@ URL = base + path, joined verbatim. Some bases already end in `/api`, so real pa
 |---|---|
 | Credentials | `credentials: 'include'` on every call (cookie session) |
 | Merchant | `merchant-mid` and `gk-merchant-id` = current `storeId` |
-| Other headers | None, except an idempotency header a service needs, and `Authorization: Bearer` from the [token broker](auth-session.md#app-tokens) for app-store and editor services; anything else fails the gateway CORS preflight ([access](../gateway/access.md#cors-change-platform-team)) |
+| Other headers | None, except an idempotency header a service needs; anything else fails the gateway CORS preflight ([access](../gateway/access.md#cors-change-platform-team)) |
 | Idempotency | `newIdempotencyKey()` (UUID v4, one per attempt); the service module shapes it and puts it where its service wants it (refunds: `refund-<orderId>-<uuid>`, ≤ 64 chars) ([commands](../commands/execution.md#idempotency-and-retry)) |
 | Response | Returns status and body as-is; envelopes differ per service, so unwrapping is the service module's job |
-| Request id | `X-Request-Id` from every response goes into a Sentry breadcrumb (method, path, status) and into `ApiError` |
 | Errors | Non-2xx → `ApiError` (below). `401` also emits `session-expired`, which sends the Session machine to login |
 | Uploads | Presigned storage PUTs bypass the client (no cookie, no merchant headers) |
 
@@ -46,11 +45,8 @@ interface ApiError {
   status: number;
   code?: string;          // first of: body.code, body.error_code, body.errors[0].code (v3)
   message: string;        // body.message; a Nest string[] is joined
-  requestId?: string;     // X-Request-Id, for backend logs
   raw: unknown;           // full body, for the service module
 }
 ```
-
-Not carried over from today's `makeAPICall` (read from the live bundle by Ashish): errors returned as data, security headers sent as request headers, the duplicate merchant header, the global loader event, the whole build env inlined into the bundle. Its internal-user write block and `mode` param: [open question 25](../docs/open-questions.md).
 
 **Not the client's job** (layer 3, `api/<service>/`): envelopes, `success: false` in a 2xx body, scoping params (`?storeId=`, `merchant_id`, `?merchantId=`), staff fields in write bodies, case conversion, schema validation ([data flow](../service-api/README.md#data-flow-transform-once-never-mutate)).

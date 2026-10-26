@@ -22,7 +22,7 @@ Decided in the docs, no ADR of its own:
 | List, editor and detail routes generated from the registry; mobile shell, desktop-first pages | [pages](../surfaces/pages.md) |
 | Store in the URL, one store per tab | [routing](../surfaces/routing.md) |
 
-## Tracker decisions d01–d45
+## Tracker decisions d01–d42
 
 From the standalone decision tracker (all closed); each page lists the ones it carries.
 
@@ -40,8 +40,6 @@ From the standalone decision tracker (all closed); each page lists the ones it c
 | d38 | [UI kit › governance](../docs/ui-kit.md#governance-d38) |
 | d40 | [stack](../docs/stack.md) (adopted after review) |
 | d41 | registry scope: [resources](../resources/README.md#rules), palette [chrome](../surfaces/chrome.md) |
-| d43 | MCP readiness (pending): [assistant](../docs/assistant.md#open) |
-| d44, d45 | bug evidence, silent bugs, Clarity: [quality](../operations/quality.md#bug-evidence-d44-d45) |
 | d42 | fresh codebase [ADR 0002](0002-new-codebase.md); freshness [ADR 0005](0005-cache-policy-switch.md); docs stay in this repo (ADR 0002 over d42's Confluence) |
 
 Still open: subdomain (d02), deploy process (d19), phased rollout (d03): [open questions](../docs/open-questions.md) #2, #8, #24.

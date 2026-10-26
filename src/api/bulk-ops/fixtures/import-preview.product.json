@@ -1,0 +1,17 @@
+{
+  "success": true,
+  "isValid": true,
+  "fileInfo": { "fileName": "products.csv", "fileFormat": "csv", "fileSize": 2048, "fileSizeFormatted": "2 KB", "totalRows": 12 },
+  "Estimation": { "estimatedInsertTime": "about 1 minute" },
+  "FileField": ["title", "price", "status"],
+  "Fields": { "required": ["title", "price"], "optional": ["status"] },
+  "validation": { "missingRequiredFields": [], "extraFields": [] },
+  "errors": [],
+  "warnings": [],
+  "nestedDtoValidation": {},
+  "jobId": "job_import_1",
+  "s3FileUrl": "https://example-bucket/products.csv",
+  "s3FileKey": "products.csv",
+  "jobStatus": "PENDING",
+  "jobStep": "PREVIEW"
+}

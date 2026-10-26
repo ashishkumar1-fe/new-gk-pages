@@ -1,0 +1,17 @@
+{
+  "status_code": 200,
+  "data": {
+    "user_details": {
+      "email": "demo@gokwik.co",
+      "name": "Demo staff",
+      "is_internal_user": false,
+      "role": { "permissions": ["view_order", "refund"] },
+      "allowed_merchants": [
+        { "id": 101, "m_id": "demo-store", "business_name": "Demo Store" },
+        { "id": 102, "m_id": "second-store", "business_name": "Second Store" }
+      ]
+    },
+    "merchant_details": { "m_id": "demo-store", "id": 101, "business_name": "Demo Store" },
+    "config": { "selected_products": { "pages": true, "checkout": true } }
+  }
+}

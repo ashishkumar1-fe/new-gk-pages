@@ -1,0 +1,41 @@
+import { defineResource, keysFor, queryFromParams, type ListConfig } from './define';
+import { {{pascal name}}Schema, {{pascal name}}ListItemSchema, {{pascal name}}InputSchema, type {{pascal name}}, type {{pascal name}}ListItem, type {{pascal name}}Input } from '@/domain/{{name}}/schema';
+import * as client from '@/api/{{service}}/{{name}}.client';
+
+const list: ListConfig<{{pascal name}}ListItem> = {
+  columns: [
+    { id: 'title', header: 'Title', cell: (r) => ({ kind: 'text', value: r.title }) },
+    { id: 'updatedAt', header: 'Updated at', cell: (r) => ({ kind: 'date', value: r.updatedAt }) },
+  ],
+  search: { placeholder: 'Search {{name}}s', debounceMs: 500 },
+  pageSize: 50,
+  selection: { enabled: true },
+  empty: { title: 'Create your first {{name}}', action: '{{name}}.create' },
+};
+
+export const {{name}} = defineResource<{{pascal name}}, {{pascal name}}ListItem, {{pascal name}}Input>({
+  name: '{{name}}',
+  label: { singular: '{{pascal name}}', plural: '{{pascal name}}s' },
+  icon: 'box',
+  title: (r) => r.title,
+  service: '{{service}}',
+  schema: { detail: {{pascal name}}Schema, item: {{pascal name}}ListItemSchema, input: {{pascal name}}InputSchema },
+  data: {
+    cache: '{{cache}}',                                                   // required: the scaffolder put this here
+    getList: (p, o) => client.list{{pascal name}}s(queryFromParams(list, p), o),
+    getOne:  (id, o) => client.get{{pascal name}}(id, o),
+  },
+  keys: keysFor('{{name}}'),
+  routes: { list: '{{route}}', detail: '{{route}}/$id', create: '{{route}}/new' },
+  list,
+  editor: {
+    toInput: (r) => ({ id: r.id, title: r.title }),
+    layout: { main: [{ id: 'details', title: '{{pascal name}} details', fields: [{ path: 'title', label: 'Title', type: 'text' }] }] },
+    save: '{{name}}.update',
+    create: { route: '{{route}}/new', initial: () => ({ title: '' }), command: '{{name}}.create' },
+  },
+  commands: { page: ['{{name}}.create'], bulk: [], more: () => ['{{name}}.delete'] },
+  search: { enabled: true, limit: 4 },
+  nav: { group: '{{pascal name}}s', position: 1 },
+  permissions: { read: 'read_{{name}}s', write: 'write_{{name}}s' },
+});

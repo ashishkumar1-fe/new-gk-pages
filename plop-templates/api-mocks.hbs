@@ -1,0 +1,31 @@
+import { http, HttpResponse, delay } from 'msw';
+import list from './fixtures/{{name}}.list.json';
+import type { Raw{{pascal name}} } from './{{name}}.wire';
+
+const store = new Map<string, Raw{{pascal name}}>((list.items as Raw{{pascal name}}[]).map((r) => [r.id, r]));
+let seq = 100;
+const now = () => new Date().toISOString();
+
+export const {{name}}Handlers = [
+  http.get('*/api/v1/admin/{{name}}s', async ({ request }) => {
+    await delay(200);
+    const search = (new URL(request.url).searchParams.get('search') ?? '').toLowerCase();
+    const items = [...store.values()].filter((r) => !search || r.title.toLowerCase().includes(search));
+    return HttpResponse.json({ items, total: items.length });
+  }),
+  http.get('*/api/v1/admin/{{name}}s/:id', async ({ params }) => {
+    const r = store.get(String(params.id));
+    return r ? HttpResponse.json(r) : HttpResponse.json({ message: 'Not found' }, { status: 404 });
+  }),
+  http.post('*/api/v1/admin/{{name}}s', async ({ request }) => {
+    const b = (await request.json()) as { title: string };
+    const r: Raw{{pascal name}} = { id: `{{name}}_${++seq}`, title: b.title, created_at: now(), updated_at: now() };
+    store.set(r.id, r); return HttpResponse.json(r, { status: 201 });
+  }),
+  http.put('*/api/v1/admin/{{name}}s/:id', async ({ params, request }) => {
+    const prev = store.get(String(params.id)); if (!prev) return HttpResponse.json({ message: 'Not found' }, { status: 404 });
+    const b = (await request.json()) as { title: string };
+    const r = { ...prev, title: b.title, updated_at: now() }; store.set(r.id, r); return HttpResponse.json(r);
+  }),
+  http.delete('*/api/v1/admin/{{name}}s/:id', async ({ params }) => { store.delete(String(params.id)); return new HttpResponse(null, { status: 204 }); }),
+];

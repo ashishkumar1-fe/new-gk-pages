@@ -1,0 +1,16 @@
+
+/** {{endpoint}} */
+export const {{verb}} = defineCommand<{ {{#if (eq scope "selection")}}ids: string[]{{else}}id: string{{/if}} }, unknown>({
+  id: '{{resource}}.{{verb}}', resource: '{{resource}}', label: '{{label}}', description: '{{label}}.',
+  input: z.object({ {{#if (eq scope "selection")}}ids: z.array(z.string()).min(1){{else}}id: z.string(){{/if}} }),
+  fromContext: (ctx) => ({ {{#if (eq scope "selection")}}ids: ctx.selection?.ids{{else}}id: (ctx.record as { id?: string } | undefined)?.id{{/if}} }),
+  scope: '{{scope}}', permission: 'write_{{resource}}s',
+  effect: { readOnly: {{readOnly}}, destructive: {{destructive}}, idempotent: {{idempotent}}, external: {{external}} },
+  confirm: {{#if destructive}}(_i, ctx) => ({ title: `{{label}}?`, body: 'This can’t be undone.', confirmLabel: '{{label}}', tone: 'critical' }){{else}}'never'{{/if}},
+  mode: 'pessimistic',{{#if idempotent}} idempotencyKey: true,{{/if}}
+  steps: [{ id: '{{verb}}', onFailure: 'abort', run: (i, _p, d) => d.api.{{apiModule}}.{{apiFunction}}(i, { signal: d.signal{{#if idempotent}}, idempotencyKey: d.idempotencyKey{{/if}} }) }],
+  invalidates: () => [keysFor('{{resource}}').lists()],
+  onSuccess: { toast: () => '{{label}} done' },
+  expose: { palette: true, assistant: {{#if destructive}}false{{else}}{ topic: '{{resource}}' }{{/if}}, extensions: false },
+});
+

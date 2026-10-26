@@ -1,0 +1,6 @@
+import { describe, it, expect } from 'vitest';
+import { canDelete } from './rules';
+
+describe('{{name}} rules (pinned to gk-pages behaviour)', () => {
+  it('can delete', () => { expect(canDelete({ id: 'x' })).toBe(true); });
+});

@@ -1,0 +1,2 @@
+# Commit message format: [Hotfix|Bugfix|Feature|Refactor|Chore|Docs|Test]: one line
+node scripts/check-commit-msg.mjs "$1"

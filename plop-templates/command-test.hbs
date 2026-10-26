@@ -1,0 +1,18 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { runCommand } from './runCommand';
+import { configureCommandHost } from './host';
+import { api } from '@/api';
+import type { CommandContext } from './define';
+
+const ctx: CommandContext = { storeId: 'demo-store', staff: { id: 's1', name: 'Test' }, can: () => true, route: '/', surface: 'button'{{#if (eq scope "selection")}}, selection: { resource: '{{resource}}', ids: ['x1'], rows: [] }{{else}}, record: { id: 'x1' }{{/if}} };
+
+/** Assert the exact endpoint call and payload (recorded gk-pages payload), the confirm, and the invalidations. */
+describe('{{resource}}.{{verb}}', () => {
+  beforeEach(() => { vi.restoreAllMocks(); configureCommandHost({ confirm: async () => true, toast: () => {}, navigate: () => {} }); });
+  it('calls {{apiModule}}.{{apiFunction}} with the input', async () => {
+    const call = vi.spyOn(api.{{apiModule}}, '{{apiFunction}}').mockResolvedValue(undefined as never);
+    const r = await runCommand('{{resource}}.{{verb}}', undefined, ctx);
+    expect(r.status).toBe('success');
+    expect(call).toHaveBeenCalledWith({{#if (eq scope "selection")}}{ ids: ['x1'] }{{else}}{ id: 'x1' }{{/if}}, expect.objectContaining({ signal: expect.anything() }));
+  });
+});

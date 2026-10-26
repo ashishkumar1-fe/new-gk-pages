@@ -1,0 +1,37 @@
+import { request } from '@/platform/http/client';
+import { BASE } from '@/platform/config';
+import { reportDrift } from '@/platform/telemetry';
+import type { Page } from '@/domain/shared/entity';
+import type { {{pascal name}}, {{pascal name}}ListItem, {{pascal name}}Input } from '@/domain/{{name}}/schema';
+import { Raw{{pascal name}}, Raw{{pascal name}}List, type Raw{{pascal name}} as Raw } from './{{name}}.wire';
+
+const ROOT = `${BASE}/api/v1/admin`;
+interface Opts { signal?: AbortSignal }
+export interface {{pascal name}}Query { search?: string; page?: number; limit?: number }
+
+const toDomain = (w: Raw): {{pascal name}} => ({ id: w.id, title: w.title, createdAt: w.created_at, updatedAt: w.updated_at });
+const toWire = (i: {{pascal name}}Input) => ({ title: i.title });
+
+export async function list{{pascal name}}s(q: {{pascal name}}Query, { signal }: Opts = {}): Promise<Page<{{pascal name}}ListItem>> {
+  const { body } = await request(`${ROOT}/{{name}}s`, { params: { search: q.search, page: q.page ?? 1, limit: q.limit ?? 50 }, signal });
+  const parsed = Raw{{pascal name}}List.safeParse(body);
+  if (!parsed.success) reportDrift('{{service}}', 'GET /{{name}}s', parsed.error.issues);
+  const data = parsed.success ? parsed.data : (body as ReturnType<typeof Raw{{pascal name}}List.parse>);
+  const page = q.page ?? 1; const limit = q.limit ?? 50;
+  return { items: data.items.map(toDomain), page, limit, total: data.total, hasNext: page * limit < data.total };
+}
+export async function get{{pascal name}}(id: string, { signal }: Opts = {}): Promise<{{pascal name}}> {
+  const { body } = await request(`${ROOT}/{{name}}s/${id}`, { signal });
+  return toDomain(Raw{{pascal name}}.parse(body));
+}
+export async function create{{pascal name}}(i: {{pascal name}}Input, { signal }: Opts = {}): Promise<{{pascal name}}> {
+  const { body } = await request(`${ROOT}/{{name}}s`, { method: 'POST', body: toWire(i), signal });
+  return toDomain(Raw{{pascal name}}.parse(body));
+}
+export async function update{{pascal name}}(i: {{pascal name}}Input & { id: string }, { signal }: Opts = {}): Promise<{{pascal name}}> {
+  const { body } = await request(`${ROOT}/{{name}}s/${i.id}`, { method: 'PUT', body: toWire(i), signal });
+  return toDomain(Raw{{pascal name}}.parse(body));
+}
+export async function delete{{pascal name}}(id: string, { signal }: Opts = {}): Promise<void> {
+  await request(`${ROOT}/{{name}}s/${id}`, { method: 'DELETE', signal });
+}

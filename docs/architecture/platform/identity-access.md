@@ -5,7 +5,7 @@
 | # | Decision |
 |---|---|
 | d01 | The product is **Ratio**. |
-| d02 | Domain deferred. Constraint: a `gokwik.in` subdomain ([auth-session](auth-session.md#domain-options)). |
+| d02 | Domain deferred. Constraint: a `gokwik.in` subdomain ([auth-session](auth-session.md#why-a-gokwikin-subdomain)). |
 | d03 | Who gets it: the existing per-merchant flag `selected_products.pages` is the single source of truth. All-at-once vs phased rollout is decided with the cutover. |
 | d04 | Entitlement: the same flag, enforced by a route guard. |
 | d08 | Permissions: the existing model, from the same user-details API. |

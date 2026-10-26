@@ -1,0 +1,2 @@
+# Everything CI runs, before the code leaves your machine.
+npm run typecheck && npm run lint && npm run check-format && npm test && npm run build

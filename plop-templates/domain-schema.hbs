@@ -1,0 +1,18 @@
+import { z } from 'zod';
+import { EntitySchema } from '@/domain/shared/entity';
+
+/** What the app means by a {{name}}. Changes when the business meaning changes, not when the backend does. */
+export const {{pascal name}}Schema = EntitySchema.extend({
+  title: z.string(),
+  // TODO: fields in domain names (camelCase, Money for amounts, DateTime for dates)
+});
+export type {{pascal name}} = z.infer<typeof {{pascal name}}Schema>;
+
+export const {{pascal name}}ListItemSchema = {{pascal name}}Schema.pick({ id: true, title: true, createdAt: true, updatedAt: true });
+export type {{pascal name}}ListItem = z.infer<typeof {{pascal name}}ListItemSchema>;
+
+export const {{pascal name}}InputSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().trim().min(1, 'Title is required'),
+});
+export type {{pascal name}}Input = z.infer<typeof {{pascal name}}InputSchema>;

@@ -1,0 +1,284 @@
+{
+  "products": [
+    {
+      "id": "p_1001",
+      "title": "Blue Cotton Shirt",
+      "handle": "blue-cotton-shirt",
+      "body_html": "<p>Soft cotton, regular fit.</p>",
+      "vendor": "Nike",
+      "product_type": "Shirt",
+      "status": "active",
+      "tags": "summer, cotton",
+      "created_at": "2026-09-02T08:00:00Z",
+      "updated_at": "2026-10-10T09:30:00Z",
+      "published_at": "2026-09-02T08:00:00Z",
+      "charge_tax": true,
+      "hs_code": "6105",
+      "seo_title": "Blue Cotton Shirt",
+      "seo_description": null,
+      "options": [{ "id": "o1", "name": "Size", "position": 1, "values": ["S", "M", "L"] }],
+      "images": [{ "id": "img1", "src": "https://picsum.photos/seed/shirt/200", "alt": "Blue shirt", "position": 0 }],
+      "variants": [
+        {
+          "id": "v1",
+          "title": "S",
+          "price": "44900.00",
+          "compare_at_price": "59900.00",
+          "cost_per_item": "30000.00",
+          "sku": "BCS-S",
+          "option1": "S",
+          "taxable": true,
+          "requires_shipping": true,
+          "inventory_management": "shopify",
+          "continue_selling_out_of_stock": false,
+          "inventory_quantity": 12
+        },
+        {
+          "id": "v2",
+          "title": "M",
+          "price": "44900.00",
+          "compare_at_price": "59900.00",
+          "cost_per_item": "30000.00",
+          "sku": "BCS-M",
+          "option1": "M",
+          "taxable": true,
+          "requires_shipping": true,
+          "inventory_management": "shopify",
+          "continue_selling_out_of_stock": false,
+          "inventory_quantity": 25
+        },
+        {
+          "id": "v3",
+          "title": "L",
+          "price": "44900.00",
+          "compare_at_price": "59900.00",
+          "cost_per_item": "30000.00",
+          "sku": "BCS-L",
+          "option1": "L",
+          "taxable": true,
+          "requires_shipping": true,
+          "inventory_management": "shopify",
+          "continue_selling_out_of_stock": false,
+          "inventory_quantity": 13
+        }
+      ],
+      "variants_count": 3
+    },
+    {
+      "id": "p_1002",
+      "title": "Running Shoes Air",
+      "handle": "running-shoes-air",
+      "body_html": "",
+      "vendor": "Nike",
+      "product_type": "Shoes",
+      "status": "active",
+      "tags": "running",
+      "created_at": "2026-09-05T08:00:00Z",
+      "updated_at": "2026-10-01T09:30:00Z",
+      "published_at": "2026-09-05T08:00:00Z",
+      "charge_tax": true,
+      "hs_code": "6403",
+      "options": [],
+      "images": [{ "id": "img2", "src": "https://picsum.photos/seed/shoes/200", "alt": "Shoes", "position": 0 }],
+      "variants": [
+        {
+          "id": "v4",
+          "title": "Default Title",
+          "price": "799900.00",
+          "compare_at_price": null,
+          "cost_per_item": "500000.00",
+          "sku": "RSA-1",
+          "taxable": true,
+          "requires_shipping": true,
+          "inventory_management": "shopify",
+          "continue_selling_out_of_stock": false,
+          "inventory_quantity": 8
+        }
+      ],
+      "variants_count": 1
+    },
+    {
+      "id": "p_1003",
+      "title": "Yoga Mat Pro",
+      "handle": "yoga-mat-pro",
+      "body_html": "<p>6mm, non-slip.</p>",
+      "vendor": "Puma",
+      "product_type": "Accessory",
+      "status": "draft",
+      "tags": "",
+      "created_at": "2026-09-20T08:00:00Z",
+      "updated_at": "2026-09-20T08:00:00Z",
+      "published_at": null,
+      "charge_tax": false,
+      "hs_code": null,
+      "options": [],
+      "images": [],
+      "variants": [
+        {
+          "id": "v5",
+          "title": "Default Title",
+          "price": "129900.00",
+          "compare_at_price": null,
+          "cost_per_item": null,
+          "sku": "YMP",
+          "taxable": false,
+          "requires_shipping": true,
+          "inventory_management": null,
+          "continue_selling_out_of_stock": true,
+          "inventory_quantity": 0
+        }
+      ],
+      "variants_count": 1
+    },
+    {
+      "id": "p_1004",
+      "title": "Classic Hoodie",
+      "handle": "classic-hoodie",
+      "body_html": "",
+      "vendor": "Puma",
+      "product_type": "Hoodie",
+      "status": "active",
+      "tags": "winter",
+      "created_at": "2026-08-11T08:00:00Z",
+      "updated_at": "2026-10-12T09:30:00Z",
+      "published_at": "2026-08-11T08:00:00Z",
+      "charge_tax": true,
+      "hs_code": "6110",
+      "options": [
+        { "id": "o2", "name": "Size", "position": 1, "values": ["M", "L"] },
+        { "id": "o3", "name": "Color", "position": 2, "values": ["Black", "Grey"] }
+      ],
+      "images": [{ "id": "img4", "src": "https://picsum.photos/seed/hoodie/200", "alt": "Hoodie", "position": 0 }],
+      "variants": [
+        {
+          "id": "v6",
+          "title": "M / Black",
+          "price": "219900.00",
+          "sku": "CH-M-B",
+          "option1": "M",
+          "option2": "Black",
+          "taxable": true,
+          "inventory_management": "shopify",
+          "inventory_quantity": 4
+        },
+        {
+          "id": "v7",
+          "title": "M / Grey",
+          "price": "219900.00",
+          "sku": "CH-M-G",
+          "option1": "M",
+          "option2": "Grey",
+          "taxable": true,
+          "inventory_management": "shopify",
+          "inventory_quantity": 0
+        },
+        {
+          "id": "v8",
+          "title": "L / Black",
+          "price": "219900.00",
+          "sku": "CH-L-B",
+          "option1": "L",
+          "option2": "Black",
+          "taxable": true,
+          "inventory_management": "shopify",
+          "inventory_quantity": 9
+        },
+        {
+          "id": "v9",
+          "title": "L / Grey",
+          "price": "219900.00",
+          "sku": "CH-L-G",
+          "option1": "L",
+          "option2": "Grey",
+          "taxable": true,
+          "inventory_management": "shopify",
+          "inventory_quantity": 2
+        }
+      ],
+      "variants_count": 4
+    },
+    {
+      "id": "p_1005",
+      "title": "Steel Water Bottle 1L",
+      "handle": "steel-water-bottle-1l",
+      "body_html": "",
+      "vendor": "Milton",
+      "product_type": "Accessory",
+      "status": "archived",
+      "tags": "kitchen, steel",
+      "created_at": "2026-07-01T08:00:00Z",
+      "updated_at": "2026-09-01T09:30:00Z",
+      "published_at": null,
+      "charge_tax": true,
+      "hs_code": "7323",
+      "options": [],
+      "images": [],
+      "variants": [
+        {
+          "id": "v10",
+          "title": "Default Title",
+          "price": "64900.00",
+          "sku": "SWB-1L",
+          "taxable": true,
+          "inventory_management": "shopify",
+          "inventory_quantity": 40
+        }
+      ],
+      "variants_count": 1
+    },
+    {
+      "id": "p_1006",
+      "title": "Linen Kurta",
+      "handle": "linen-kurta",
+      "body_html": "<p>Handloom linen.</p>",
+      "vendor": "Fabindia",
+      "product_type": "Kurta",
+      "status": "active",
+      "tags": "linen, festive",
+      "created_at": "2026-10-01T08:00:00Z",
+      "updated_at": "2026-10-15T09:30:00Z",
+      "published_at": "2026-10-01T08:00:00Z",
+      "charge_tax": true,
+      "hs_code": "6205",
+      "options": [{ "id": "o4", "name": "Size", "position": 1, "values": ["38", "40", "42"] }],
+      "images": [{ "id": "img6", "src": "https://picsum.photos/seed/kurta/200", "alt": "Kurta", "position": 0 }],
+      "variants": [
+        {
+          "id": "v11",
+          "title": "38",
+          "price": "189900.00",
+          "cost_per_item": "90000.00",
+          "sku": "LK-38",
+          "option1": "38",
+          "taxable": true,
+          "inventory_management": "shopify",
+          "inventory_quantity": 6
+        },
+        {
+          "id": "v12",
+          "title": "40",
+          "price": "189900.00",
+          "cost_per_item": "90000.00",
+          "sku": "LK-40",
+          "option1": "40",
+          "taxable": true,
+          "inventory_management": "shopify",
+          "inventory_quantity": 3
+        },
+        {
+          "id": "v13",
+          "title": "42",
+          "price": "189900.00",
+          "cost_per_item": "90000.00",
+          "sku": "LK-42",
+          "option1": "42",
+          "taxable": true,
+          "inventory_management": "shopify",
+          "inventory_quantity": 0
+        }
+      ],
+      "variants_count": 3
+    }
+  ],
+  "pagination": { "total": 6, "page": 1, "limit": 50, "totalPages": 1, "hasNext": false, "hasPrevious": false }
+}

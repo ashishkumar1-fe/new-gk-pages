@@ -1,0 +1,11 @@
+import { z } from 'zod';
+
+/** What the {{service}} service actually sends. Record a sandbox response into fixtures/{{name}}.list.json and shape this from it. */
+export const Raw{{pascal name}} = z.object({
+  id: z.string(),
+  title: z.string(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+export type Raw{{pascal name}} = z.infer<typeof Raw{{pascal name}}>;
+export const Raw{{pascal name}}List = z.object({ items: z.array(Raw{{pascal name}}), total: z.number() });

@@ -1,0 +1,40 @@
+{
+  "success": true,
+  "entityTypes": ["products"],
+  "template": {
+    "entities": [
+      {
+        "entityType": "products",
+        "configuration": {
+          "groups": {
+            "basic": {
+              "name": "Basic",
+              "include": true,
+              "columns": [
+                { "name": "title", "group": "basic", "include": true },
+                { "name": "handle", "group": "basic", "include": true },
+                { "name": "status", "group": "basic", "include": true }
+              ]
+            },
+            "pricing": {
+              "name": "Pricing",
+              "include": true,
+              "columns": [
+                { "name": "price", "group": "pricing", "include": true },
+                { "name": "compare_at_price", "group": "pricing", "include": false }
+              ]
+            },
+            "inventory": {
+              "name": "Inventory",
+              "include": false,
+              "columns": [
+                { "name": "sku", "group": "inventory", "include": false },
+                { "name": "inventory_quantity", "group": "inventory", "include": false }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

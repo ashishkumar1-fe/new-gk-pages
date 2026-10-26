@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(npm test)",
+      "Bash(npm test:*)",
+      "Bash(npm run typecheck)",
+      "Bash(npm run lint)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run build)",
+      "Bash(npm run new:resource:*)",
+      "Bash(npm run new:command:*)",
+      "Bash(npx vitest run:*)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ],
+    "deny": ["Read(./.env)", "Read(./.env.*)", "Read(**/*.pem)", "Read(**/*secret*)", "Bash(cat .env*)", "Bash(git push:*)"]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path // empty'); case \"$f\" in *.ts|*.tsx) npx eslint \"$f\" >&2 || exit 2 ;; esac"
+          }
+        ]
+      }
+    ]
+  }
+}

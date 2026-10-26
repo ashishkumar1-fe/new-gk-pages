@@ -1,0 +1,41 @@
+import { z } from 'zod';
+import { defineCommand } from './define';
+import { {{pascal name}}InputSchema, type {{pascal name}}, type {{pascal name}}Input } from '@/domain/{{name}}/schema';
+import { keysFor } from '@/resources/define';
+import * as client from '@/api/{{service}}/{{name}}.client';
+
+const keys = keysFor('{{name}}');
+const record = (ctx: { record?: unknown }) => ctx.record as {{pascal name}} | undefined;
+
+export const create = defineCommand<{{pascal name}}Input, {{pascal name}}>({
+  id: '{{name}}.create', resource: '{{name}}', label: 'Add {{name}}', description: 'Create a new {{name}}.',
+  input: {{pascal name}}InputSchema, scope: 'page', permission: 'write_{{name}}s',
+  effect: { readOnly: false, destructive: false, idempotent: false, external: false }, confirm: 'never', mode: 'pessimistic',
+  steps: [{ id: 'create', onFailure: 'abort', run: (i, _p, d) => client.create{{pascal name}}(i, { signal: d.signal }) }],
+  invalidates: () => [keys.lists()],
+  onSuccess: { toast: () => '{{pascal name}} created', navigate: (r) => `{{route}}/${r.id}` },
+  expose: { palette: true, assistant: { topic: '{{name}}' }, extensions: false },
+});
+
+export const update = defineCommand<{{pascal name}}Input & { id: string }, {{pascal name}}>({
+  id: '{{name}}.update', resource: '{{name}}', label: 'Save', description: 'Save changes.', shortcut: 'mod+s',
+  input: {{pascal name}}InputSchema.extend({ id: z.string() }), scope: 'record', permission: 'write_{{name}}s',
+  effect: { readOnly: false, destructive: false, idempotent: true, external: false }, confirm: 'never', mode: 'pessimistic',
+  steps: [{ id: 'update', onFailure: 'abort', run: (i, _p, d) => client.update{{pascal name}}(i, { signal: d.signal }) }],
+  invalidates: (i) => [keys.detail(i.id), keys.lists()],
+  onSuccess: { toast: () => '{{pascal name}} saved' },
+  expose: { palette: true, assistant: { topic: '{{name}}' }, extensions: { targets: ['record'] } },
+});
+
+export const del = defineCommand<{ id: string }, void>({
+  id: '{{name}}.delete', resource: '{{name}}', label: 'Delete {{name}}', description: 'Delete this {{name}} permanently.',
+  input: z.object({ id: z.string() }), fromContext: (ctx) => ({ id: record(ctx)?.id }),
+  scope: 'record', permission: 'write_{{name}}s',
+  effect: { readOnly: false, destructive: true, idempotent: true, external: false },
+  confirm: (_i, ctx) => ({ title: `Delete ${record(ctx)?.title ?? 'this {{name}}'}?`, body: 'This can’t be undone.', confirmLabel: 'Delete', tone: 'critical' }),
+  mode: 'pessimistic',
+  steps: [{ id: 'delete', onFailure: 'abort', run: (i, _p, d) => client.delete{{pascal name}}(i.id, { signal: d.signal }) }],
+  invalidates: () => [keys.lists()],
+  onSuccess: { toast: () => '{{pascal name}} deleted', navigate: () => '{{route}}' },
+  expose: { palette: true, assistant: false, extensions: false },
+});

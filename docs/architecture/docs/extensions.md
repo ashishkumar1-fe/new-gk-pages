@@ -7,7 +7,7 @@ Today GK supports two kinds of third-party UI. Both carry over.
 | Kind | Today | In the new admin |
 |---|---|---|
 | **UI extensions** | Sandboxed worker code (`gokwik-ui-extensions-core/host/rpc`), rendered into an `ExtensionPoint` | Same runtime; targets declared on resources |
-| **Embedded apps** | Iframe with an app bridge (title bar, modal messages) | The [bridge](#bridge) at `/store/$storeId/apps/$handle/*`, plus toast, save bar (joins the leave guard), resource picker, redirect and sidebar entries under Apps |
+| **Embedded apps** | Iframe with an app bridge (title bar, modal messages) | Same bridge at `/store/$storeId/apps/$handle/*`, plus toast, save bar (joins the leave guard), resource picker, redirect and sidebar entries under Apps |
 
 ## Changes
 
@@ -18,14 +18,4 @@ Today GK supports two kinds of third-party UI. Both carry over.
 ## Rules
 
 - One crashing extension never breaks the page (error boundary per extension).
-- Extensions never get the session token or direct API access; an embedded app gets an `appstore` token from the [broker](../platform/auth-session.md#app-tokens) in `INIT`, never in a URL.
-
-## Bridge
-
-Platform `embed` carries every iframe conversation (visual editor, bundle app, embedded apps); the [Embed machine](machines.md#embed) drives it.
-
-- Envelope `{ v, kind: req | res | evt, id, type, payload }`, one Zod union per direction; unknown types are dropped and logged.
-- A message counts only if `event.origin` is the embed's registered origin exactly and `event.source` is its iframe; replies name that origin, never `'*'`.
-- Handshake READY → INIT (store, context, token) → ACK; INIT is resent on the iframe's `load`. Every request gets one response or times out.
-- Navigation only to in-app paths under the app's base; remote redirects `https:` only. An embed never changes `storeId` (today the bundle app can rewrite `merchant-mid`, and an app can redirect to `javascript:`).
-- Sandbox without `allow-top-navigation`; a store switch remounts the iframe.
+- Extensions never get the session token or direct API access. How an embedded app proves who the user is to its own backend (an app-scoped token, as App Bridge does) is open.

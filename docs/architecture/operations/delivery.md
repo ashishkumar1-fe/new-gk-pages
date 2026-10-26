@@ -38,8 +38,6 @@ flowchart LR
 
 ## Cutover
 
-Before step 1: cookie family and domain confirmed ([open question 2](../docs/open-questions.md)); gateway CORS live with `x-request-id` exposed; bypass audit done; smoke green; browser matrix passed, including iOS Safari and Chrome Incognito; alerts verified into OpsGuard; parity checklist signed by product; rollback rehearsed on staging.
-
 | Step | Rollback |
 |---|---|
 | 1. Ratio live on its domain; smoke test | Take the domain down |

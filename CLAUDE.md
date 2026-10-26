@@ -25,7 +25,7 @@ Read this first. Then `docs/mistakes.md`. Recipes, not prose.
 - fetching in `useEffect`; server data in Zustand; mutating query data
 - a component calling an `api/*` client function or a write endpoint
 - XState imports in components (use the machine's hook)
-- raw hex / px / `className` on kit components; raw `<button>` `<input>` in features
+- raw hex / px / arbitrary Tailwind values / `className` on kit components; raw `<button>` `<input>` in features. Need a new size or colour? Add a token in `config/tailwind.js`, do not inline it.
 - `any`
 
 ## Repo layout

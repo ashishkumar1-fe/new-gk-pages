@@ -21,6 +21,7 @@ import {
   SaveBar,
   Select,
   Skeleton,
+  TagInput,
   TextArea,
   TextField,
   TwoColumn,
@@ -87,9 +88,10 @@ function FieldInput({ f, form, draft, locked }: { f: FieldSpec<Draft>; form: For
                 type="number"
                 step="0.01"
                 min={0}
+                prefix="₹"
                 invalid={!!err}
                 readOnly={readOnly}
-                placeholder="₹0.00"
+                placeholder="0.00"
                 value={field.value ? String(toRupees(field.value as Money)) : ''}
                 onChange={(e) => field.onChange(e.target.value === '' ? undefined : money(Number(e.target.value) * 100))}
               />,
@@ -105,20 +107,13 @@ function FieldInput({ f, form, draft, locked }: { f: FieldSpec<Draft>; form: For
           control={control}
           render={({ field }) =>
             wrap(
-              <TextField
+              <TagInput
                 id={id}
-                readOnly={readOnly}
-                value={((field.value as string[] | undefined) ?? []).join(', ')}
-                onChange={(e) =>
-                  field.onChange(
-                    e.target.value
-                      .split(',')
-                      .map((t) => t.trim())
-                      .filter(Boolean),
-                  )
-                }
+                value={(field.value as string[] | undefined) ?? []}
+                onChange={(v) => field.onChange(v)}
+                placeholder={f.type === 'tags' ? 'Add tags' : `Add ${f.label.toLowerCase()}`}
               />,
-              f.help ?? 'Comma-separated',
+              f.help ?? 'Enter or comma adds one',
             )
           }
         />
@@ -165,18 +160,23 @@ const SectionView = ({
     const C = resolveComponent(s.component);
     return (
       <Card title={s.title}>
-        {C ? <C record={record} draft={draft} calc={calc} /> : <p className="text-critical">Unknown component {s.component}</p>}
+        {C ? <C record={record} draft={draft} calc={calc} /> : <p className="text-a-danger">Unknown component {s.component}</p>}
       </Card>
     );
   }
   const fields = s.fields.filter((f) => !f.visibleWhen || f.visibleWhen(draft));
+  const collapsible = 'collapsible' in s && s.collapsible;
   return (
-    <Card title={s.title}>
-      {'collapsible' in s && s.collapsible && (
-        <button type="button" className="mb-3 text-sm text-muted hover:text-ink" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-          {open ? 'Hide' : 'Edit'}
-        </button>
-      )}
+    <Card
+      title={s.title}
+      action={
+        collapsible && (
+          <Button variant="ghost" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+            {open ? 'Done' : 'Edit'}
+          </Button>
+        )
+      }
+    >
       {open && (
         <div className="flex flex-col gap-4">
           {fields.map((f) => (
@@ -297,6 +297,7 @@ export function EditorPage({ resource, id }: { resource: AnyResource; id?: strin
         <SaveBar
           dirty={dirty}
           saving={saver.busy}
+          title={create ? `New ${resource.label.singular.toLowerCase()}` : undefined}
           onSave={() => void onSave()}
           onDiscard={() => form.reset(values)}
           status={
@@ -310,7 +311,7 @@ export function EditorPage({ resource, id }: { resource: AnyResource; id?: strin
       )}
       <PageHeader
         title={title}
-        subtitle={status && <Badge tone={status.tone}>{status.label}</Badge>}
+        badge={status && !create && <Badge tone={status.tone}>{status.label}</Badge>}
         back={{ label: resource.label.plural, onClick: () => go(resource.routes.list) }}
         actions={<CommandButtons ids={primary ? [...more, primary] : more} ctx={ctx} primaryLast={!!primary} onResult={applyResult} />}
       />

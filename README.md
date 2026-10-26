@@ -69,6 +69,10 @@ Testing and release, end to end: `docs/engineering/testing-and-release.md`.
 
 Husky runs three hooks: `pre-commit` (prettier + eslint on staged files), `commit-msg` (`[Feature|Bugfix|Hotfix]: one line`), `pre-push` (typecheck, lint, format check, tests, build). Rules in CLAUDE.md › Git rules.
 
+## Design
+
+The UI is the Ratio admin design (blue, Inter, 240px sidebar, Arya) ported from `naman-prima/ratio-website`'s `/admin` into `src/ui` as closed components. Surfaces (list, editor, detail, home, login, settings sheet, Arya panel, ⌘K) are generated from the registry and styled by the kit; no page was copied. Tokens: `config/tailwind.js`; base styles and the design's `.a-ring` / `.a-card` / Arya gradients: `src/main.css`.
+
 ## Repo layout
 
 Tool config lives in `config/` (eslint, prettier, tailwind, postcss, vite, vitest setup, plop); npm scripts pass the paths. Root keeps only package.json, tsconfig.json, index.html and the docs people read first.

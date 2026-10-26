@@ -24,7 +24,7 @@ describe('ListPage (products) through all layers', () => {
     expect(await screen.findByText('Blue Cotton Shirt', {}, { timeout: 4000 })).toBeInTheDocument();
     expect(screen.getByText('50 in stock for 3 variants')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Products' })).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByText('1–6 of 6')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('1 – 6 of 6 results')).toBeInTheDocument());
   });
 
   it('applies the view from the URL (draft tab shows only drafts)', async () => {

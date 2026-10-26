@@ -30,11 +30,13 @@ export const JobsIndicator = () => {
   if (jobs.length === 0) return null;
   return (
     <Popover
-      trigger={
-        <span className="text-sm">
+      up
+      align="left"
+      trigger={(open, toggle) => (
+        <Button variant="ghost" aria-expanded={open} onClick={toggle} icon="clock">
           {jobs.length} job{jobs.length === 1 ? '' : 's'} running
-        </span>
-      }
+        </Button>
+      )}
     >
       <div className="w-72 divide-y divide-line">
         {jobs.map((j) => (

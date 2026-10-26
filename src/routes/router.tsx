@@ -14,6 +14,7 @@ import { LoginPage } from './flows/LoginPage';
 import { PickStorePage } from './flows/PickStorePage';
 import { NoAccessPage } from './flows/NoAccessPage';
 import { AppPage } from './flows/AppPage';
+import { HomePage } from './flows/HomePage';
 
 const rootRoute = createRootRoute({ component: () => <Outlet />, errorComponent: RouteErrorCard });
 
@@ -21,7 +22,7 @@ const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
   beforeLoad: () => {
-    throw redirect({ href: '/store/demo-store/products' });
+    throw redirect({ href: `/store/${getStoreId()}` });
   },
 });
 
@@ -39,13 +40,8 @@ const storeRoute = createRoute({
   component: StoreLayout,
   errorComponent: RouteErrorCard,
 });
-const storeIndex = createRoute({
-  getParentRoute: () => storeRoute,
-  path: '/',
-  beforeLoad: ({ params }) => {
-    throw redirect({ href: `/store/${params.storeId}/products` });
-  },
-});
+/** Home (design: ReturningHome): metrics, Arya hero, action cards. */
+const storeIndex = createRoute({ getParentRoute: () => storeRoute, path: '/', component: HomePage });
 
 /** List, editor and create routes are generated from the registry. Flow routes are written by hand beside them. */
 const search = (s: Record<string, unknown>) => s as Record<string, string | undefined>;

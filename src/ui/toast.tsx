@@ -18,12 +18,16 @@ export const toast = (message: string, tone: Tone = 'default') => {
   const t = { id: ++seq, message, tone };
   toasts = [...toasts, t];
   notify();
-  setTimeout(() => {
-    toasts = toasts.filter((x) => x.id !== t.id);
-    notify();
-  }, 4000);
+  setTimeout(
+    () => {
+      toasts = toasts.filter((x) => x.id !== t.id);
+      notify();
+    },
+    tone === 'default' ? 3200 : 5000,
+  );
 };
 
+/** Dark pill, bottom centre (design: shell toast). Critical and warning tones tint the pill. */
 export const Toaster = () => {
   const [items, setItems] = useState<Toast[]>([]);
   useEffect(() => {
@@ -33,17 +37,18 @@ export const Toaster = () => {
     };
   }, []);
   return (
-    <div className="pointer-events-none fixed bottom-4 right-4 z-50 flex flex-col gap-2" aria-live="polite">
+    <div className="pointer-events-none fixed inset-x-0 bottom-24 z-[90] flex flex-col items-center gap-2 lg:left-60" aria-live="polite">
       {items.map((t) => (
         <div
           key={t.id}
+          role="status"
           className={cn(
-            'pointer-events-auto rounded-lg px-4 py-2 text-sm shadow',
+            'pointer-events-auto animate-up rounded-md px-3.5 py-2.5 text-base shadow-lg',
             t.tone === 'critical'
-              ? 'bg-critical text-surface'
+              ? 'bg-a-danger text-white'
               : t.tone === 'warning'
-                ? 'bg-warning-soft text-warning'
-                : 'bg-ink text-surface',
+                ? 'bg-a-warn-bg text-a-ink-900 shadow-ring-warn'
+                : 'bg-a-ink-900 text-white',
           )}
         >
           {t.message}

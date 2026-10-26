@@ -12,6 +12,7 @@ import { segment } from './segment';
 import { discount } from './discount';
 import { discountSet } from './discountSet';
 /* plop:imports */
+import { library } from './library';
 
 /** Every resource in the admin, in nav order. Routes, sidebar, ⌘K and assistant read tools are generated from this list. */
 export const resources: AnyResource[] = [
@@ -28,6 +29,7 @@ export const resources: AnyResource[] = [
   discount,
   discountSet,
   /* plop:resources */
+  library,
 ];
 
 export const resourceByName = (name: string) => resources.find((r) => r.name === name);

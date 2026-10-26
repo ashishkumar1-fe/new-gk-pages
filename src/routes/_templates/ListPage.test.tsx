@@ -39,3 +39,19 @@ describe('ListPage (products) through all layers', () => {
     expect(screen.queryByText('Blue Cotton Shirt')).not.toBeInTheDocument();
   });
 });
+
+describe('ListPage (content library) through all layers', () => {
+  it('renders assets from the media fixture with kind pills, and filters by the Images view', async () => {
+    const router = createAppRouter(createMemoryHistory({ initialEntries: ['/store/demo-store/library?view=images'] }));
+    const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <QueryClientProvider client={qc}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>,
+    );
+    expect(await screen.findByText('Summer banner', {}, { timeout: 4000 })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Content library' })).toBeInTheDocument();
+    expect(screen.queryByText('Size guide')).not.toBeInTheDocument(); // a document, hidden by the Images view
+    expect(screen.getAllByText('Image').length).toBeGreaterThan(0);
+  });
+});

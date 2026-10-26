@@ -7,6 +7,7 @@ import { discountHandlers } from '@/api/discount/mocks';
 import { bulkopsHandlers } from '@/api/bulk-ops/mocks';
 import { mediaappsHandlers } from '@/api/media-apps/mocks';
 /* plop:imports */
+import { libraryHandlers } from '@/api/media-apps/library.mocks';
 
 export const handlers = [
   ...itemHandlers,
@@ -18,4 +19,5 @@ export const handlers = [
   ...bulkopsHandlers,
   ...mediaappsHandlers,
   /* plop:handlers */
+  ...libraryHandlers,
 ];

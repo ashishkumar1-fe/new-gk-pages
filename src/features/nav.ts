@@ -15,6 +15,7 @@ const BY_RESOURCE: Record<string, IconName> = {
   purchaseOrder: 'clipboard',
   transfer: 'switch',
   location: 'pin',
+  library: 'content',
 };
 export const navIconFor = (resource: string, fallback?: string): IconName => BY_RESOURCE[resource] ?? iconFor(fallback);
 
@@ -22,11 +23,11 @@ export const navIconFor = (resource: string, fallback?: string): IconName => BY_
 export const COMING_SOON: { after: string; label: string; icon: IconName; children?: string[] }[] = [
   { after: 'customer', label: 'Reviews', icon: 'star' },
   { after: 'customer', label: 'Growth', icon: 'growth', children: ['Scheduled events', 'Personalization'] },
-  { after: 'discount', label: 'Content', icon: 'content' },
-  { after: 'discount', label: 'Markets', icon: 'markets' },
-  { after: 'discount', label: 'Analytics', icon: 'analytics', children: ['Reports'] },
+  { after: 'library', label: 'Markets', icon: 'markets' },
+  { after: 'library', label: 'Analytics', icon: 'analytics', children: ['Reports'] },
 ];
 export const CHILD_PLACEHOLDERS: Record<string, string[]> = {
   order: ['Abandoned checkouts'],
   product: ['Gift cards'],
+  library: ['Pages', 'Blog posts'],
 };

@@ -1,8 +1,10 @@
 import type { ComponentType } from 'react';
 import type { Product } from '@/domain/product/schema';
+import type { Library } from '@/domain/library/schema';
+import { dimensions, formatBytes, kindLabel, kindTone, usedInLabel } from '@/domain/library/format';
 import { formatMoney } from '@/domain/shared/format';
 import { flags } from '@/platform/flags';
-import { Badge } from '@/ui';
+import { Badge, Thumb } from '@/ui';
 import { ExtensionPoint } from '@/extensions/ExtensionPoint';
 import { CommandButtons } from '@/routes/_templates/CommandButtons';
 import { useCommandContext } from '@/routes/_hooks/useCommandContext';
@@ -69,12 +71,58 @@ const ProductInsightsStrip = () => (flags.isOn('product-insights') ? <p classNam
 
 const OrderSummary = ({ record }: SectionProps) => <pre className="text-xs">{JSON.stringify(record, null, 2)}</pre>;
 
+/** Content library: the file itself (preview + facts). Read-only; the editor fields sit below it. */
+const AssetPreview = ({ record }: SectionProps) => {
+  const a = record as Library | undefined;
+  if (!a) return null;
+  return (
+    <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex h-48 w-full shrink-0 items-center justify-center overflow-hidden rounded-md bg-a-page sm:w-64">
+        {a.kind === 'image' ? (
+          <img src={a.url} alt={a.altText ?? ''} className="max-h-full max-w-full object-contain" />
+        ) : (
+          <Thumb src={a.thumbnailUrl} size={84} />
+        )}
+      </div>
+      <dl className="grid flex-1 gap-x-4 gap-y-1.5 text-sm" style={{ gridTemplateColumns: 'auto 1fr' }}>
+        <dt className="text-a-ink-450">File</dt>
+        <dd className="truncate font-mono text-xs text-a-ink-800">{a.fileName}</dd>
+        <dt className="text-a-ink-450">Type</dt>
+        <dd>
+          <Badge tone={kindTone(a.kind)}>{kindLabel(a.kind)}</Badge>
+        </dd>
+        <dt className="text-a-ink-450">Size</dt>
+        <dd className="tabular-nums">{formatBytes(a.sizeBytes)}</dd>
+        <dt className="text-a-ink-450">Dimensions</dt>
+        <dd className="tabular-nums">{dimensions(a)}</dd>
+        <dt className="text-a-ink-450">MIME</dt>
+        <dd className="text-a-ink-600">{a.mimeType}</dd>
+      </dl>
+    </div>
+  );
+};
+
+/** Where the asset is referenced. The count comes from the service; the per-place list lands when usage lookups are ported. */
+const AssetUsage = ({ record }: SectionProps) => {
+  const a = record as Library | undefined;
+  if (!a) return null;
+  return a.usedIn === 0 ? (
+    <p className="text-sm text-a-ink-500">Not used anywhere yet. Safe to delete.</p>
+  ) : (
+    <p className="text-sm text-a-ink-800">
+      Referenced in <b className="font-semibold">{usedInLabel(a.usedIn)}</b>. Remove it there before deleting.
+    </p>
+  );
+};
+
 export const components: Record<string, ComponentType<SectionProps>> = {
   variantsCard: VariantsCard,
   inventorySection: InventorySection,
   customFields: CustomFieldsSection,
   productInsights: ProductInsightsStrip,
   orderSummary: OrderSummary,
+  assetPreview: AssetPreview,
+  assetUsage: AssetUsage,
 };
 
 const EXTENSION_PREFIX = 'extension:';

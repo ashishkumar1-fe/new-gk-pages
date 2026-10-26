@@ -18,6 +18,7 @@ import * as discountCommands from './discount';
 import * as discountSetCommands from './discountSet';
 import * as bulkOpsCommands from './bulkOps';
 /* plop:imports */
+import * as libraryCommands from './library';
 
 /** All commands (docs/architecture/commands/registry.md). IDs are stable forever: shortcuts, extensions and assistant history bind to them. */
 export const commands: AnyCommand[] = [
@@ -40,6 +41,7 @@ export const commands: AnyCommand[] = [
   ...Object.values(discountSetCommands),
   ...Object.values(bulkOpsCommands),
   /* plop:commands */
+  ...Object.values(libraryCommands),
 ];
 
 const byId = new Map(commands.map((c) => [c.id, c]));
